@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <name>billing</name>
+        </general-data>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/2">
+            <!-- Do not use Project Properties customizer when editing this file manually. -->
+            <name>billing</name>
+            <properties/>
+            <folders>
+                <source-folder>
+                    <label>billing</label>
+                    <location>.</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>classes</label>
+                    <type>java</type>
+                    <location>classes</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>view</label>
+                    <type>doc_root</type>
+                    <location>view</location>
+                </source-folder>
+                <source-folder>
+                    <label>web</label>
+                    <type>web_inf</type>
+                    <location>descriptors/web</location>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <action name="build">
+                    <target>compile</target>
+                </action>
+                <action name="clean">
+                    <target>clean</target>
+                </action>
+                <action name="javadoc">
+                    <target>xdoclet-webgenerate</target>
+                </action>
+                <action name="test">
+                    <target>test</target>
+                </action>
+                <action name="redeploy">
+                    <target>deploy-local</target>
+                </action>
+                <action name="rebuild">
+                    <target>clean</target>
+                    <target>compile</target>
+                </action>
+            </ide-actions>
+            <view>
+                <items>
+                    <source-folder style="tree">
+                        <label>Web Pages</label>
+                        <location>view</location>
+                    </source-folder>
+                    <source-folder style="tree">
+                        <label>WEB-INF Content</label>
+                        <location>descriptors/web</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>classes</label>
+                        <location>classes</location>
+                    </source-folder>
+                    <source-file>
+                        <location>build.xml</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="build"/>
+                    <ide-action name="rebuild"/>
+                    <ide-action name="clean"/>
+                    <ide-action name="javadoc"/>
+                    <ide-action name="redeploy"/>
+                    <ide-action name="test"/>
+                </context-menu>
+            </view>
+            <subprojects/>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/1">
+            <compilation-unit>
+                <package-root>classes</package-root>
+                <classpath mode="compile">jars/activemq-all.jar;jars/activemq-pool.jar;jars/antlr-runtime.jar;jars/antlr.jar;jars/asm.jar;jars/barcode4j-light.jar;jars/c3p0.jar;jars/cglib.jar;jars/commons-beanutils.jar;jars/commons-codec.jar;jars/commons-collections.jar;jars/commons-digester.jar;jars/commons-fileupload.jar;jars/commons-httpclient.jar;jars/commons-io.jar;jars/commons-lang.jar;jars/commons-logging.jar;jars/commons-net.jar;jars/commons-pool.jar;jars/commons-validator.jar;jars/cxf.jar;jars/dom4j.jar;jars/drools-api.jar;jars/drools-compiler.jar;jars/drools-core.jar;jars/ehcache.jar;jars/ejb3-persistence.jar;jars/FastInfoset.jar;jars/hessian.jar;jars/hibernate-annotations.jar;jars/hibernate-commons-annotations.jar;jars/hibernate-validator.jar;jars/hibernate3.jar;jars/hsqldb.jar;jars/itext.jar;jars/jakarta-oro.jar;jars/jasperreports.jar;jars/javassist.jar;jars/joda-time.jar;jars/jstl.jar;jars/jta.jar;jars/log4j.jar;jars/mail.jar;jars/mvel2.jar;jars/neethi.jar;jars/paypal_base.jar;jars/postgresql.jdbc4.jar;jars/quartz.jar;jars/rowset.jar;jars/slf4j-api.jar;jars/slf4j-log4j12.jar;jars/spring-modules-cache.jar;jars/spring-webmvc.jar;jars/spring.jar;jars/standard.jar;jars/struts.jar;jars/taglibs-session.jar;jars/velocity-tools-generic.jar;jars/velocity.jar;jars/wsdl4j.jar;jars/xmlrpc-client.jar;jars/xmlrpc-common.jar;jars/xmlrpc-server.jar;jars/XmlSchema.jar;C:\jDev\jbilling\lib\annotations-api.jar;C:\jDev\jbilling\lib\catalina-ant.jar;C:\jDev\jbilling\lib\catalina-ha.jar;C:\jDev\jbilling\lib\catalina-tribes.jar;C:\jDev\jbilling\lib\catalina.jar;C:\jDev\jbilling\lib\el-api.jar;C:\jDev\jbilling\lib\hsqldb.jar;C:\jDev\jbilling\lib\jasper-el.jar;C:\jDev\jbilling\lib\jasper-jdt.jar;C:\jDev\jbilling\lib\jasper.jar;C:\jDev\jbilling\lib\jboss-faces.jar;C:\jDev\jbilling\lib\jsf-api.jar;C:\jDev\jbilling\lib\jsf-impl.jar;C:\jDev\jbilling\lib\jsp-api.jar;C:\jDev\jbilling\lib\mysql-connector-java-5.1.13-bin.jar;C:\jDev\jbilling\lib\payflow.jar;C:\jDev\jbilling\lib\servlet-api.jar;C:\jDev\jbilling\lib\tomcat-coyote.jar;C:\jDev\jbilling\lib\tomcat-dbcp.jar;C:\jDev\jbilling\lib\tomcat-i18n-es.jar;C:\jDev\jbilling\lib\tomcat-i18n-fr.jar;C:\jDev\jbilling\lib\tomcat-i18n-ja.jar</classpath>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+        </java-data>
+        <web-data xmlns="http://www.netbeans.org/ns/freeform-project-web/2">
+            <web-module>
+                <doc-root>view</doc-root>
+                <classpath/>
+                <context-path/>
+                <j2ee-spec-level>1.5</j2ee-spec-level>
+                <web-inf>descriptors/web</web-inf>
+            </web-module>
+        </web-data>
+    </configuration>
+</project>
