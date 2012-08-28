@@ -267,7 +267,11 @@ public class InvoiceBL extends ResultList implements Serializable, InvoiceSQL {
             lineToAdd.setIsPercentage(new Integer(0));
             if (lineToAdd.getItem() != null) {
                 try {
-                    ItemBL item = new ItemBL(lineToAdd.getItem());
+                    // when Invoice line is created product Item added
+                    // to line using only item id, hence all other Item
+                    // details is missing from Invoice Line
+                    // hence persantage in item never identified true
+                    ItemBL item = new ItemBL(lineToAdd.getItem().getId());
                     if (item.getEntity().getPercentage() != null) {
                         lineToAdd.setIsPercentage(new Integer(1));
                     }
