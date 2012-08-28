@@ -1,23 +1,22 @@
 /*
-    jBilling - The Enterprise Open Source Billing System
-    Copyright (C) 2003-2009 Enterprise jBilling Software Ltd. and Emiliano Conde
+ jBilling - The Enterprise Open Source Billing System
+ Copyright (C) 2003-2009 Enterprise jBilling Software Ltd. and Emiliano Conde
 
-    This file is part of jbilling.
+ This file is part of jbilling.
 
-    jbilling is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ jbilling is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    jbilling is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
+ jbilling is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-    You should have received a copy of the GNU Affero General Public License
-    along with jbilling.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU Affero General Public License
+ along with jbilling.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.sapienter.jbilling.server.util.api;
 
 import java.math.BigDecimal;
@@ -40,6 +39,7 @@ import com.sapienter.jbilling.server.entity.AchDTO;
 import com.sapienter.jbilling.server.entity.CreditCardDTO;
 
 public interface JbillingAPI {
+
     public InvoiceWS getInvoiceWS(Integer invoiceId)
             throws JbillingAPIException;
 
@@ -51,13 +51,13 @@ public interface JbillingAPI {
 
     public Integer[] getInvoicesByDate(String since, String until)
             throws JbillingAPIException;
-    
-    public Integer getAutoPaymentType(Integer userId) throws JbillingAPIException;
-    
-    public void setAutoPaymentType(Integer userId, Integer autoPaymentType, boolean use)
-    		throws JbillingAPIException;
 
-    public Integer[] getUserInvoicesByDate(Integer userId, String since, 
+    public Integer getAutoPaymentType(Integer userId) throws JbillingAPIException;
+
+    public void setAutoPaymentType(Integer userId, Integer autoPaymentType, boolean use)
+            throws JbillingAPIException;
+
+    public Integer[] getUserInvoicesByDate(Integer userId, String since,
             String until) throws JbillingAPIException;
 
     public Integer[] createInvoice(Integer userId, boolean onlyRecurring)
@@ -85,7 +85,7 @@ public interface JbillingAPI {
             throws JbillingAPIException;
 
     public Integer[] getUsersByCreditCard(String number)
-        throws JbillingAPIException;
+            throws JbillingAPIException;
 
     public Integer[] getUsersNotInStatus(Integer statusId)
             throws JbillingAPIException;
@@ -101,9 +101,9 @@ public interface JbillingAPI {
 
     public void updateCreditCard(Integer userId, CreditCardDTO creditCard)
             throws JbillingAPIException;
-    
+
     public void updateAch(Integer userId, AchDTO ach)
-    		throws JbillingAPIException;
+            throws JbillingAPIException;
 
     public PaymentAuthorizationDTOEx createOrderPreAuthorize(OrderWS order)
             throws JbillingAPIException;
@@ -131,11 +131,11 @@ public interface JbillingAPI {
 
     public void deleteOrder(Integer id) throws JbillingAPIException;
 
-    public OrderWS getCurrentOrder(Integer userId, Date date) 
+    public OrderWS getCurrentOrder(Integer userId, Date date)
             throws JbillingAPIException;
 
-    public OrderWS updateCurrentOrder(Integer userId, OrderLineWS[] lines, 
-            PricingField[] fields, Date date, String eventDescription) 
+    public OrderWS updateCurrentOrder(Integer userId, OrderLineWS[] lines,
+            PricingField[] fields, Date date, String eventDescription)
             throws JbillingAPIException;
 
     public Integer applyPayment(PaymentWS payment, Integer invoiceId)
@@ -161,20 +161,19 @@ public interface JbillingAPI {
 
     public Integer authenticate(String username, String password)
             throws JbillingAPIException;
-    
+
     public ItemDTOEx getItem(Integer itemId, Integer userId, PricingField[] fields)
-    		throws JbillingAPIException;
+            throws JbillingAPIException;
 
     public OrderWS rateOrder(OrderWS order) throws JbillingAPIException;
 
     public OrderWS[] rateOrders(OrderWS orders[]) throws JbillingAPIException;
-    
+
     public void updateItem(ItemDTOEx item) throws JbillingAPIException;
-    
+
     // "byItemType" routines:
-    
     public OrderWS getLatestOrderByItemType(Integer userId, Integer itemTypeId) throws JbillingAPIException;
-    
+
     public InvoiceWS getLatestInvoiceByItemType(Integer userId, Integer itemTypeId) throws JbillingAPIException;
 
     public Integer[] getLastInvoicesByItemType(Integer userId, Integer itemTypeId, Integer number) throws JbillingAPIException;
@@ -182,7 +181,7 @@ public interface JbillingAPI {
     public Integer[] getLastOrdersByItemType(Integer userId, Integer itemTypeId, Integer number) throws JbillingAPIException;
 
     public BigDecimal isUserSubscribedTo(Integer userId, Integer itemId) throws JbillingAPIException;
-    
+
     public Integer[] getUserItemsByCategory(Integer userId, Integer categoryId) throws JbillingAPIException;
 
     public ItemDTOEx[] getItemByCategory(Integer itemTypeId) throws JbillingAPIException;
@@ -200,4 +199,17 @@ public interface JbillingAPI {
     void updateItemCategory(ItemTypeWS itemType) throws JbillingAPIException;
 
     public void generateRules(String rulesData) throws JbillingAPIException;
+
+    /*-------------------------------------------------------------------------
+     * Added NEW APIs
+     *-------------------------------------------------------------------------
+     */
+    /**
+     * Retrieves a list of all {@link UserWS users} in a given status.
+     *
+     * @param statusId the status id that will be used for extraction
+     * @return an array of <code>UserWS</code> objects in a given status.
+     * @throws JbillingAPIException
+     */
+    public UserWS[] getUserListInStatus(Integer statusId) throws JbillingAPIException;
 }

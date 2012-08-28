@@ -1,22 +1,22 @@
 /*
-    jBilling - The Enterprise Open Source Billing System
-    Copyright (C) 2003-2009 Enterprise jBilling Software Ltd. and Emiliano Conde
+ jBilling - The Enterprise Open Source Billing System
+ Copyright (C) 2003-2009 Enterprise jBilling Software Ltd. and Emiliano Conde
 
-    This file is part of jbilling.
+ This file is part of jbilling.
 
-    jbilling is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ jbilling is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    jbilling is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
+ jbilling is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-    You should have received a copy of the GNU Affero General Public License
-    along with jbilling.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with jbilling.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /*
  * Created on Jan 27, 2005
@@ -114,8 +114,8 @@ import com.sapienter.jbilling.server.util.api.WebServicesConstants;
 import com.sapienter.jbilling.server.util.audit.EventLogger;
 import com.sapienter.jbilling.server.util.db.CurrencyDAS;
 
-@Transactional( propagation = Propagation.REQUIRED )
-@WebService( endpointInterface = "com.sapienter.jbilling.server.util.IWebServicesSessionBean" )
+@Transactional( propagation = Propagation.REQUIRED)
+@WebService( endpointInterface = "com.sapienter.jbilling.server.util.IWebServicesSessionBean")
 public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
     private static final Logger LOG = Logger.getLogger(WebServicesSessionSpringBean.class);
@@ -151,8 +151,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             }
             return retValue;
         } catch (Exception e) { // needed because the sql exception :(
-            LOG.error("Exception in web service: getting latest invoice" +
-                    " for user " + userId, e);
+            LOG.error("Exception in web service: getting latest invoice"
+                    + " for user " + userId, e);
             throw new SessionInternalError("Error getting latest invoice");
         }
     }
@@ -181,8 +181,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             InvoiceBL invoiceBl = new InvoiceBL();
             return invoiceBl.getInvoicesByCreateDateArray(entityId, dSince, dUntil);
         } catch (Exception e) { // needed for the SQLException :(
-            LOG.error("Exception in web service: getting invoices by date" +
-                    since + until, e);
+            LOG.error("Exception in web service: getting invoices by date"
+                    + since + until, e);
             throw new SessionInternalError("Error getting last invoices");
         }
     }
@@ -190,7 +190,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     /**
      * Returns the invoices for the user within the given date range.
      */
-    public Integer[] getUserInvoicesByDate(Integer userId, String since, 
+    public Integer[] getUserInvoicesByDate(Integer userId, String since,
             String until) throws SessionInternalError {
         if (userId == null || since == null || until == null) {
             return null;
@@ -208,9 +208,9 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Deletes an invoice 
-     * @param invoiceId
-     * The id of the invoice to delete
+     * Deletes an invoice
+     *
+     * @param invoiceId The id of the invoice to delete
      */
     public void deleteInvoice(Integer invoiceId) {
         Integer executorId = getCallerId();
@@ -219,9 +219,9 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Generates invoices for orders not yet invoiced for this user.
-     * Optionally only allow recurring orders to generate invoices. 
-     * Returns the ids of the invoices generated. 
+     * Generates invoices for orders not yet invoiced for this user. Optionally
+     * only allow recurring orders to generate invoices. Returns the ids of the
+     * invoices generated.
      */
     public Integer[] createInvoice(Integer userId, boolean onlyRecurring)
             throws SessionInternalError {
@@ -261,14 +261,14 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * USERS
      */
     /**
-     * Creates a new user. The user to be created has to be of the roles customer
-     * or partner.
-     * The username has to be unique, otherwise the creating won't go through. If 
-     * that is the case, the return value will be null.
-     * @param newUser 
-     * The user object with all the information of the new user. If contact or 
-     * credit card information are present, they will be included in the creation
-     * although they are not mandatory.
+     * Creates a new user. The user to be created has to be of the roles
+     * customer or partner. The username has to be unique, otherwise the
+     * creating won't go through. If that is the case, the return value will be
+     * null.
+     *
+     * @param newUser The user object with all the information of the new user.
+     * If contact or credit card information are present, they will be included
+     * in the creation although they are not mandatory.
      * @return The id of the new user, or null if non was created
      */
     public Integer createUser(UserWS newUser)
@@ -301,13 +301,13 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                 UserDTO userD = new UserDAS().find(userId);
                 userD.getCreditCards().add(ccBL.getEntity());
             }
-            
+
             if (newUser.getAch() != null) {
-            	AchDTO ach = new AchDTO(newUser.getAch());
-            	ach.setId(0);
-            	ach.setBaseUser(bl.getEntity());
-            	AchBL abl = new AchBL();
-            	abl.create(ach);
+                AchDTO ach = new AchDTO(newUser.getAch());
+                ach.setId(0);
+                ach.setBaseUser(bl.getEntity());
+                AchBL abl = new AchBL();
+                abl.create(ach);
             }
             return userId;
         }
@@ -329,7 +329,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * @param user 
+     * @param user
      */
     public void updateUser(UserWS user)
             throws SessionInternalError {
@@ -378,9 +378,9 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Retrieves a user with its contact and credit card information. 
-     * @param userId
-     * The id of the user to be returned
+     * Retrieves a user with its contact and credit card information.
+     *
+     * @param userId The id of the user to be returned
      */
     public UserWS getUserWS(Integer userId)
             throws SessionInternalError {
@@ -395,9 +395,9 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Retrieves all the contacts of a user 
-     * @param userId
-     * The id of the user to be returned
+     * Retrieves all the contacts of a user
+     *
+     * @param userId The id of the user to be returned
      */
     public ContactWS[] getUserContactsWS(Integer userId)
             throws SessionInternalError {
@@ -413,7 +413,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Retrieves the user id for the given username 
+     * Retrieves the user id for the given username
      */
     public Integer getUserId(String username)
             throws SessionInternalError {
@@ -424,7 +424,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Retrieves an array of users in the required status 
+     * Retrieves an array of users in the required status
      */
     public Integer[] getUsersInStatus(Integer statusId) throws SessionInternalError {
         Integer entityId = getCallerCompanyId();
@@ -432,7 +432,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Retrieves an array of users in the required status 
+     * Retrieves an array of users in the required status
      */
     public Integer[] getUsersNotInStatus(Integer statusId)
             throws SessionInternalError {
@@ -441,7 +441,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Retrieves an array of users in the required status 
+     * Retrieves an array of users in the required status
      */
     public Integer[] getUsersByCustomField(Integer typeId, String value)
             throws SessionInternalError {
@@ -466,15 +466,15 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     private Integer[] getByCCNumber(Integer entityId, String number) {
-    	List<Integer> usersIds = new CreditCardDAS().findByLastDigits(entityId, number);
-        
+        List<Integer> usersIds = new CreditCardDAS().findByLastDigits(entityId, number);
+
         Integer[] ids = new Integer[usersIds.size()];
         return usersIds.toArray(ids);
-        
+
     }
-    
+
     /**
-     * Retrieves an array of users in the required status 
+     * Retrieves an array of users in the required status
      */
     public Integer[] getUsersByCreditCard(String number) throws SessionInternalError {
         Integer entityId = getCallerCompanyId();
@@ -484,7 +484,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Retrieves an array of users in the required status 
+     * Retrieves an array of users in the required status
      */
     public Integer[] getUsersByStatus(Integer statusId, Integer entityId,
             boolean in)
@@ -507,9 +507,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Creates a user, then an order for it, an invoice out the order
-     * and tries the invoice to be paid by an online payment
-     * This is ... the mega call !!! 
+     * Creates a user, then an order for it, an invoice out the order and tries
+     * the invoice to be paid by an online payment This is ... the mega call !!!
      */
     public CreateResponseWS create(UserWS user, OrderWS order)
             throws SessionInternalError {
@@ -557,11 +556,12 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
     /**
      * Validates the credentials and returns if the user can login or not
+     *
      * @param username
      * @param password
-     * @return
-     * 0 if the user can login (success), or grater than 0 if the user can not login.
-     * See the constants in WebServicesConstants (AUTH*) for details.
+     * @return 0 if the user can login (success), or grater than 0 if the user
+     * can not login. See the constants in WebServicesConstants (AUTH*) for
+     * details.
      * @throws SessionInternalError
      */
     public Integer authenticate(String username, String password)
@@ -595,14 +595,14 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     /**
      * Pays given invoice, using the first credit card available for invoice'd
      * user.
-     * 
-     * @return <code>null</code> if invoice has not positive balance, or if
-     *         user does not have credit card
-     * @return resulting authorization record. The payment itself can be found by
-     * calling getLatestPayment
+     *
+     * @return <code>null</code> if invoice has not positive balance, or if user
+     * does not have credit card
+     * @return resulting authorization record. The payment itself can be found
+     * by calling getLatestPayment
      */
     public PaymentAuthorizationDTOEx payInvoice(Integer invoiceId) throws SessionInternalError {
-        
+
         if (invoiceId == null) {
             throw new SessionInternalError("Can not pay null invoice");
         }
@@ -614,27 +614,26 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         }
 
         PaymentDTOEx payment = doPayInvoice(invoice, creditCard);
-        
+
         PaymentAuthorizationDTOEx result = null;
         if (payment != null) {
             result = new PaymentAuthorizationDTOEx(payment.getAuthorization().getOldDTO());
             result.setResult(new Integer(payment.getPaymentResult().getId()).equals(Constants.RESULT_OK));
         }
-        
+
         return result;
     }
 
     /**
      * Updates a user's credit card.
-     * @param userId
-     * The id of the user updating credit card data.
-     * @param creditCard
-     * The credit card data to be updated. 
+     *
+     * @param userId The id of the user updating credit card data.
+     * @param creditCard The credit card data to be updated.
      */
     public void updateCreditCard(Integer userId, com.sapienter.jbilling.server.entity.CreditCardDTO creditCard)
             throws SessionInternalError {
-        if (creditCard != null && (creditCard.getName() == null ||
-                creditCard.getExpiry() == null)) {
+        if (creditCard != null && (creditCard.getName() == null
+                || creditCard.getExpiry() == null)) {
             LOG.debug("WS - updateCreditCard: " + "credit card validation error.");
             throw new SessionInternalError("Missing cc data.");
         }
@@ -652,8 +651,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * ORDERS
      */
     /**
-     * @return the information of the payment aurhotization, or NULL if the 
-     * user does not have a credit card
+     * @return the information of the payment aurhotization, or NULL if the user
+     * does not have a credit card
      */
     public PaymentAuthorizationDTOEx createOrderPreAuthorize(OrderWS order)
             throws SessionInternalError {
@@ -694,9 +693,9 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         return ordr;
     }
 
-    public OrderWS[] rateOrders(OrderWS orders[]) 
+    public OrderWS[] rateOrders(OrderWS orders[])
             throws SessionInternalError {
-        
+
         if (orders == null || orders.length == 0) {
             LOG.debug("Call to rateOrders without orders to rate");
             return null;
@@ -704,7 +703,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
         OrderWS retValue[] = new OrderWS[orders.length];
         for (int index = 0; index < orders.length; index++) {
-            retValue[index] = doCreateOrder(orders[index],false);
+            retValue[index] = doCreateOrder(orders[index], false);
         }
         return retValue;
     }
@@ -733,7 +732,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     private void processItemLine(OrderLineWS[] lines, Integer languageId,
-            Integer entityId, Integer userId, Integer currencyId, 
+            Integer entityId, Integer userId, Integer currencyId,
             String pricingFields)
             throws SessionInternalError, PluggableTaskException, TaskException {
         for (OrderLineWS line : lines) {
@@ -760,8 +759,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                 } else {
                     line.setPrice(item.getPrice());
                 }
-                if (line.getDescription() == null ||
-                        line.getDescription().length() == 0) {
+                if (line.getDescription() == null
+                        || line.getDescription().length() == 0) {
                     line.setDescription(item.getDescription());
                 }
             }
@@ -783,8 +782,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             Integer languageId = bl.getEntity().getLanguageIdField();
 
             // see if the related items should provide info
-            processItemLine(order.getOrderLines(), languageId, entityId, 
-                    order.getUserId(), order.getCurrencyId(), 
+            processItemLine(order.getOrderLines(), languageId, entityId,
+                    order.getUserId(), order.getCurrencyId(),
                     order.getPricingFields());
 
             // do some transformation from WS to DTO :(
@@ -804,7 +803,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     public OrderWS getOrder(Integer orderId) throws SessionInternalError {
-            // get the info from the caller
+        // get the info from the caller
         UserBL userbl = new UserBL(getCallerId());
         Integer languageId = userbl.getEntity().getLanguageIdField();
 
@@ -842,7 +841,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     public void updateOrderLine(OrderLineWS line) throws SessionInternalError {
-            // now get the order
+        // now get the order
         OrderBL bl = new OrderBL();
         bl.updateOrderLine(line);
     }
@@ -885,8 +884,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Returns the current one-time order for this user for the given 
-     * date. Returns null for users with no main subscription order.
+     * Returns the current one-time order for this user for the given date.
+     * Returns null for users with no main subscription order.
      */
     public OrderWS getCurrentOrder(Integer userId, Date date) {
         OrderWS retValue = null;
@@ -904,18 +903,18 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Updates the uesr's current one-time order for the given date.
-     * Returns the updated current order. Throws an exception for 
-     * users with no main subscription order.
+     * Updates the uesr's current one-time order for the given date. Returns the
+     * updated current order. Throws an exception for users with no main
+     * subscription order.
      */
-    public OrderWS updateCurrentOrder(Integer userId, OrderLineWS[] lines, 
+    public OrderWS updateCurrentOrder(Integer userId, OrderLineWS[] lines,
             String pricing, Date date, String eventDescription) {
         try {
             UserBL userbl = new UserBL(userId);
             // check user has a main subscription order
             if (userbl.getEntity().getCustomer().getCurrentOrderId() == null) {
-                throw new SessionInternalError("No main subscription order " +
-                        "for userId: " + userId);
+                throw new SessionInternalError("No main subscription order "
+                        + "for userId: " + userId);
             }
 
             // get currency from the user
@@ -946,17 +945,17 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                         true));
                 List<OrderLineDTO> oldLines = OrderLineBL.copy(bl.getDTO().getLines());
                 // convert order lines from WS to DTO
-                processItemLine(lines, languageId, getCallerCompanyId(), 
+                processItemLine(lines, languageId, getCallerCompanyId(),
                         userId, currencyId, pricing);
 
                 for (OrderLineWS line : lines) {
                     // add the line to the current order
                     bl.addItem(line.getItemId(), line.getQuantityAsDecimal(), languageId, userId, getCallerCompanyId(),
-                               currencyId, records);
+                            currencyId, records);
                 }
                 diffLines = OrderLineBL.diffOrderLines(oldLines, bl.getDTO().getLines());
                 // generate NewQuantityEvents
-                bl.checkOrderLineQuantities(oldLines, bl.getDTO().getLines(), 
+                bl.checkOrderLineQuantities(oldLines, bl.getDTO().getLines(),
                         getCallerCompanyId(), bl.getDTO().getId(), true);
 
             } else if (records != null) {
@@ -982,28 +981,28 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
                 // the mediation process might not have anything for you...
                 if (result.getCurrentOrder() == null) {
-                    LOG.debug("Call to updateOrder did not resolve to a current order lines = " +
-                            Arrays.toString(lines) + " fields= " + Arrays.toString(fieldsArray));
+                    LOG.debug("Call to updateOrder did not resolve to a current order lines = "
+                            + Arrays.toString(lines) + " fields= " + Arrays.toString(fieldsArray));
                     return null;
                 }
                 bl.set(result.getCurrentOrder());
             } else {
-                throw new SessionInternalError("Both the order lines and " +
-                        "pricing fields were null. At least one of either " +
-                        "must be provided.");
+                throw new SessionInternalError("Both the order lines and "
+                        + "pricing fields were null. At least one of either "
+                        + "must be provided.");
             }
 
             // save the event
             // assign to record DONE and BILLABLE status
             MediationRecordStatusDTO status = new MediationRecordStatusDAS().find(Constants.MEDIATION_RECORD_STATUS_DONE_AND_BILLABLE);
             MediationRecordDTO record = new MediationRecordDTO(String.valueOf(date.getTime()),
-                                                               new Date(),
-                                                               null,
-                                                               status);
+                    new Date(),
+                    null,
+                    status);
             record = new MediationRecordDAS().save(record);
 
             IMediationSessionBean mediation = (IMediationSessionBean) Context.getBean(Context.Name.MEDIATION_SESSION);
-            mediation.saveEventRecordLines(new ArrayList<OrderLineDTO>(diffLines), record, date,eventDescription);
+            mediation.saveEventRecordLines(new ArrayList<OrderLineDTO>(diffLines), record, date, eventDescription);
 
             // return the updated order
             return bl.getWS(languageId);
@@ -1084,7 +1083,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Retrieves an array of items for the caller's entity. 
+     * Retrieves an array of items for the caller's entity.
+     *
      * @return an array of items from the caller's entity
      */
     public ItemDTOEx[] getAllItems() throws SessionInternalError {
@@ -1097,17 +1097,18 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * Implementation of the User Transitions List webservice. This accepts a
      * start and end date as arguments, and produces an array of data containing
      * the user transitions logged in the requested time range.
-     * @param from Date indicating the lower limit for the extraction of transition
-     * logs. It can be <code>null</code>, in such a case, the extraction will start
-     * where the last extraction left off. If no extractions have been done so far and
-     * this parameter is null, the function will extract from the oldest transition
-     * logged.
-     * @param to Date indicatin the upper limit for the extraction of transition logs.
-     * It can be <code>null</code>, in which case the extraction will have no upper
-     * limit. 
-     * @return UserTransitionResponseWS[] an array of objects containing the result
-     * of the extraction, or <code>null</code> if there is no data thas satisfies
-     * the extraction parameters.
+     *
+     * @param from Date indicating the lower limit for the extraction of
+     * transition logs. It can be <code>null</code>, in such a case, the
+     * extraction will start where the last extraction left off. If no
+     * extractions have been done so far and this parameter is null, the
+     * function will extract from the oldest transition logged.
+     * @param to Date indicatin the upper limit for the extraction of transition
+     * logs. It can be <code>null</code>, in which case the extraction will have
+     * no upper limit.
+     * @return UserTransitionResponseWS[] an array of objects containing the
+     * result of the extraction, or <code>null</code> if there is no data thas
+     * satisfies the extraction parameters.
      */
     public UserTransitionResponseWS[] getUserTransitions(Date from, Date to)
             throws SessionInternalError {
@@ -1149,9 +1150,9 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * @return UserTransitionResponseWS[] an array of objects containing the result
-     * of the extraction, or <code>null</code> if there is no data thas satisfies
-     * the extraction parameters.
+     * @return UserTransitionResponseWS[] an array of objects containing the
+     * result of the extraction, or <code>null</code> if there is no data thas
+     * satisfies the extraction parameters.
      */
     public UserTransitionResponseWS[] getUserTransitionsAfterId(Integer id)
             throws SessionInternalError {
@@ -1199,14 +1200,14 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         // use the currency of the given user if provided, otherwise
         // default to the currency of the caller (admin user)
         Integer currencyId = (userId != null
-                              ? new UserBL(userId).getCurrencyId()
-                              : caller.getCurrencyId());
+                ? new UserBL(userId).getCurrencyId()
+                : caller.getCurrencyId());
 
         ItemDTOEx retValue = helper.getWS(helper.getDTO(languageId, userId, entityId, currencyId));
         return retValue;
     }
 
-    public Integer createItemCategory(ItemTypeWS itemType) 
+    public Integer createItemCategory(ItemTypeWS itemType)
             throws SessionInternalError {
 
         UserBL bl = new UserBL(getCallerId());
@@ -1270,8 +1271,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         newUser.setLanguageId(zero2null(newUser.getLanguageId()));
         newUser.setStatusId(zero2null(newUser.getStatusId()));
         // clean up the cc number from spaces and '-'
-        if (newUser.getCreditCard() != null &&
-                newUser.getCreditCard().getNumber() != null) {
+        if (newUser.getCreditCard() != null
+                && newUser.getCreditCard().getNumber() != null) {
             newUser.getCreditCard().setNumber(CreditCardBL.cleanUpNumber(
                     newUser.getCreditCard().getNumber()));
         }
@@ -1292,14 +1293,14 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                 throw new SessionInternalError(valid.getText());
             }
             // additional validation
-            if (newUser.getMainRoleId().equals(Constants.TYPE_CUSTOMER) ||
-                    newUser.getMainRoleId().equals(Constants.TYPE_PARTNER)) {
+            if (newUser.getMainRoleId().equals(Constants.TYPE_CUSTOMER)
+                    || newUser.getMainRoleId().equals(Constants.TYPE_PARTNER)) {
             } else {
-                throw new SessionInternalError("Valid user roles are customer (5) " +
-                        "and partner (4)");
+                throw new SessionInternalError("Valid user roles are customer (5) "
+                        + "and partner (4)");
             }
-            if (newUser.getCurrencyId() != null &&
-                    newUser.getCurrencyId().intValue() <= 0) {
+            if (newUser.getCurrencyId() != null
+                    && newUser.getCurrencyId().intValue() <= 0) {
                 throw new SessionInternalError("Invalid currency code");
             }
             if (newUser.getStatusId().intValue() <= 0) {
@@ -1354,25 +1355,25 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                 String error = "";
                 // if use the item, I need the item id
                 if (line.getUseItem().booleanValue()) {
-                    if (line.getItemId() == null ||
-                            line.getItemId().intValue() == 0) {
-                        error += "OrderLineWS: if useItem == true the itemId " +
-                                "is required - ";
+                    if (line.getItemId() == null
+                            || line.getItemId().intValue() == 0) {
+                        error += "OrderLineWS: if useItem == true the itemId "
+                                + "is required - ";
                     }
                     if (line.getQuantityAsDecimal() == null || BigDecimal.ZERO.compareTo(line.getQuantityAsDecimal()) == 0) {
-                        error += "OrderLineWS: if useItem == true the quantity " +
-                                "is required - ";
+                        error += "OrderLineWS: if useItem == true the quantity "
+                                + "is required - ";
                     }
                 } else {
                     // I need the amount and description
                     if (line.getAmount() == null) {
-                        error += "OrderLineWS: if useItem == false the item amount " +
-                                "is required - ";
+                        error += "OrderLineWS: if useItem == false the item amount "
+                                + "is required - ";
                     }
-                    if (line.getDescription() == null ||
-                            line.getDescription().length() == 0) {
-                        error += "OrderLineWS: if useItem == false the description " +
-                                "is required - ";
+                    if (line.getDescription() == null
+                            || line.getDescription().length() == 0) {
+                        error += "OrderLineWS: if useItem == false the description "
+                                + "is required - ";
                     }
                 }
                 if (error.length() > 0) {
@@ -1512,7 +1513,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         // see if the related items should provide info
         try {
             processItemLine(order.getOrderLines(), languageId, entityId,
-                    order.getUserId(), order.getCurrencyId(), 
+                    order.getUserId(), order.getCurrencyId(),
                     order.getPricingFields());
         } catch (Exception e) {
             throw new SessionInternalError(e);
@@ -1542,7 +1543,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                     preferenceBL.set(entityId, Constants.PREFERENCE_USE_CURRENT_ORDER);
                 } catch (EmptyResultDataAccessException e) {
                     // default preference will be used
-                    }
+                }
                 if (preferenceBL.getInt() != 0) {
                     OrderDAS das = new OrderDAS();
                     OrderDTO mainOrder = das.findNow(mainOrderId);
@@ -1587,12 +1588,12 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             LOG.info("copying line: " + line);
             if (line.getDeleted() == 0) {
 
-            	OrderLineWS lineWS = new OrderLineWS(line.getId(), line.getItem().getId(), line.getDescription(),
-                		line.getAmount(), line.getQuantity(), line.getPrice(),
-                		line.getCreateDatetime(), line.getDeleted(), line.getOrderLineType().getId(), 
-                		line.getEditable(), (line.getPurchaseOrder() != null?line.getPurchaseOrder().getId():null), 
-                		null, line.getVersionNum(),line.getProvisioningStatusId(),line.getProvisioningRequestId());
-              
+                OrderLineWS lineWS = new OrderLineWS(line.getId(), line.getItem().getId(), line.getDescription(),
+                        line.getAmount(), line.getQuantity(), line.getPrice(),
+                        line.getCreateDatetime(), line.getDeleted(), line.getOrderLineType().getId(),
+                        line.getEditable(), (line.getPurchaseOrder() != null ? line.getPurchaseOrder().getId() : null),
+                        null, line.getVersionNum(), line.getProvisioningStatusId(), line.getProvisioningRequestId());
+
                 lines.add(lineWS);
             }
         }
@@ -1622,8 +1623,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             }
             return retValue;
         } catch (Exception e) { // forced by SQLException
-            LOG.error("Exception in web service: getting latest invoice" +
-                    " for user " + userId, e);
+            LOG.error("Exception in web service: getting latest invoice"
+                    + " for user " + userId, e);
             throw new SessionInternalError("Error getting latest invoice");
         }
     }
@@ -1691,13 +1692,13 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     public Integer[] getUserItemsByCategory(Integer userId, Integer categoryId) {
-    	Integer[] result = null;
+        Integer[] result = null;
         OrderDAS das = new OrderDAS();
         result = das.findUserItemsByCategory(userId, categoryId);
         return result;
     }
 
-    public ItemDTOEx[] getItemByCategory(Integer itemTypeId) {        
+    public ItemDTOEx[] getItemByCategory(Integer itemTypeId) {
         return new ItemBL().getAllItemsByType(itemTypeId);
     }
 
@@ -1706,7 +1707,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     public PaymentAuthorizationDTOEx processPayment(PaymentWS payment) {
-		validatePayment(payment);
+        validatePayment(payment);
         Integer entityId = getCallerCompanyId();
         PaymentDTOEx dto = new PaymentDTOEx(payment);
 
@@ -1727,11 +1728,13 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         }
 
         // populate payment method based on the payment instrument
-        if (dto.getCreditCard() != null)
+        if (dto.getCreditCard() != null) {
             dto.setPaymentMethod(new PaymentMethodDTO(dto.getCreditCard().getCcType()));
+        }
 
-        if (dto.getAch() != null)
+        if (dto.getAch() != null) {
             dto.setPaymentMethod(new PaymentMethodDTO(Constants.PAYMENT_METHOD_ACH));
+        }
 
         // process payment
         IPaymentSessionBean session = (IPaymentSessionBean) Context.getBean(Context.Name.PAYMENT_SESSION);
@@ -1750,30 +1753,30 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             auth.setResult(result.equals(Constants.RESULT_FAIL));
         }
         return auth;
-	}
+    }
 
     public ValidatePurchaseWS validatePurchase(Integer userId, Integer itemId,
             String fields) {
         Integer[] itemIds = null;
         if (itemId != null) {
-            itemIds = new Integer[] { itemId };
+            itemIds = new Integer[]{itemId};
         }
 
         String[] fieldsArray = null;
         if (fields != null) {
-            fieldsArray = new String[] { fields };
+            fieldsArray = new String[]{fields};
         }
 
         return doValidatePurchase(userId, itemIds, fieldsArray);
     }
 
-    public ValidatePurchaseWS validateMultiPurchase(Integer userId, 
+    public ValidatePurchaseWS validateMultiPurchase(Integer userId,
             Integer[] itemIds, String[] fields) {
 
         return doValidatePurchase(userId, itemIds, fields);
     }
 
-    private ValidatePurchaseWS doValidatePurchase(Integer userId, 
+    private ValidatePurchaseWS doValidatePurchase(Integer userId,
             Integer[] itemIds, String[] fields) {
 
         if (userId == null || (itemIds == null && fields == null)) {
@@ -1836,15 +1839,15 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                     PrintWriter pw = new PrintWriter(sw);
                     e.printStackTrace(pw);
                     pw.close();
-                    LOG.error("Validate Purchase error: " + e.getMessage() + 
-                            "\n" + sw.toString());
+                    LOG.error("Validate Purchase error: " + e.getMessage()
+                            + "\n" + sw.toString());
 
                     ValidatePurchaseWS result = new ValidatePurchaseWS();
                     result.setSuccess(false);
                     result.setAuthorized(false);
                     result.setQuantity(BigDecimal.ZERO);
-                    result.setMessage(new String[] { "Error: " + 
-                            e.getMessage() } );
+                    result.setMessage(new String[]{"Error: "
+                                + e.getMessage()});
 
                     return result;
                 }
@@ -1854,8 +1857,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         }
 
         // find the prices first
-	// this will do nothing if the mediation process was uses. In that case
-	// the itemIdsList will be empty
+        // this will do nothing if the mediation process was uses. In that case
+        // the itemIdsList will be empty
         int itemNum = 0;
         for (Integer itemId : itemIdsList) {
             ItemBL item = new ItemBL(itemId);
@@ -1870,23 +1873,23 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                 item.setPricingFields(fieldsList.get(fieldsIndex));
             }
 
-            prices.add(item.getPrice(userId, 
+            prices.add(item.getPrice(userId,
                     getCallerCompanyId()));
             items.add(item.getEntity());
             itemNum++;
         }
 
-        ValidatePurchaseWS ret = new UserBL(userId).validatePurchase(items, 
+        ValidatePurchaseWS ret = new UserBL(userId).validatePurchase(items,
                 prices, fieldsList);
         return ret;
     }
 
-	@Override
-	public void updateAch(Integer userId, com.sapienter.jbilling.server.entity.AchDTO ach)
-			throws SessionInternalError {
-		
-		if (ach != null && (ach.getAbaRouting() == null ||
-                ach.getBankAccount() == null)) {
+    @Override
+    public void updateAch(Integer userId, com.sapienter.jbilling.server.entity.AchDTO ach)
+            throws SessionInternalError {
+
+        if (ach != null && (ach.getAbaRouting() == null
+                || ach.getBankAccount() == null)) {
             LOG.debug("WS - updateAch: " + "ACH validation error.");
             throw new SessionInternalError("Missing ACH data.");
         }
@@ -1897,25 +1900,25 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         AchDTO ac = ach != null ? new AchDTO(ach) : null;
 
         sess.updateACH(userId, executorId, ac);
-	}
+    }
 
-	@Override
-	public Integer getAuthPaymentType(Integer userId)
-			throws SessionInternalError {
-		
-		IUserSessionBean sess = (IUserSessionBean) Context.getBean(
-                Context.Name.USER_SESSION);
-		return sess.getAuthPaymentType(userId);
-	}
+    @Override
+    public Integer getAuthPaymentType(Integer userId)
+            throws SessionInternalError {
 
-	@Override
-	public void setAuthPaymentType(Integer userId, Integer autoPaymentType, boolean use)
-			throws SessionInternalError {
-		
-		IUserSessionBean sess = (IUserSessionBean) Context.getBean(
+        IUserSessionBean sess = (IUserSessionBean) Context.getBean(
                 Context.Name.USER_SESSION);
-		sess.setAuthPaymentType(userId, autoPaymentType, use);
-	}
+        return sess.getAuthPaymentType(userId);
+    }
+
+    @Override
+    public void setAuthPaymentType(Integer userId, Integer autoPaymentType, boolean use)
+            throws SessionInternalError {
+
+        IUserSessionBean sess = (IUserSessionBean) Context.getBean(
+                Context.Name.USER_SESSION);
+        sess.setAuthPaymentType(userId, autoPaymentType, use);
+    }
 
     public void generateRules(String rulesData) throws SessionInternalError {
         try {
@@ -1931,5 +1934,34 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         } catch (Exception e) {
             throw new SessionInternalError(e);
         }
+    }
+    /*-------------------------------------------------------------------------
+     * Added NEW APIs
+     *-------------------------------------------------------------------------
+     */
+
+    /**
+     * Retrieves a list of all {@link UserWS users} in a given status.
+     *
+     * @param statusId the status id that will be used for extraction
+     * @return an array of <code>UserWS</code> objects in a given status.
+     * @throws SessionInternalError
+     */
+    public UserWS[] getUserListInStatus(Integer statusId) throws SessionInternalError {
+        UserWS[] users = null;
+        Integer entityId = getCallerCompanyId();
+        Integer[] userIds = getUsersByStatus(statusId, entityId, true);
+
+        users = new UserWS[userIds.length];
+        for (int f = 0; f < userIds.length; f++) {
+            // get user details by id
+            UserWS dto = null;
+            // calling from dot.net seems to not have a context set. So then when calling
+            // getCallerPrincipal the client gets a 'No security context set' exception
+            // log.debug("principal = " + context.getCallerPrincipal().getName());
+            UserBL bl = new UserBL(userIds[f]);
+            users[f] = bl.getUserWS();
+        }
+        return users;
     }
 }

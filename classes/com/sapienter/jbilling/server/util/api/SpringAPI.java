@@ -1,23 +1,22 @@
 /*
-    jBilling - The Enterprise Open Source Billing System
-    Copyright (C) 2003-2009 Enterprise jBilling Software Ltd. and Emiliano Conde
+ jBilling - The Enterprise Open Source Billing System
+ Copyright (C) 2003-2009 Enterprise jBilling Software Ltd. and Emiliano Conde
 
-    This file is part of jbilling.
+ This file is part of jbilling.
 
-    jbilling is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ jbilling is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    jbilling is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
+ jbilling is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-    You should have received a copy of the GNU Affero General Public License
-    along with jbilling.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ You should have received a copy of the GNU Affero General Public License
+ along with jbilling.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.sapienter.jbilling.server.util.api;
 
 import java.math.BigDecimal;
@@ -207,7 +206,6 @@ public class SpringAPI implements JbillingAPI {
         }
     }
 
-
     public Integer[] getLastOrdersByItemType(Integer userId, Integer itemTypeId, Integer number)
             throws JbillingAPIException {
         try {
@@ -217,7 +215,7 @@ public class SpringAPI implements JbillingAPI {
         }
     }
 
-    public OrderWS getCurrentOrder(Integer userId, Date date) 
+    public OrderWS getCurrentOrder(Integer userId, Date date)
             throws JbillingAPIException {
         try {
             return session.getCurrentOrder(userId, date);
@@ -226,12 +224,12 @@ public class SpringAPI implements JbillingAPI {
         }
     }
 
-    public OrderWS updateCurrentOrder(Integer userId, OrderLineWS[] lines, 
-            PricingField[] fields, Date date, String eventDescription) 
+    public OrderWS updateCurrentOrder(Integer userId, OrderLineWS[] lines,
+            PricingField[] fields, Date date, String eventDescription)
             throws JbillingAPIException {
         try {
-            return session.updateCurrentOrder(userId, lines, 
-                    PricingField.setPricingFieldsValue(fields), date, 
+            return session.updateCurrentOrder(userId, lines,
+                    PricingField.setPricingFieldsValue(fields), date,
                     eventDescription);
         } catch (Exception e) {
             throw new JbillingAPIException(e);
@@ -393,7 +391,7 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
-    
+
     public PaymentAuthorizationDTOEx payInvoice(Integer invoiceId)
             throws JbillingAPIException {
         try {
@@ -411,14 +409,14 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
-    
+
     public void updateAch(Integer userId, AchDTO ach) throws JbillingAPIException {
-    	try {
-    		session.updateAch(userId, ach);
-    				//new com.sapienter.jbilling.server.user.db.AchDTO(ach));
-    	} catch (Exception e) {
-    		throw new JbillingAPIException(e);
-    	}
+        try {
+            session.updateAch(userId, ach);
+            //new com.sapienter.jbilling.server.user.db.AchDTO(ach));
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
     }
 
     public void updateOrder(OrderWS order) throws JbillingAPIException {
@@ -453,118 +451,118 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
-    
+
     public Integer[] getUsersByCreditCard(String number)
-        throws JbillingAPIException {
+            throws JbillingAPIException {
         try {
             return session.getUsersByCreditCard(number);
         } catch (Exception e) {
             throw new JbillingAPIException(e);
         }
     }
-    
-    public ItemDTOEx getItem(Integer itemId, Integer userId, PricingField[] fields) 
-    		throws JbillingAPIException {
-    	try {
-    		return session.getItem(itemId, userId, PricingField.setPricingFieldsValue(fields));
-    	} catch (Exception e) {
-    		throw new JbillingAPIException(e);
-    	}
+
+    public ItemDTOEx getItem(Integer itemId, Integer userId, PricingField[] fields)
+            throws JbillingAPIException {
+        try {
+            return session.getItem(itemId, userId, PricingField.setPricingFieldsValue(fields));
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
     }
-    
+
     public OrderWS rateOrder(OrderWS order) throws JbillingAPIException {
-    	try {
-    		return session.rateOrder(order);
-    	} catch (Exception e) {
-    		throw new JbillingAPIException(e);
-    	}
+        try {
+            return session.rateOrder(order);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
     }
 
     public OrderWS[] rateOrders(OrderWS orders[]) throws JbillingAPIException {
-    	try {
-    		return session.rateOrders(orders);
-    	} catch (Exception e) {
-    		throw new JbillingAPIException(e);
-    	}
+        try {
+            return session.rateOrders(orders);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
     }
-    
+
     public void updateItem(ItemDTOEx item) throws JbillingAPIException {
-    	try {
-    		session.updateItem(item);
-    	} catch (Exception e) {
-    		throw new JbillingAPIException(e);
-    	}
+        try {
+            session.updateItem(item);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
     }
 
     public Integer[] createInvoice(Integer userId, boolean onlyRecurring)
-        throws JbillingAPIException {
-    	try {
-    		return session.createInvoice(userId, onlyRecurring);
-    	} catch (Exception e) {
-    		throw new JbillingAPIException(e);
-    	}
+            throws JbillingAPIException {
+        try {
+            return session.createInvoice(userId, onlyRecurring);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
     }
 
     public BigDecimal isUserSubscribedTo(Integer userId, Integer itemId)
-    		throws JbillingAPIException {
-    	try {
-    		return session.isUserSubscribedTo(userId, itemId);
-    	} catch (Exception e) {
-    		throw new JbillingAPIException(e);
-    	}
+            throws JbillingAPIException {
+        try {
+            return session.isUserSubscribedTo(userId, itemId);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
     }
 
     @Override
     public Integer[] getUserItemsByCategory(Integer userId, Integer categoryId)
-    		throws JbillingAPIException {
-    	try {
-    		return session.getUserItemsByCategory(userId, categoryId);
-    	} catch (Exception e) {
-    		throw new JbillingAPIException(e);
-    	}
+            throws JbillingAPIException {
+        try {
+            return session.getUserItemsByCategory(userId, categoryId);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
     }
 
     public ItemDTOEx[] getItemByCategory(Integer itemTypeId) throws JbillingAPIException {
         try {
             return session.getItemByCategory(itemTypeId);
-    	} catch (Exception e) {
-    		throw new JbillingAPIException(e);
-    	}
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
     }
 
     public ItemTypeWS[] getAllItemCategories() throws JbillingAPIException {
         try {
             return session.getAllItemCategories();
-    	} catch (Exception e) {
-    		throw new JbillingAPIException(e);
-    	}
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
     }
 
-	/*
-	 * @see com.sapienter.jbilling.server.util.api.JbillingAPI#processPayment(com.sapienter.jbilling.server.payment.PaymentWS)
-	 */
-	@Override
-	public PaymentAuthorizationDTOEx processPayment(PaymentWS payment)
-			throws JbillingAPIException {
-		try {
-			return session.processPayment(payment);
-		} catch (Exception e) {
-			throw new JbillingAPIException(e);
-		}
-	}
+    /*
+     * @see com.sapienter.jbilling.server.util.api.JbillingAPI#processPayment(com.sapienter.jbilling.server.payment.PaymentWS)
+     */
+    @Override
+    public PaymentAuthorizationDTOEx processPayment(PaymentWS payment)
+            throws JbillingAPIException {
+        try {
+            return session.processPayment(payment);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
 
     public ValidatePurchaseWS validatePurchase(Integer userId, Integer itemId,
             PricingField[] fields) throws JbillingAPIException {
         try {
-            return session.validatePurchase(userId, itemId, 
+            return session.validatePurchase(userId, itemId,
                     PricingField.setPricingFieldsValue(fields));
         } catch (Exception e) {
             throw new JbillingAPIException(e);
         }
     }
 
-    public ValidatePurchaseWS validateMultiPurchase(Integer userId, 
-            Integer[] itemIds, PricingField[][] fields) 
+    public ValidatePurchaseWS validateMultiPurchase(Integer userId,
+            Integer[] itemIds, PricingField[][] fields)
             throws JbillingAPIException {
         try {
             String[] pricingFields = null;
@@ -575,7 +573,7 @@ public class SpringAPI implements JbillingAPI {
                             fields[i]);
                 }
             }
-            return session.validateMultiPurchase(userId, itemIds, 
+            return session.validateMultiPurchase(userId, itemIds,
                     pricingFields);
         } catch (Exception e) {
             throw new JbillingAPIException(e);
@@ -598,29 +596,49 @@ public class SpringAPI implements JbillingAPI {
         }
     }
 
-	@Override
-	public Integer getAutoPaymentType(Integer userId)
-			throws JbillingAPIException {
-		try {
-			return session.getAuthPaymentType(userId);
-		} catch (Exception e) {
-			throw new JbillingAPIException(e);
-		}
-	}
+    @Override
+    public Integer getAutoPaymentType(Integer userId)
+            throws JbillingAPIException {
+        try {
+            return session.getAuthPaymentType(userId);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
 
-	@Override
-	public void setAutoPaymentType(Integer userId, Integer autoPaymentType, boolean use)
-			throws JbillingAPIException {
-		try {
-			session.setAuthPaymentType(userId, autoPaymentType, use);
-		} catch (Exception e) {
-			throw new JbillingAPIException(e);
-		}
-	}
+    @Override
+    public void setAutoPaymentType(Integer userId, Integer autoPaymentType, boolean use)
+            throws JbillingAPIException {
+        try {
+            session.setAuthPaymentType(userId, autoPaymentType, use);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
 
     public void generateRules(String rulesData) throws JbillingAPIException {
         try {
             session.generateRules(rulesData);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /*-------------------------------------------------------------------------
+     * Added NEW APIs
+     *-------------------------------------------------------------------------
+     */
+    
+    /**
+     * Retrieves a list of all {@link UserWS users} in a given status.
+     *
+     * @param statusId the status id that will be used for extraction
+     * @return an array of <code>UserWS</code> objects in a given status.
+     * @throws JbillingAPIException
+     */
+    public UserWS[] getUserListInStatus(Integer statusId) throws JbillingAPIException {
+        try {
+            return session.getUserListInStatus(statusId);
         } catch (Exception e) {
             throw new JbillingAPIException(e);
         }
