@@ -628,17 +628,32 @@ public class SpringAPI implements JbillingAPI {
      * Added NEW APIs
      *-------------------------------------------------------------------------
      */
-    
     /**
      * Retrieves a list of all {@link UserWS users} in a given status.
      *
      * @param statusId the status id that will be used for extraction
      * @return an array of <code>UserWS</code> objects in a given status.
-     * @throws JbillingAPIException
+     * @throws JbillingAPIException when internal error occurs
      */
     public UserWS[] getUserListInStatus(Integer statusId) throws JbillingAPIException {
         try {
             return session.getUserListInStatus(statusId);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /**
+     * Sends an email with the invoice to a customer. This API call is used to
+     * manually send an email invoice to a customer. TODO: Extra check might
+     * require to make sure invoice belongs to user.
+     *
+     * @see JbillingAPI#emailInvoice(java.lang.Integer, java.lang.Integer)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Boolean emailInvoice(Integer invoiceId, Integer userId) throws JbillingAPIException {
+        try {
+            return session.emailInvoice(invoiceId, userId);
         } catch (Exception e) {
             throw new JbillingAPIException(e);
         }

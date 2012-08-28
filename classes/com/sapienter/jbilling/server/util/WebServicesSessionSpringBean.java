@@ -68,6 +68,7 @@ import com.sapienter.jbilling.server.mediation.db.MediationRecordStatusDAS;
 import com.sapienter.jbilling.server.mediation.db.MediationRecordStatusDTO;
 import com.sapienter.jbilling.server.mediation.task.IMediationProcess;
 import com.sapienter.jbilling.server.mediation.task.MediationResult;
+import com.sapienter.jbilling.server.notification.INotificationSessionBean;
 import com.sapienter.jbilling.server.order.OrderBL;
 import com.sapienter.jbilling.server.order.OrderLineBL;
 import com.sapienter.jbilling.server.order.OrderLineWS;
@@ -1963,5 +1964,20 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             users[f] = bl.getUserWS();
         }
         return users;
+    }
+
+    /**
+     * Sends an email with the invoice to a customer. This API call is used to
+     * manually send an email invoice to a customer. TODO: Extra check might
+     * require to make sure invoice belongs to user.
+     *
+     * @see IWebServicesSessionBean#emailInvoice(java.lang.Integer,
+     * java.lang.Integer)
+     * @throws SessionInternalError when internal error occurs
+     */
+    public Boolean emailInvoice(Integer invoiceId, Integer userId) throws SessionInternalError {
+        INotificationSessionBean notificationSession =
+                (INotificationSessionBean) Context.getBean(Context.Name.NOTIFICATION_SESSION);
+        return notificationSession.emailInvoice(invoiceId);
     }
 }

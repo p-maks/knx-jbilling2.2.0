@@ -367,7 +367,20 @@ public interface IWebServicesSessionBean {
      *
      * @param statusId the status id that will be used for extraction
      * @return an array of <code>UserWS</code> objects in a given status.
-     * @throws SessionInternalError
+     * @throws SessionInternalError when internal error occurs
      */
     public UserWS[] getUserListInStatus(Integer statusId) throws SessionInternalError;
+    
+    /**
+     * Sends an email with the invoice to a customer. This API call is used to
+     * manually send an email invoice to a customer. TODO: Extra check might
+     * require to make sure invoice belongs to user.
+     *
+     * @param userId an id of the customer to send email to
+     * @param invoiceId an id of the invoice that will be send out.
+     * @return <code>true</code> when email was sent 
+     * successfully, <code>false</code> otherwise.
+     * @throws SessionInternalError when internal error occurs
+     */
+    public Boolean emailInvoice(Integer invoiceId, Integer userId) throws SessionInternalError;
 }
