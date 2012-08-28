@@ -658,4 +658,19 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
+
+    /**
+     * Retrieves a list of all the {@link InvoiceWS invoices} in a given period
+     * of time. The method will return an array of the InvoiceWS objects.<br>
+     *
+     * @see JbillingAPI#getInvoiceListByDate(java.lang.String, java.lang.String)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public InvoiceWS[] getInvoiceListByDate(String since, String until) throws JbillingAPIException {
+        try {
+            return session.getInvoiceListByDate(since, until);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
 }

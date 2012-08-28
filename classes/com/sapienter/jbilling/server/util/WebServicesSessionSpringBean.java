@@ -1980,4 +1980,38 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                 (INotificationSessionBean) Context.getBean(Context.Name.NOTIFICATION_SESSION);
         return notificationSession.emailInvoice(invoiceId);
     }
+
+    /**
+     * Retrieves a list of all the {@link InvoiceWS invoices} in a given period
+     * of time. The method will return an array of the InvoiceWS objects.
+     *
+     * @see IWebServicesSessionBean#getInvoiceListByDate(java.lang.String,
+     * java.lang.String)
+     * @throws SessionInternalError when internal error occurs
+     */
+    public InvoiceWS[] getInvoiceListByDate(String since, String until) throws SessionInternalError {
+        try {
+            Date dSince = com.sapienter.jbilling.common.Util.parseDate(since);
+            Date dUntil = com.sapienter.jbilling.common.Util.parseDate(until);
+            if (since == null || until == null) {
+                return null;
+            }
+
+            Integer entityId = getCallerCompanyId();
+            InvoiceBL invoiceBl = new InvoiceBL();
+
+            Integer[] invoiceIds = invoiceBl.getInvoicesByCreateDateArray(entityId, dSince, dUntil);
+
+            InvoiceWS[] invoices = null;
+            invoices = new InvoiceWS[invoiceIds.length];
+            for (int f = 0; f < invoiceIds.length; f++) {
+                invoices[f] = invoiceBl.getWS(new InvoiceDAS().find(invoiceIds[f]));
+            }
+            return invoices;
+        } catch (Exception e) { // needed for the SQLException :(
+            LOG.error("Exception in WS - getInvoiceListByDate(): getting invoices by date"
+                    + since + until, e);
+            throw new SessionInternalError("Error getting invoices by date");
+        }
+    }
 }

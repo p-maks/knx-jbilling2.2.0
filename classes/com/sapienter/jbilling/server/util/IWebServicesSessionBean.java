@@ -356,12 +356,11 @@ public interface IWebServicesSessionBean {
     public Integer getAuthPaymentType(Integer userId) throws SessionInternalError;
 
     public void generateRules(String rulesData) throws SessionInternalError;
-    
+
     /*-------------------------------------------------------------------------
      * Added NEW APIs
      *-------------------------------------------------------------------------
      */
-    
     /**
      * Retrieves a list of all {@link UserWS users} in a given status.
      *
@@ -370,7 +369,7 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError when internal error occurs
      */
     public UserWS[] getUserListInStatus(Integer statusId) throws SessionInternalError;
-    
+
     /**
      * Sends an email with the invoice to a customer. This API call is used to
      * manually send an email invoice to a customer. TODO: Extra check might
@@ -378,9 +377,25 @@ public interface IWebServicesSessionBean {
      *
      * @param userId an id of the customer to send email to
      * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent 
+     * @return <code>true</code> when email was sent *
      * successfully, <code>false</code> otherwise.
      * @throws SessionInternalError when internal error occurs
      */
     public Boolean emailInvoice(Integer invoiceId, Integer userId) throws SessionInternalError;
+
+    /**
+     * Retrieves a list of all the {@link InvoiceWS invoices} in a given period
+     * of time. The method will return an array of the InvoiceWS objects.<br>
+     *
+     * If no invoices where generated for the specified period, an empty array
+     * is returned. If the parameters do not follow the required format
+     * (yyyy-mm-dd), null is returned.
+     *
+     * @param since the starting date for the data extraction
+     * @param until the ending date for the data extraction
+     * @return an array of <code>InvoiceWS</code> objects or an empty array if
+     * nothing found
+     * @throws SessionInternalError when internal error occurs
+     */
+    public InvoiceWS[] getInvoiceListByDate(String since, String until) throws SessionInternalError;
 }
