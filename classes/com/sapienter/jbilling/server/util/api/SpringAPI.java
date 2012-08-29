@@ -673,4 +673,19 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
+
+    /**
+     * Generates and returns the paper invoice PDF for the given invoiceId.
+     * TODO: Extra check might require to make sure invoice belongs to user.
+     *
+     * @see JbillingAPI#getPaperInvoicePDF(java.lang.Integer, java.lang.Integer) 
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public byte[] getPaperInvoicePDF(Integer invoiceId, Integer userId) throws JbillingAPIException {
+        try {
+            return session.getPaperInvoicePDF(invoiceId, userId);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
 }

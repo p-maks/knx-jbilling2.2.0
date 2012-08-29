@@ -48,6 +48,7 @@ import sun.jdbc.rowset.CachedRowSet;
 import com.sapienter.jbilling.common.GatewayBL;
 import com.sapienter.jbilling.common.JBCrypto;
 import com.sapienter.jbilling.common.SessionInternalError;
+import com.sapienter.jbilling.server.invoice.IInvoiceSessionBean;
 import com.sapienter.jbilling.server.invoice.InvoiceBL;
 import com.sapienter.jbilling.server.invoice.InvoiceWS;
 import com.sapienter.jbilling.server.invoice.db.InvoiceDAS;
@@ -2013,5 +2014,18 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                     + since + until, e);
             throw new SessionInternalError("Error getting invoices by date");
         }
+    }
+
+    /**
+     * Generates and returns the paper invoice PDF for the given invoiceId.
+     * TODO: Extra check might require to make sure invoice belongs to user.
+     *
+     * @see IWebServicesSessionBean#getPaperInvoicePDF(java.lang.Integer,
+     * java.lang.Integer)
+     * @throws SessionInternalError when internal error occurs
+     */
+    public byte[] getPaperInvoicePDF(Integer invoiceId, Integer userId) throws SessionInternalError {
+        IInvoiceSessionBean invoiceSession = (IInvoiceSessionBean) Context.getBean(Context.Name.INVOICE_SESSION);
+        return invoiceSession.getPDFInvoice(invoiceId);
     }
 }

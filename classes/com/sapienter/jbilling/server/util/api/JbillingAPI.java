@@ -242,4 +242,15 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public InvoiceWS[] getInvoiceListByDate(String since, String until) throws JbillingAPIException;
+    
+    /**
+     * Generates and returns the paper invoice PDF for the given invoiceId.
+     * TODO: Extra check might require to make sure invoice belongs to user.
+     *
+     * @param userId an id of the customer
+     * @param invoiceId an id of the invoice that will be downloaded.
+     * @return an array of bytes for PDF invoice or null if nothing found.
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public byte[] getPaperInvoicePDF(Integer invoiceId, Integer userId)throws JbillingAPIException;
 }
