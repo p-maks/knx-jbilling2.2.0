@@ -1992,6 +1992,38 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         }
         return users;
     }
+    
+    /**
+     * Search for {@link UserWS users}, including sub-accounts by given search
+     * parameter. Only search users who are customers. <br> Not going through
+     * JBilling generic search, rolled out own one. <br>
+     * {@link UserBL#searchCustomer(java.lang.Integer, java.lang.String)} is
+     * used to get array of users ids then populate UserWS object
+     *
+     * @see IWebServicesSessionBean#searchCustomers(java.lang.String)
+     * @throws SessionInternalError when internal error occurs
+     */
+    public UserWS[] searchCustomers(String searchValue) throws SessionInternalError {
+        UserWS[] users = null;
+        Integer entityId = getCallerCompanyId();
+
+        if (searchValue == null || "".equals(searchValue)) {
+            return null;
+        }
+        try {
+            CachedRowSet userIds = new UserBL().searchCustomer(entityId, searchValue);
+            users = new UserWS[userIds.size()];
+
+            for (int i = 0; i < userIds.size(); i++) {
+                UserBL newUser = new UserBL(userIds.getInt(1));
+                users[i] = newUser.getUserWS();
+            }
+        } catch (Exception e) {// can't remove because of the SQL Exception :(
+            throw new SessionInternalError(e);
+        }
+        return users;
+    }
+
 
 
     /**

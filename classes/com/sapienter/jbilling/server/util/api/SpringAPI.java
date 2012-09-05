@@ -656,7 +656,20 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
-
+    
+    /**
+     * Search for {@link UserWS users}, including sub-accounts by given search parameter.
+     * Only search users who are customers.  
+     * @see JbillingAPI#searchCustomers(java.lang.String) 
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public UserWS[] searchCustomers(String searchValue)throws JbillingAPIException{
+         try {
+            return session.searchCustomers(searchValue);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
 
     /**
      * Sends an email with the invoice to a customer. This API call is used to

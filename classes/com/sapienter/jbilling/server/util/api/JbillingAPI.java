@@ -222,6 +222,15 @@ public interface JbillingAPI {
      */
     public UserWS[] getCustomersInStatus(Integer statusId) throws JbillingAPIException;
 
+    /**
+     * Search for {@link UserWS users}, including sub-accounts by given search parameter.
+     * Only search users who are customers.  
+     * @param searchValue the string parameter to search for
+     * @return an array of <code>UserWS</code> objects if any match found, null
+     * otherwise.
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public UserWS[] searchCustomers(String searchValue)throws JbillingAPIException;
     
     /**
      * Sends an email with the invoice to a customer. This API call is used to
