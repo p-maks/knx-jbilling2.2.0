@@ -114,4 +114,13 @@ public class WebServicesCaller {
     public static Integer getCompanyId() {
         return get().getCompany().getId();
     }
+    
+    /**
+     * Returns the caller language id.
+     * @return id of the caller language
+     */
+    public static Integer getLanguageId() {
+        return get().getLanguageIdField();
+    }
+
 }

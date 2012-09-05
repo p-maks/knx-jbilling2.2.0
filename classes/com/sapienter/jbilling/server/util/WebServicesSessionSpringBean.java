@@ -122,6 +122,36 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
     private static final Logger LOG = Logger.getLogger(WebServicesSessionSpringBean.class);
 
+    /**
+     * Returns the company ID of the authenticated user account making the web
+     * service call.
+     *
+     * @return caller company ID
+     */
+    private Integer getCallerId() {
+        return WebServicesCaller.getUserId();
+    }
+
+    /**
+     * Returns the language ID of the authenticated user account making the web
+     * service call.
+     *
+     * @return caller language ID
+     */
+    private Integer getCallerCompanyId() {
+        return WebServicesCaller.getCompanyId();
+    }
+
+    /**
+     * Returns the language ID of the authenticated user account making the web
+     * service call.
+     *
+     * @return caller language ID
+     */
+    private Integer getCallerLanguageId() {
+        return WebServicesCaller.getLanguageId();
+    }
+
     /*
      * INVOICES
      */
@@ -1678,14 +1708,6 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         }
         OrderBL order = new OrderBL();
         return order.getListIdsByItemType(userId, itemTypeId, number);
-    }
-
-    private Integer getCallerId() {
-        return WebServicesCaller.getUserId();
-    }
-
-    private Integer getCallerCompanyId() {
-        return WebServicesCaller.getCompanyId();
     }
 
     public BigDecimal isUserSubscribedTo(Integer userId, Integer itemId) {
