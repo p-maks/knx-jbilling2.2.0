@@ -1966,6 +1966,33 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         }
         return users;
     }
+    
+    /**
+     * Retrieves a list of all {@link UserWS customers} in a given status
+     * including sub-accounts. This call excludes any other users that are not
+     * Customers.
+     *
+     * @see IWebServicesSessionBean#getCustomersInStatus(java.lang.Integer)
+     * @throws SessionInternalError when internal error occurs
+     */
+    public UserWS[] getCustomersInStatus(Integer statusId) throws SessionInternalError {
+        UserWS[] users = null;
+        Integer entityId = getCallerCompanyId();
+
+        Integer[] userIds = getUsersByStatus(statusId, entityId, true);
+        users = new UserWS[userIds.length];
+
+        for (int f = 0; f < userIds.length; f++) {
+            UserBL bl = new UserBL(userIds[f]);
+            UserWS dto = bl.getUserWS();
+            // add only customers to return
+            if (Constants.TYPE_CUSTOMER.equals(dto.getMainRoleId())) {
+                users[f] = dto;
+            }
+        }
+        return users;
+    }
+
 
     /**
      * Sends an email with the invoice to a customer. This API call is used to

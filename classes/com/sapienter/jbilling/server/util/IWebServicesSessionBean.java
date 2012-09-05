@@ -369,6 +369,15 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError when internal error occurs
      */
     public UserWS[] getUserListInStatus(Integer statusId) throws SessionInternalError;
+    
+    /**
+     * Retrieves a list of all {@link UserWS customers} in a given status including
+     * sub-accounts. This call excludes any other users that are not Customers.
+     * @param statusId the status id that will be used for extraction
+     * @return an array of <code>UserWS</code> objects in a given status.
+     * @throws SessionInternalError when internal error occurs
+     */
+    public UserWS[] getCustomersInStatus(Integer statusId) throws SessionInternalError;
 
     /**
      * Sends an email with the invoice to a customer. This API call is used to

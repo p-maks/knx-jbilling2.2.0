@@ -642,6 +642,21 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
+    
+    /**
+     * Retrieves a list of all {@link UserWS customers} in a given status including
+     * sub-accounts. This call excludes any other users that are not Customers.
+     * @see JbillingAPI#getCustomersInStatus(java.lang.Integer) 
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public UserWS[] getCustomersInStatus(Integer statusId) throws JbillingAPIException{
+        try {
+            return session.getCustomersInStatus(statusId);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
 
     /**
      * Sends an email with the invoice to a customer. This API call is used to

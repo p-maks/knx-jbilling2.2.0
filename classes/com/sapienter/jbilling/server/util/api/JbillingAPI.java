@@ -214,6 +214,16 @@ public interface JbillingAPI {
     public UserWS[] getUserListInStatus(Integer statusId) throws JbillingAPIException;
     
     /**
+     * Retrieves a list of all {@link UserWS customers} in a given status including
+     * sub-accounts. This call excludes any other users that are not Customers.
+     * @param statusId the status id that will be used for extraction
+     * @return an array of <code>UserWS</code> objects in a given status.
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public UserWS[] getCustomersInStatus(Integer statusId) throws JbillingAPIException;
+
+    
+    /**
      * Sends an email with the invoice to a customer. This API call is used to
      * manually send an email invoice to a customer. TODO: Extra check might
      * require to make sure invoice belongs to user.
