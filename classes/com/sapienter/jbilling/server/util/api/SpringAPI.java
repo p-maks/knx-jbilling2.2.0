@@ -39,6 +39,7 @@ import com.sapienter.jbilling.server.user.UserWS;
 import com.sapienter.jbilling.server.user.ValidatePurchaseWS;
 import com.sapienter.jbilling.server.util.IWebServicesSessionBean;
 import com.sapienter.jbilling.server.util.RemoteContext;
+import java.util.Collection;
 
 public class SpringAPI implements JbillingAPI {
 
@@ -649,7 +650,7 @@ public class SpringAPI implements JbillingAPI {
      * @see JbillingAPI#getCustomersInStatus(java.lang.Integer) 
      * @throws JbillingAPIException when internal error occurs
      */
-    public UserWS[] getCustomersInStatus(Integer statusId) throws JbillingAPIException{
+    public Collection<UserWS> getCustomersInStatus(Integer statusId) throws JbillingAPIException{
         try {
             return session.getCustomersInStatus(statusId);
         } catch (Exception e) {

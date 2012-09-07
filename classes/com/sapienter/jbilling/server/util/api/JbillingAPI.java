@@ -37,6 +37,7 @@ import com.sapienter.jbilling.server.user.UserWS;
 import com.sapienter.jbilling.server.user.ValidatePurchaseWS;
 import com.sapienter.jbilling.server.entity.AchDTO;
 import com.sapienter.jbilling.server.entity.CreditCardDTO;
+import java.util.Collection;
 
 public interface JbillingAPI {
 
@@ -217,10 +218,10 @@ public interface JbillingAPI {
      * Retrieves a list of all {@link UserWS customers} in a given status including
      * sub-accounts. This call excludes any other users that are not Customers.
      * @param statusId the status id that will be used for extraction
-     * @return an array of <code>UserWS</code> objects in a given status.
+     * @return a Collection of <code>UserWS</code> objects in a given status.
      * @throws JbillingAPIException when internal error occurs
      */
-    public UserWS[] getCustomersInStatus(Integer statusId) throws JbillingAPIException;
+    public Collection<UserWS> getCustomersInStatus(Integer statusId) throws JbillingAPIException;
 
     /**
      * Search for {@link UserWS users}, including sub-accounts by given search parameter.

@@ -38,6 +38,7 @@ import com.sapienter.jbilling.server.user.UserTransitionResponseWS;
 import com.sapienter.jbilling.server.user.UserWS;
 import com.sapienter.jbilling.server.user.ValidatePurchaseWS;
 import com.sapienter.jbilling.server.entity.AchDTO;
+import java.util.Collection;
 
 /**
  * Interface for WebServicesSessionBean
@@ -374,10 +375,10 @@ public interface IWebServicesSessionBean {
      * Retrieves a list of all {@link UserWS customers} in a given status including
      * sub-accounts. This call excludes any other users that are not Customers.
      * @param statusId the status id that will be used for extraction
-     * @return an array of <code>UserWS</code> objects in a given status.
+     * @return a Collection of <code>UserWS</code> objects in a given status.
      * @throws SessionInternalError when internal error occurs
      */
-    public UserWS[] getCustomersInStatus(Integer statusId) throws SessionInternalError;
+    public Collection<UserWS> getCustomersInStatus(Integer statusId) throws SessionInternalError;
     
     /**
      * Search for {@link UserWS users}, including sub-accounts by given search parameter.

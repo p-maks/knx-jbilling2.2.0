@@ -115,6 +115,7 @@ import com.sapienter.jbilling.server.user.db.UserDTO;
 import com.sapienter.jbilling.server.util.api.WebServicesConstants;
 import com.sapienter.jbilling.server.util.audit.EventLogger;
 import com.sapienter.jbilling.server.util.db.CurrencyDAS;
+import java.util.Collection;
 
 @Transactional( propagation = Propagation.REQUIRED)
 @WebService( endpointInterface = "com.sapienter.jbilling.server.util.IWebServicesSessionBean")
@@ -1997,19 +1998,19 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * @see IWebServicesSessionBean#getCustomersInStatus(java.lang.Integer)
      * @throws SessionInternalError when internal error occurs
      */
-    public UserWS[] getCustomersInStatus(Integer statusId) throws SessionInternalError {
-        UserWS[] users = null;
+    public Collection<UserWS> getCustomersInStatus(Integer statusId) throws SessionInternalError {
+        Collection users = null;
         Integer entityId = getCallerCompanyId();
 
         Integer[] userIds = getUsersByStatus(statusId, entityId, true);
-        users = new UserWS[userIds.length];
+        users = new ArrayList();
 
         for (int f = 0; f < userIds.length; f++) {
             UserBL bl = new UserBL(userIds[f]);
             UserWS dto = bl.getUserWS();
             // add only customers to return
             if (Constants.TYPE_CUSTOMER.equals(dto.getMainRoleId())) {
-                users[f] = dto;
+                users.add(dto);
             }
         }
         return users;
