@@ -2026,27 +2026,40 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * @throws SessionInternalError when internal error occurs
      */
     public UserWS[] searchCustomers(String searchValue) throws SessionInternalError {
-        UserWS[] users = null;
-        Integer entityId = getCallerCompanyId();
-
         if (searchValue == null || "".equals(searchValue)) {
             return null;
         }
-        try {
-            CachedRowSet userIds = new UserBL().searchCustomer(entityId, searchValue);
-            users = new UserWS[userIds.size()];
+        
+        UserWS[] users = null;        
+        Integer entityId = getCallerCompanyId();
 
-            for (int i = 0; i < userIds.size(); i++) {
-                UserBL newUser = new UserBL(userIds.getInt(1));
-                users[i] = newUser.getUserWS();
-            }
-        } catch (Exception e) {// can't remove because of the SQL Exception :(
-            throw new SessionInternalError(e);
-        }
+        Integer[] userIds = searchForCustomer(searchValue, entityId);
+        users = new UserWS[userIds.length];
+        for (int f = 0; f < userIds.length; f++) {
+            UserBL bl = new UserBL(userIds[f]);            
+            users[f] = bl.getUserWS();
+        }        
         return users;
     }
 
 
+    public Integer[] searchForCustomer(String searchValue, Integer entityId) throws SessionInternalError {
+        try {
+            UserBL bl = new UserBL();
+            CachedRowSet users = bl.searchCustomer(entityId, searchValue);
+            LOG.debug("got collection. Now converting");
+            Integer[] ret = new Integer[users.size()];
+            int f = 0;
+            while (users.next()) {
+                ret[f] = users.getInt(1);
+                f++;
+            }
+            users.close();
+            return ret;
+        } catch (Exception e) { // can't remove because of SQLException :(
+            throw new SessionInternalError(e);
+        }
+    }
 
     /**
      * Sends an email with the invoice to a customer. This API call is used to
