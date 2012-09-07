@@ -431,4 +431,13 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError when internal error occurs
      */
     public byte[] getPaperInvoicePDF(Integer invoiceId, Integer userId) throws SessionInternalError;
+    
+    /**
+     * Saves uploaded logo image file for the user's entity (company).
+     *
+     * @param inBytes an array of bytes for image to upload.    
+     * @return true if image was successfully saved, false otherwise
+     * @throws SessionInternalError when internal error occurs
+     */
+    public boolean uploadLogo(byte[] inBytes) throws SessionInternalError;
 }

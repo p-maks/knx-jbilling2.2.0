@@ -717,4 +717,18 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
+    
+    /**
+     * Saves uploaded logo image file for the user's entity (company).
+     *
+     * @see JbillingAPI#uploadLogo(byte[]) 
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public boolean uploadLogo(byte[] inBytes) throws JbillingAPIException {
+        try {
+            return session.uploadLogo(inBytes);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
 }

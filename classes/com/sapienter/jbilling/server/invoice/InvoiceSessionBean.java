@@ -48,7 +48,13 @@ import com.sapienter.jbilling.server.user.db.CompanyDTO;
 import com.sapienter.jbilling.server.util.Constants;
 import com.sapienter.jbilling.server.util.Context;
 import com.sapienter.jbilling.server.util.PreferenceBL;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Set;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -235,5 +241,29 @@ public class InvoiceSessionBean implements IInvoiceSessionBean {
         Set<InvoiceDTO>  ret = new UserBL(userId).getEntity().getInvoices();
         ret.iterator().next().getDueDate(); // touch
         return ret;
+    }
+    
+    /**
+     * Saves uploaded logo image file for the user's entity (company).
+     * 
+     * @see IInvoiceSessionBean#uploadLogo(byte[], java.lang.Integer) 
+     * @throws SessionInternalError when internal error occurs
+     */
+    public boolean uploadLogo(byte[] inBytes, Integer entityId) throws SessionInternalError {        
+        try {
+            if (inBytes != null) {
+                // convert byte array back to BufferedImage
+                InputStream in = new ByteArrayInputStream(inBytes);
+                BufferedImage bImageFromConvert = ImageIO.read(in);
+
+                ImageIO.write(bImageFromConvert, "jpg", new File(com.sapienter.jbilling.common.Util.getSysProp("base_dir")
+                        + "logos" + File.separator + "entity-" + entityId + ".jpg"));
+                return true;               
+            }            
+            return false;
+        } catch (IOException e) {
+            LOG.error("IOException in InvoiceSessionBean: could save Logo.", e);
+            throw new SessionInternalError("Error uploading Logo.");
+        }
     }
 }    

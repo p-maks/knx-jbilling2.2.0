@@ -68,4 +68,13 @@ public interface IInvoiceSessionBean {
 
     // only for unit tests
     public Set<InvoiceDTO> getAllInvoices(Integer userId);
+    
+    /**
+     * Saves uploaded logo image file for the user's entity (company).
+     * @param inBytes an array of bytes for image to upload.
+     * @param entityId
+     * @return true if image was successfully saved, false otherwise
+     * @throws SessionInternalError when internal error occurs
+     */
+    public boolean uploadLogo(byte[] inBytes, Integer entityId) throws SessionInternalError;
 }    

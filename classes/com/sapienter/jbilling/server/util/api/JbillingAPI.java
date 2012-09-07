@@ -273,4 +273,13 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public byte[] getPaperInvoicePDF(Integer invoiceId, Integer userId)throws JbillingAPIException;
+    
+    /**
+     * Saves uploaded logo image file for the user's entity (company).
+     *
+     * @param inBytes an array of bytes for image to upload.    
+     * @return true if image was successfully saved, false otherwise
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public boolean uploadLogo(byte[] inBytes)throws JbillingAPIException;
 }

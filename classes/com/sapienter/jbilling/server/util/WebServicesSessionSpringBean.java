@@ -1989,7 +1989,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         }
         return users;
     }
-    
+
     /**
      * Retrieves a list of all {@link UserWS customers} in a given status
      * including sub-accounts. This call excludes any other users that are not
@@ -2015,7 +2015,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         }
         return users;
     }
-    
+
     /**
      * Search for {@link UserWS users}, including sub-accounts by given search
      * parameter. Only search users who are customers. <br> Not going through
@@ -2030,19 +2030,18 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         if (searchValue == null || "".equals(searchValue)) {
             return null;
         }
-        
-        UserWS[] users = null;        
+
+        UserWS[] users = null;
         Integer entityId = getCallerCompanyId();
 
         Integer[] userIds = searchForCustomer(searchValue, entityId);
         users = new UserWS[userIds.length];
         for (int f = 0; f < userIds.length; f++) {
-            UserBL bl = new UserBL(userIds[f]);            
+            UserBL bl = new UserBL(userIds[f]);
             users[f] = bl.getUserWS();
-        }        
+        }
         return users;
     }
-
 
     public Integer[] searchForCustomer(String searchValue, Integer entityId) throws SessionInternalError {
         try {
@@ -2122,5 +2121,18 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     public byte[] getPaperInvoicePDF(Integer invoiceId, Integer userId) throws SessionInternalError {
         IInvoiceSessionBean invoiceSession = (IInvoiceSessionBean) Context.getBean(Context.Name.INVOICE_SESSION);
         return invoiceSession.getPDFInvoice(invoiceId);
+    }
+
+    /**
+     * Saves uploaded logo image file for the user's entity (company).
+     *
+     * @param inBytes an array of bytes for image to upload.   
+     * @return true if image was successfully saved, false otherwise
+     * @throws SessionInternalError when internal error occurs
+     */
+    public boolean uploadLogo(byte[] inBytes) throws SessionInternalError {
+        IInvoiceSessionBean invoiceSession = (IInvoiceSessionBean) Context.getBean(Context.Name.INVOICE_SESSION);
+        Integer entityId = getCallerCompanyId();
+        return invoiceSession.uploadLogo(inBytes, entityId);
     }
 }
