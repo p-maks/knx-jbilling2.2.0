@@ -45,6 +45,9 @@
 <sess:equalsAttribute name="jsp_payment_method" match="cheque">                
      <bean:message key="payment.cheque.title"/>
 </sess:equalsAttribute>
+<sess:equalsAttribute name="jsp_payment_method" match="cash">                
+     <bean:message key="payment.cash.title"/>
+</sess:equalsAttribute>
 <sess:equalsAttribute name="jsp_payment_method" match="ach">                
      <bean:message key="payment.ach.title"/>
 </sess:equalsAttribute>
@@ -75,10 +78,5 @@
 <html:messages message="true" id="myMessage">
 	<p><bean:write name="myMessage"/></p>
 </html:messages>
-
-
-<jbilling:genericList setup="true" type='<%=Constants.LIST_TYPE_INVOICE%>'/>
-	
-<p class="instr"><bean:message key="payment.enter.invoice.list"/></p>	
-
-
+<jbilling:genericList setup="true" type='<%=Constants.LIST_TYPE_INVOICE%>'/>	
+<p class="instr"><bean:message key="payment.enter.invoice.list"/></p>

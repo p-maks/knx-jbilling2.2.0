@@ -130,6 +130,30 @@
 	 		<td><bean:message key="all.prompt.dateFormat"/></td>
 	 	</tr>
 	 	</sess:equalsAttribute>
+                
+           <%--  Added cash Payment --%>
+           <sess:equalsAttribute name="jsp_payment_method" match="cash">                
+      	   <html:hidden property="method" value="cash"/>	 	
+	 	<tr class="form">
+	 		<td></td>
+	 		<td class="form_prompt"><bean:message key="payment.cash.ref"/></td>
+	 		<td colspan="4"><html:text property="customerRef" size="20" /></td>
+	 	</tr>	 	
+	 	<tr class="form">
+	 		<td></td>
+	 		<td class="form_prompt"><bean:message key="payment.cash.date"/></td>
+	 		<jbilling:dateFormat format="mm-dd">
+				 <td><html:text property="cashDate_month" size="2" maxlength="2"/></td>
+				 <td><html:text property="cashDate_day" size="2" maxlength="2"/></td>
+	 		</jbilling:dateFormat>
+	 		<jbilling:dateFormat format="dd-mm">
+				 <td><html:text property="cashDate_day" size="2" maxlength="2"/></td>
+				 <td><html:text property="cashDate_month" size="2" maxlength="2"/></td>
+	 		</jbilling:dateFormat>
+	 		<td><html:text property="cashDate_year" size="4" maxlength="4"/></td>
+	 		<td><bean:message key="all.prompt.dateFormat"/></td>
+	 	</tr>
+        </sess:equalsAttribute>
 
        <sess:equalsAttribute name="jsp_payment_method" match="ach">                
       	   <html:hidden property="method" value="ach"/>	 

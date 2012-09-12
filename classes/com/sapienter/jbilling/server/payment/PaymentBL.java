@@ -50,6 +50,8 @@ import com.sapienter.jbilling.server.notification.NotificationNotFoundException;
 import com.sapienter.jbilling.server.payment.db.PaymentAuthorizationDTO;
 import com.sapienter.jbilling.server.payment.db.PaymentDAS;
 import com.sapienter.jbilling.server.payment.db.PaymentDTO;
+import com.sapienter.jbilling.server.payment.db.PaymentInfoCashDAS;
+import com.sapienter.jbilling.server.payment.db.PaymentInfoCashDTO;
 import com.sapienter.jbilling.server.payment.db.PaymentInfoChequeDAS;
 import com.sapienter.jbilling.server.payment.db.PaymentInfoChequeDTO;
 import com.sapienter.jbilling.server.payment.db.PaymentInvoiceMapDAS;
@@ -84,6 +86,7 @@ public class PaymentBL extends ResultList implements PaymentSQL {
 
     private PaymentDAS paymentDas = null;
     private PaymentInfoChequeDAS chequeDas = null;
+    private PaymentInfoCashDAS cashDas = null;
     private CreditCardDAS ccDas = null;
     private PaymentMethodDAS methodDas = null;
     private PaymentInvoiceMapDAS mapDas = null;
@@ -115,7 +118,9 @@ public class PaymentBL extends ResultList implements PaymentSQL {
             paymentDas = new PaymentDAS();
 
             chequeDas = new PaymentInfoChequeDAS();
-
+            // added Cash payment
+            cashDas = new PaymentInfoCashDAS();
+            
             ccDas = new CreditCardDAS();
 
             methodDas = new PaymentMethodDAS();
@@ -160,6 +165,18 @@ public class PaymentBL extends ResultList implements PaymentSQL {
 
             // update the relationship dto-info
             payment.setPaymentInfoCheque(cheque);
+        }
+        
+        // Added cash 
+        // now verify if an info record should be created as well
+        if (dto.getCash() != null) {
+            // create the db record
+            PaymentInfoCashDTO cash = cashDas.create();
+            cash.setCustomerRef(dto.getCash().getCustomerRef());          
+            cash.setDate(dto.getCash().getDate());
+
+            // update the relationship dto-info
+            payment.setPaymentInfoCash(cash);
         }
 
         if (dto.getCreditCard() != null) {
@@ -262,7 +279,11 @@ public class PaymentBL extends ResultList implements PaymentSQL {
             cheque.setBank(dto.getCheque().getBank());
             cheque.setNumber(dto.getCheque().getNumber());
             cheque.setDate(dto.getCheque().getDate());
-        } else if (dto.getCreditCard() != null) {
+        } else if (dto.getCash() != null) {// Added cash
+            PaymentInfoCashDTO cash = payment.getPaymentInfoCash();
+            cash.setCustomerRef(dto.getCash().getCustomerRef());            
+            cash.setDate(dto.getCash().getDate());
+        }else if (dto.getCreditCard() != null) {
             CreditCardBL cc = new CreditCardBL(payment.getCreditCard());
             cc.update(executorId, dto.getCreditCard(), null);
         } else if (dto.getAch() != null) {
@@ -400,6 +421,17 @@ public class PaymentBL extends ResultList implements PaymentSQL {
             chequeDto.setNumber(payment.getPaymentInfoCheque().getNumber());
         }
         dto.setCheque(chequeDto);
+        
+        // cash info if applies
+        PaymentInfoCashDTO cashDto = null;
+        if (payment.getPaymentInfoCash() != null) {
+            cashDto = new PaymentInfoCashDTO();
+            cashDto.setCustomerRef(payment.getPaymentInfoCash().getCustomerRef());
+            cashDto.setDate(payment.getPaymentInfoCash().getDate());
+            cashDto.setId(payment.getPaymentInfoCash().getId());
+           
+        }
+        dto.setCash(cashDto);
 
         // credit card info if applies
         CreditCardDTO ccDto = null;
@@ -505,6 +537,17 @@ public class PaymentBL extends ResultList implements PaymentSQL {
             ws.setCheque(chqDTO);
         } else {
             ws.setCheque(null);
+        }
+        
+        // Added cash
+        if (dto.getCash() != null) {
+            com.sapienter.jbilling.server.entity.PaymentInfoCashDTO cashDTO = new com.sapienter.jbilling.server.entity.PaymentInfoCashDTO();
+            cashDTO.setCustomerRef(dto.getCash().getCustomerRef());
+            cashDTO.setDate(dto.getCash().getDate());
+            cashDTO.setId(dto.getCash().getId());           
+            ws.setCash(cashDTO);
+        } else {
+            ws.setCash(null);
         }
 
         ws.setMethod(dto.getMethod());
@@ -677,6 +720,9 @@ public class PaymentBL extends ResultList implements PaymentSQL {
         } else if (dto.getCheque() != null) {
             PaymentDTOEx ex = new PaymentDTOEx(dto);
             retValue = validate(ex.getCheque());
+        }else if (dto.getCash() != null) {
+            PaymentDTOEx ex = new PaymentDTOEx(dto);
+            retValue = validate(ex.getCash());
         }
 
         return retValue;
@@ -689,6 +735,15 @@ public class PaymentBL extends ResultList implements PaymentSQL {
             retValue = false;
         }
 
+        return retValue;
+    }
+    
+    public static boolean validate(PaymentInfoCashDTO dto) {
+        boolean retValue = true;
+
+        if (dto.getDate() == null || dto.getCustomerRef() == null) {
+            retValue = false;
+        }
         return retValue;
     }
 

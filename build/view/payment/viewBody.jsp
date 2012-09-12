@@ -47,7 +47,9 @@
 	
 	if (methodId.equals(Constants.PAYMENT_METHOD_CHEQUE)) {
 		session.setAttribute("jsp_payment_method", "cheque");
-	} else if (methodId.equals(Constants.PAYMENT_METHOD_ACH)) {
+	}else if (methodId.equals(Constants.PAYMENT_METHOD_CASH)) {
+		session.setAttribute("jsp_payment_method", "cash");	
+	}else if (methodId.equals(Constants.PAYMENT_METHOD_ACH)) {
 		session.setAttribute("jsp_payment_method", "ach");
 	} else if (methodId.equals(Constants.PAYMENT_METHOD_PAYPAL)) {
 		session.setAttribute("jsp_payment_method", "paypal");
@@ -143,6 +145,22 @@
 							property="cheque.date"
 							scope="page"
 							formatKey="format.date"/>
+			</td>
+		</tr>
+	</sess:equalsAttribute>
+                                   
+       <%--  Added cash payment --%>                            
+       <sess:equalsAttribute name="jsp_payment_method" match="cash">                
+		<tr class="infoA">
+			<td class="infoprompt"><bean:message key="payment.cash.ref"/></td>
+			<td class="infodata">	
+				<bean:write name="dto" 	property="cash.customerRef" scope="page"/>
+			</td>
+		</tr>		
+		<tr class="infoB">
+			<td class="infoprompt"><bean:message key="payment.cash.date"/></td>
+			<td class="infodata">	
+				<bean:write name="dto" property="cash.date" scope="page" formatKey="format.date"/>
 			</td>
 		</tr>
 	</sess:equalsAttribute>

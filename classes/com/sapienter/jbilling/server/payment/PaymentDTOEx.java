@@ -1,23 +1,22 @@
 /*
-    jBilling - The Enterprise Open Source Billing System
-    Copyright (C) 2003-2009 Enterprise jBilling Software Ltd. and Emiliano Conde
+ jBilling - The Enterprise Open Source Billing System
+ Copyright (C) 2003-2009 Enterprise jBilling Software Ltd. and Emiliano Conde
 
-    This file is part of jbilling.
+ This file is part of jbilling.
 
-    jbilling is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ jbilling is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    jbilling is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
+ jbilling is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-    You should have received a copy of the GNU Affero General Public License
-    along with jbilling.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ You should have received a copy of the GNU Affero General Public License
+ along with jbilling.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.sapienter.jbilling.server.payment;
 
 import java.util.List;
@@ -27,6 +26,7 @@ import org.apache.log4j.Logger;
 import com.sapienter.jbilling.server.payment.db.PaymentAuthorizationDAS;
 import com.sapienter.jbilling.server.payment.db.PaymentAuthorizationDTO;
 import com.sapienter.jbilling.server.payment.db.PaymentDTO;
+import com.sapienter.jbilling.server.payment.db.PaymentInfoCashDTO;
 import com.sapienter.jbilling.server.payment.db.PaymentInfoChequeDTO;
 import com.sapienter.jbilling.server.payment.db.PaymentMethodDTO;
 import com.sapienter.jbilling.server.payment.db.PaymentResultDAS;
@@ -36,9 +36,10 @@ import com.sapienter.jbilling.server.util.db.CurrencyDTO;
 import java.util.ArrayList;
 
 public class PaymentDTOEx extends PaymentDTO {
-    
+
     private Integer userId = null;
     private PaymentInfoChequeDTO cheque = null;
+    private PaymentInfoCashDTO cash = null;
     private AchDTO ach = null;
     private CreditCardDTO creditCard = null;
     private String method = null;
@@ -47,13 +48,12 @@ public class PaymentDTOEx extends PaymentDTO {
     private PaymentDTOEx payment = null; // for refunds
     private String resultStr = null;
     private Integer payoutId = null;
-
     // now we only support one of these
     private PaymentAuthorizationDTO authorization = null; // useful in refuds
 
     public PaymentDTOEx(PaymentDTO dto) {
         userId = dto.getBaseUser().getId();
-        
+
         setId(dto.getId());
         setCurrency(dto.getCurrency());
         setAmount(dto.getAmount());
@@ -80,7 +80,7 @@ public class PaymentDTOEx extends PaymentDTO {
         }
         setPaymentPeriod(dto.getPaymentPeriod());
         setPaymentNotes(dto.getPaymentNotes());
-        
+
         invoiceIds = new ArrayList<Integer>();
         paymentMaps = new ArrayList();
     }
@@ -99,15 +99,17 @@ public class PaymentDTOEx extends PaymentDTO {
         setUpdateDatetime(dto.getUpdateDatetime());
         setPaymentPeriod(dto.getPaymentPeriod());
         setPaymentNotes(dto.getPaymentNotes());
-       
-        if (dto.getMethodId() != null)
-            setPaymentMethod(new PaymentMethodDTO(dto.getMethodId()));
 
-        if (dto.getResultId() != null)
-        setPaymentResult(new PaymentResultDAS().find(dto.getResultId()));
-		
+        if (dto.getMethodId() != null) {
+            setPaymentMethod(new PaymentMethodDTO(dto.getMethodId()));
+        }
+
+        if (dto.getResultId() != null) {
+            setPaymentResult(new PaymentResultDAS().find(dto.getResultId()));
+        }
+
         userId = dto.getUserId();
-        
+
         if (dto.getCheque() != null) {
             PaymentInfoChequeDTO chqDTO = new PaymentInfoChequeDTO();
             chqDTO.setBank(dto.getCheque().getBank());
@@ -118,15 +120,26 @@ public class PaymentDTOEx extends PaymentDTO {
         } else {
             cheque = null;
         }
-        
+
+        // Added cash payment
+        if (dto.getCash() != null) {
+            PaymentInfoCashDTO cashDTO = new PaymentInfoCashDTO();
+            cashDTO.setCustomerRef(dto.getCash().getCustomerRef());
+            cashDTO.setDate(dto.getCash().getDate());
+            cashDTO.setId(dto.getCash().getId() == null ? 0 : dto.getCash().getId());
+            cash = cashDTO;
+        } else {
+            cash = null;
+        }
+
         if (dto.getCreditCard() != null) {
             creditCard = new CreditCardDTO(dto.getCreditCard());
         } else {
             creditCard = null;
         }
-        
+
         method = dto.getMethod();
-        
+
         if (dto.getAch() != null) {
             AchDTO achDTO = new AchDTO();
             achDTO.setAbaRouting(dto.getAch().getAbaRouting());
@@ -142,25 +155,26 @@ public class PaymentDTOEx extends PaymentDTO {
 
         invoiceIds = new ArrayList<Integer>();
         paymentMaps = new ArrayList();
-        
+
         if (dto.getInvoiceIds() != null) {
             for (int f = 0; f < dto.getInvoiceIds().length; f++) {
                 invoiceIds.add(dto.getInvoiceIds()[f]);
             }
         }
-        
+
         if (dto.getPaymentId() != null) {
             payment = new PaymentDTOEx();
             payment.setId(dto.getPaymentId());
         } else {
             payment = null;
         }
-        
+
         authorization = new PaymentAuthorizationDAS().find(dto.getAuthorizationId());
-            
-    }    
+
+    }
+
     /**
-     * 
+     *
      */
     public PaymentDTOEx() {
         super();
@@ -187,7 +201,6 @@ public class PaymentDTOEx extends PaymentDTO {
 //        invoiceIds = new ArrayList<Integer>();
 //        paymentMaps = new ArrayList();
 //    }
-
     /**
      * @param otherValue
      */
@@ -196,20 +209,19 @@ public class PaymentDTOEx extends PaymentDTO {
 //        invoiceIds = new ArrayList<Integer>();
 //        paymentMaps = new ArrayList();
 //    }
-
     public boolean validate() {
         boolean retValue = true;
-        
+
         // check some mandatory fields
         if (getPaymentMethod() == null || getPaymentResult() == null) {
             retValue = false;
         }
-        
+
         return retValue;
     }
-    
+
     public String toString() {
-        
+
         StringBuffer maps = new StringBuffer();
         if (paymentMaps != null) {
             for (int f = 0; f < paymentMaps.size(); f++) {
@@ -227,13 +239,14 @@ public class PaymentDTOEx extends PaymentDTO {
                     + creditCard.getCcType() + " " + "deleted="
                     + creditCard.getDeleted() + " " + "securityCode="
                     + creditCard.getSecurityCode());
-        }        
+        }
         cc.append('}');
 
-        
-        return super.toString() + " credit card:" + cc.toString() + 
-            " cheque:" + cheque + " payment maps:" + maps.toString();
-    } 
+
+        return super.toString() + " credit card:" + cc.toString()
+                + " cheque:" + cheque + " cash:" + cash + " payment maps:" + maps.toString();
+    }
+
     /**
      * @return
      */
@@ -248,7 +261,6 @@ public class PaymentDTOEx extends PaymentDTO {
         userId = integer;
     }
 
- 
     /**
      * @return
      */
@@ -261,6 +273,20 @@ public class PaymentDTOEx extends PaymentDTO {
      */
     public void setCheque(PaymentInfoChequeDTO chequeDTO) {
         cheque = chequeDTO;
+    }
+
+    /**
+     * @return
+     */
+    public PaymentInfoCashDTO getCash() {
+        return cash;
+    }
+
+    /**
+     * @param cashDto
+     */
+    public void setCash(PaymentInfoCashDTO cashDto) {
+        this.cash = cashDto;
     }
 
     /**
@@ -290,7 +316,6 @@ public class PaymentDTOEx extends PaymentDTO {
     public void setMethod(String string) {
         method = string;
     }
-
 
     /**
      * @return
@@ -324,8 +349,8 @@ public class PaymentDTOEx extends PaymentDTO {
      * @return
      */
     public PaymentAuthorizationDTO getAuthorization() {
-        Logger.getLogger(PaymentDTOEx.class).debug("Returning " + 
-                authorization + " for payemnt " + getId());
+        Logger.getLogger(PaymentDTOEx.class).debug("Returning "
+                + authorization + " for payemnt " + getId());
         return authorization;
     }
 
@@ -364,24 +389,26 @@ public class PaymentDTOEx extends PaymentDTO {
         this.payoutId = payoutId;
     }
 
-	/**
-	 * @return Returns the ach.
-	 */
-	public AchDTO getAch() {
-		return ach;
-	}
-	/**
-	 * @param ach The ach to set.
-	 */
-	public void setAch(AchDTO ach) {
-		this.ach = ach;
-	}
+    /**
+     * @return Returns the ach.
+     */
+    public AchDTO getAch() {
+        return ach;
+    }
+
+    /**
+     * @param ach The ach to set.
+     */
+    public void setAch(AchDTO ach) {
+        this.ach = ach;
+    }
+
     public List getPaymentMaps() {
-        Logger.getLogger(PaymentDTOEx.class).debug("Returning " + 
-                paymentMaps.size() + " elements in the map");
+        Logger.getLogger(PaymentDTOEx.class).debug("Returning "
+                + paymentMaps.size() + " elements in the map");
         return paymentMaps;
     }
-    
+
     public void addPaymentMap(PaymentInvoiceMapDTOEx map) {
         Logger.getLogger(PaymentDTOEx.class).debug("Adding map to the vector ");
         paymentMaps.add(map);

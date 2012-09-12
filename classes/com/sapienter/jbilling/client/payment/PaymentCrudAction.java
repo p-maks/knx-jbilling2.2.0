@@ -37,6 +37,7 @@ import com.sapienter.jbilling.common.Util;
 import com.sapienter.jbilling.server.invoice.db.InvoiceDTO;
 import com.sapienter.jbilling.server.payment.IPaymentSessionBean;
 import com.sapienter.jbilling.server.payment.PaymentDTOEx;
+import com.sapienter.jbilling.server.payment.db.PaymentInfoCashDTO;
 import com.sapienter.jbilling.server.payment.db.PaymentInfoChequeDTO;
 import com.sapienter.jbilling.server.payment.db.PaymentMethodDTO;
 import com.sapienter.jbilling.server.payment.db.PaymentResultDTO;
@@ -72,6 +73,9 @@ public class PaymentCrudAction extends CrudActionBase<PaymentDTOEx> {
 	private static final String FIELD_GROUP_CHEQUE_DATE = "chequeDate";
 	private static final String FIELD_CHEQUE_NUMBER = "chequeNumber";
 	private static final String FIELD_CHEQUE_BANK = "bank";
+        
+        private static final String FIELD_GROUP_CASH_DATE = "cashDate";
+	private static final String FIELD_CASH_CUSTOMER_REF = "customerRef";
 	
 	private static final String FORWARD_FROM_ORDER = "payment_fromOrder";
 	private static final String FORWARD_EDIT = "payment_edit";
@@ -124,6 +128,7 @@ public class PaymentCrudAction extends CrudActionBase<PaymentDTOEx> {
         CreditCardDTO ccDto = null;
         AchDTO achDto = null;
         PaymentInfoChequeDTO chequeDto = null;
+        PaymentInfoCashDTO cashDto = null;
         
         boolean isEdit = "edit".equals(request.getParameter("submode"));
         
@@ -150,6 +155,7 @@ public class PaymentCrudAction extends CrudActionBase<PaymentDTOEx> {
             ccDto = paymentDto.getCreditCard();
             achDto = paymentDto.getAch();
             chequeDto = paymentDto.getCheque();
+            cashDto = paymentDto.getCash();
         } else { // this is not an invoice selected, it's the first call
             LOG.debug("setting payment without invoice");
             // the date might come handy
@@ -168,7 +174,7 @@ public class PaymentCrudAction extends CrudActionBase<PaymentDTOEx> {
                 ((String) myForm.get(FIELD_CC_NUMBER)).length() == 0) {
             // normal payment, get the selected user cc
             // if the user has a credit card, put it (this is a waste for
-            // cheques, but it really doesn't hurt)
+            // cheques,cash, but it really doesn't hurt)
             LOG.debug("getting this user's cc");
             UserDTOEx user = getSessionUser();
             ccDto = user.getCreditCard();
@@ -201,6 +207,11 @@ public class PaymentCrudAction extends CrudActionBase<PaymentDTOEx> {
             myForm.set(FIELD_CHEQUE_BANK, chequeDto.getBank());
             myForm.set(FIELD_CHEQUE_NUMBER, chequeDto.getNumber());
             setFormDate(FIELD_GROUP_CHEQUE_DATE, chequeDto.getDate());
+        }
+        // added cash
+        if (cashDto != null) {
+            myForm.set(FIELD_CASH_CUSTOMER_REF, cashDto.getCustomerRef());           
+            setFormDate(FIELD_GROUP_CASH_DATE, cashDto.getDate());
         }
         
         ForwardAndMessage result = new ForwardAndMessage(FORWARD_EDIT);
@@ -252,6 +263,21 @@ public class PaymentCrudAction extends CrudActionBase<PaymentDTOEx> {
             // electronic cheques
             dto.setPaymentResult(new PaymentResultDTO(Constants.RESULT_ENTERED));
             session.setAttribute("tmp_process_now", new Boolean(false));                
+            
+            } else if ("cash".equals(payMethod)) { // added Cash
+            // create the cash dto
+            PaymentInfoCashDTO cashDto = new PaymentInfoCashDTO();
+            cashDto.setCustomerRef((String) myForm.get(FIELD_CASH_CUSTOMER_REF));           
+            cashDto.setDate(parseDate(FIELD_GROUP_CASH_DATE, "payment.cheque.date"));
+            // set the cash
+            dto.setCash(cashDto);
+            dto.setPaymentMethod(new PaymentMethodDTO(Constants.PAYMENT_METHOD_CASH));
+            // validate required fields        
+            required(cashDto.getCustomerRef(),"payment.cash.ref");
+            required(cashDto.getDate(), "payment.cash.date");
+            // Cash never process realtime 
+            dto.setPaymentResult(new PaymentResultDTO(Constants.RESULT_ENTERED));
+            session.setAttribute("tmp_process_now", false);
             
         } else if ("cc".equals(payMethod)) {
             String ccNumber = (String) myForm.get(FIELD_CC_NUMBER);

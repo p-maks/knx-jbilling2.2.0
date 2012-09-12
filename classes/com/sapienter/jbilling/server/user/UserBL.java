@@ -546,6 +546,7 @@ public class UserBL extends ResultList
         // this constants have to be in synch with the DB
         final int OPTION_SUB_ACCOUNTS = 78;
         final int OPTION_PAYMENT_CHEQUE = 24;
+        final int OPTION_PAYMENT_CASH = 98;
         final int OPTION_PAYMENT_CC = 25;
         final int OPTION_PAYMENT_ACH = 75;
         final int OPTION_PAYMENT_PAYPAL = 90;
@@ -569,6 +570,15 @@ public class UserBL extends ResultList
             } catch (Exception e) {
                 LOG.error("Exception ", e);
             }
+            break;
+        case OPTION_PAYMENT_CASH:
+            try {
+                 PaymentBL payment = new PaymentBL();
+                 retValue = payment.isMethodAccepted(user.getEntity().getId(),
+                            Constants.PAYMENT_METHOD_CASH);
+             } catch (Exception e) {
+                LOG.error("Exception ", e);
+             }
             break;
         case OPTION_PAYMENT_ACH:
             try {

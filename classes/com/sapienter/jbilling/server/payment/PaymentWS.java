@@ -23,6 +23,7 @@ package com.sapienter.jbilling.server.payment;
 import com.sapienter.jbilling.server.entity.AchDTO;
 import com.sapienter.jbilling.server.entity.CreditCardDTO;
 import com.sapienter.jbilling.server.entity.PaymentAuthorizationDTO;
+import com.sapienter.jbilling.server.entity.PaymentInfoCashDTO;
 import com.sapienter.jbilling.server.entity.PaymentInfoChequeDTO;
 import com.sapienter.jbilling.server.util.Constants;
 import java.io.Serializable;
@@ -37,6 +38,7 @@ public class PaymentWS implements Serializable {
 
     private Integer userId = null;
     private PaymentInfoChequeDTO cheque = null;
+    private PaymentInfoCashDTO cash = null;
     private CreditCardDTO creditCard = null;
     private AchDTO ach = null;
     private String method = null;
@@ -95,6 +97,14 @@ public class PaymentWS implements Serializable {
 
     public void setCheque(PaymentInfoChequeDTO cheque) {
         this.cheque = cheque;
+    }
+    
+    public PaymentInfoCashDTO getCash() {
+        return cash;
+    }   
+    
+    public void setCash(PaymentInfoCashDTO cash) {
+        this.cash = cash;
     }
 
     public CreditCardDTO getCreditCard() {
