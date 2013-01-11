@@ -41,54 +41,92 @@ import java.util.Collection;
 
 public interface JbillingAPI {
 
-    public InvoiceWS getInvoiceWS(Integer invoiceId)
-            throws JbillingAPIException;
+    /*
+     * INVOICES
+     */
+    public Integer[] createInvoice(Integer userId, boolean onlyRecurring) throws JbillingAPIException;
 
-    public InvoiceWS getLatestInvoice(Integer userId)
-            throws JbillingAPIException;
+    public InvoiceWS getInvoiceWS(Integer invoiceId) throws JbillingAPIException;
 
-    public Integer[] getLastInvoices(Integer userId, Integer number)
-            throws JbillingAPIException;
+    public void deleteInvoice(Integer invoiceId) throws JbillingAPIException;
 
-    public Integer[] getInvoicesByDate(String since, String until)
-            throws JbillingAPIException;
+    public InvoiceWS getLatestInvoice(Integer userId) throws JbillingAPIException;
 
-    public Integer getAutoPaymentType(Integer userId) throws JbillingAPIException;
+    public Integer[] getLastInvoices(Integer userId, Integer number) throws JbillingAPIException;
 
-    public void setAutoPaymentType(Integer userId, Integer autoPaymentType, boolean use)
-            throws JbillingAPIException;
+    public Integer[] getInvoicesByDate(String since, String until) throws JbillingAPIException;
 
     public Integer[] getUserInvoicesByDate(Integer userId, String since,
             String until) throws JbillingAPIException;
 
-    public Integer[] createInvoice(Integer userId, boolean onlyRecurring)
-            throws JbillingAPIException;
+    /**
+     * ------------------- INVOICE API EXTENSION --------------------------
+     */
+    /**
+     * Retrieves a list of all the {@link InvoiceWS invoices} in a given period
+     * of time. The method will return an array of the InvoiceWS objects.<br>
+     *
+     * If no invoices where generated for the specified period, an empty array
+     * is returned. If the parameters do not follow the required format
+     * (yyyy-mm-dd), null is returned.
+     *
+     * @param since the starting date for the data extraction
+     * @param until the ending date for the data extraction
+     * @return an array of <code>InvoiceWS</code> objects or an empty array if
+     * nothing found
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public InvoiceWS[] getInvoiceListByDate(String since, String until) throws JbillingAPIException;
 
+    /**
+     * Generates and returns the paper invoice PDF for the given invoiceId.
+     * TODO: Extra check might require to make sure invoice belongs to user.
+     *
+     * @param userId an id of the customer
+     * @param invoiceId an id of the invoice that will be downloaded.
+     * @return an array of bytes for PDF invoice or null if nothing found.
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public byte[] getPaperInvoicePDF(Integer invoiceId, Integer userId) throws JbillingAPIException;
+
+    /**
+     * Sends an email with the invoice to a customer. This API call is used to
+     * manually send an email invoice to a customer. TODO: Extra check might
+     * require to make sure invoice belongs to user.
+     *
+     * @param userId an id of the customer to send email to
+     * @param invoiceId an id of the invoice that will be send out.
+     * @return <code>true</code> when email was sent *
+     * successfully, <code>false</code> otherwise.
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Boolean emailInvoice(Integer invoiceId, Integer userId) throws JbillingAPIException;
+
+    /*
+     * USERS
+     */
     public Integer createUser(UserWS newUser) throws JbillingAPIException;
 
-    public void deleteUser(Integer userId) throws JbillingAPIException;
+    public UserWS getUserWS(Integer userId) throws JbillingAPIException;
 
-    public void deleteInvoice(Integer invoiceId) throws JbillingAPIException;
+    public ContactWS[] getUserContactsWS(Integer userId) throws JbillingAPIException;
+
+    public void updateUser(UserWS user) throws JbillingAPIException;
 
     public void updateUserContact(Integer userId, Integer typeId,
             ContactWS contact) throws JbillingAPIException;
 
-    public void updateUser(UserWS user) throws JbillingAPIException;
-
-    public UserWS getUserWS(Integer userId) throws JbillingAPIException;
-
-    public ContactWS[] getUserContactsWS(Integer userId)
-            throws JbillingAPIException;
+    public void deleteUser(Integer userId) throws JbillingAPIException;
 
     public Integer getUserId(String username) throws JbillingAPIException;
 
     public Integer[] getUsersInStatus(Integer statusId)
             throws JbillingAPIException;
 
-    public Integer[] getUsersByCreditCard(String number)
+    public Integer[] getUsersNotInStatus(Integer statusId)
             throws JbillingAPIException;
 
-    public Integer[] getUsersNotInStatus(Integer statusId)
+    public Integer[] getUsersByCreditCard(String number)
             throws JbillingAPIException;
 
     public Integer[] getUsersByCustomField(Integer typeId, String value)
@@ -97,7 +135,7 @@ public interface JbillingAPI {
     public CreateResponseWS create(UserWS user, OrderWS order)
             throws JbillingAPIException;
 
-    public PaymentAuthorizationDTOEx payInvoice(Integer invoiceId)
+    public Integer authenticate(String username, String password)
             throws JbillingAPIException;
 
     public void updateCreditCard(Integer userId, CreditCardDTO creditCard)
@@ -106,12 +144,64 @@ public interface JbillingAPI {
     public void updateAch(Integer userId, AchDTO ach)
             throws JbillingAPIException;
 
+    public Integer getAutoPaymentType(Integer userId) throws JbillingAPIException;
+
+    public void setAutoPaymentType(Integer userId, Integer autoPaymentType, boolean use)
+            throws JbillingAPIException;
+
+    public UserTransitionResponseWS[] getUserTransitions(Date from, Date to)
+            throws JbillingAPIException;
+
+    public UserTransitionResponseWS[] getUserTransitionsAfterId(Integer id)
+            throws JbillingAPIException;
+
+    /**
+     * ------------------- USER API EXTENSION --------------------------
+     */
+    /**
+     * Retrieves a list of all {@link UserWS users} in a given status.
+     *
+     * @param statusId the status id that will be used for extraction
+     * @return an array of <code>UserWS</code> objects in a given status.
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public UserWS[] getUserListInStatus(Integer statusId) throws JbillingAPIException;
+
+    /**
+     * Retrieves a list of all {@link UserWS customers} in a given status
+     * including sub-accounts. This call excludes any other users that are not
+     * Customers.
+     *
+     * @param statusId the status id that will be used for extraction
+     * @return a Collection of <code>UserWS</code> objects in a given status.
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Collection<UserWS> getCustomersInStatus(Integer statusId) throws JbillingAPIException;
+
+    /**
+     * Search for {@link UserWS users}, including sub-accounts by given search
+     * parameter. Only search users who are customers.
+     *
+     * @param searchValue the string parameter to search for
+     * @return an array of <code>UserWS</code> objects if any match found, null
+     * otherwise.
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public UserWS[] searchCustomers(String searchValue) throws JbillingAPIException;
+
+    /*
+     * ORDERS
+     */
+    public Integer createOrder(OrderWS order) throws JbillingAPIException;
+
     public PaymentAuthorizationDTOEx createOrderPreAuthorize(OrderWS order)
             throws JbillingAPIException;
 
-    public Integer createOrder(OrderWS order) throws JbillingAPIException;
-
     public Integer createOrderAndInvoice(OrderWS order) throws JbillingAPIException;
+
+    public OrderWS rateOrder(OrderWS order) throws JbillingAPIException;
+
+    public OrderWS[] rateOrders(OrderWS orders[]) throws JbillingAPIException;
 
     public void updateOrder(OrderWS order) throws JbillingAPIException;
 
@@ -139,6 +229,12 @@ public interface JbillingAPI {
             PricingField[] fields, Date date, String eventDescription)
             throws JbillingAPIException;
 
+    /*
+     * PAYMENT
+     */
+    public PaymentAuthorizationDTOEx payInvoice(Integer invoiceId)
+            throws JbillingAPIException;
+
     public Integer applyPayment(PaymentWS payment, Integer invoiceId)
             throws JbillingAPIException;
 
@@ -150,25 +246,20 @@ public interface JbillingAPI {
     public Integer[] getLastPayments(Integer userId, Integer number)
             throws JbillingAPIException;
 
+    public PaymentAuthorizationDTOEx processPayment(PaymentWS payment) throws JbillingAPIException;
+
+    /**
+     * ------------------- PAYMENT API EXTENSION --------------------------
+     */
+    /*
+     * ITEM
+     */
     public Integer createItem(ItemDTOEx dto) throws JbillingAPIException;
 
     public ItemDTOEx[] getAllItems() throws JbillingAPIException;
 
-    public UserTransitionResponseWS[] getUserTransitions(Date from, Date to)
-            throws JbillingAPIException;
-
-    public UserTransitionResponseWS[] getUserTransitionsAfterId(Integer id)
-            throws JbillingAPIException;
-
-    public Integer authenticate(String username, String password)
-            throws JbillingAPIException;
-
     public ItemDTOEx getItem(Integer itemId, Integer userId, PricingField[] fields)
             throws JbillingAPIException;
-
-    public OrderWS rateOrder(OrderWS order) throws JbillingAPIException;
-
-    public OrderWS[] rateOrders(OrderWS orders[]) throws JbillingAPIException;
 
     public void updateItem(ItemDTOEx item) throws JbillingAPIException;
 
@@ -189,8 +280,6 @@ public interface JbillingAPI {
 
     public ItemTypeWS[] getAllItemCategories() throws JbillingAPIException;
 
-    public PaymentAuthorizationDTOEx processPayment(PaymentWS payment) throws JbillingAPIException;
-
     public ValidatePurchaseWS validatePurchase(Integer userId, Integer itemId, PricingField[] fields) throws JbillingAPIException;
 
     public ValidatePurchaseWS validateMultiPurchase(Integer userId, Integer[] itemIds, PricingField[][] fields) throws JbillingAPIException;
@@ -201,85 +290,16 @@ public interface JbillingAPI {
 
     public void generateRules(String rulesData) throws JbillingAPIException;
 
-    /*-------------------------------------------------------------------------
-     * Added NEW APIs
-     *-------------------------------------------------------------------------
-     */
     /**
-     * Retrieves a list of all {@link UserWS users} in a given status.
      *
-     * @param statusId the status id that will be used for extraction
-     * @return an array of <code>UserWS</code> objects in a given status.
-     * @throws JbillingAPIException when internal error occurs
+     * ------------------- MISC API EXTENSION --------------------------
      */
-    public UserWS[] getUserListInStatus(Integer statusId) throws JbillingAPIException;
-    
-    /**
-     * Retrieves a list of all {@link UserWS customers} in a given status including
-     * sub-accounts. This call excludes any other users that are not Customers.
-     * @param statusId the status id that will be used for extraction
-     * @return a Collection of <code>UserWS</code> objects in a given status.
-     * @throws JbillingAPIException when internal error occurs
-     */
-    public Collection<UserWS> getCustomersInStatus(Integer statusId) throws JbillingAPIException;
-
-    /**
-     * Search for {@link UserWS users}, including sub-accounts by given search parameter.
-     * Only search users who are customers.  
-     * @param searchValue the string parameter to search for
-     * @return an array of <code>UserWS</code> objects if any match found, null
-     * otherwise.
-     * @throws JbillingAPIException when internal error occurs
-     */
-    public UserWS[] searchCustomers(String searchValue)throws JbillingAPIException;
-    
-    /**
-     * Sends an email with the invoice to a customer. This API call is used to
-     * manually send an email invoice to a customer. TODO: Extra check might
-     * require to make sure invoice belongs to user.
-     *
-     * @param userId an id of the customer to send email to
-     * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent 
-     * successfully, <code>false</code> otherwise.
-     * @throws JbillingAPIException when internal error occurs
-     */
-    public Boolean emailInvoice(Integer invoiceId, Integer userId) throws JbillingAPIException;
-    
-    
-    /**
-     * Retrieves a list of all the {@link InvoiceWS invoices} in a given period
-     * of time. The method will return an array of the InvoiceWS objects.<br>
-     *
-     * If no invoices where generated for the specified period, an empty array
-     * is returned. If the parameters do not follow the required format
-     * (yyyy-mm-dd), null is returned.
-     *
-     * @param since the starting date for the data extraction
-     * @param until the ending date for the data extraction
-     * @return an array of <code>InvoiceWS</code> objects or an empty array if
-     * nothing found
-     * @throws JbillingAPIException when internal error occurs
-     */
-    public InvoiceWS[] getInvoiceListByDate(String since, String until) throws JbillingAPIException;
-    
-    /**
-     * Generates and returns the paper invoice PDF for the given invoiceId.
-     * TODO: Extra check might require to make sure invoice belongs to user.
-     *
-     * @param userId an id of the customer
-     * @param invoiceId an id of the invoice that will be downloaded.
-     * @return an array of bytes for PDF invoice or null if nothing found.
-     * @throws JbillingAPIException when internal error occurs
-     */
-    public byte[] getPaperInvoicePDF(Integer invoiceId, Integer userId)throws JbillingAPIException;
-    
     /**
      * Saves uploaded logo image file for the user's entity (company).
      *
-     * @param inBytes an array of bytes for image to upload.    
+     * @param inBytes an array of bytes for image to upload.
      * @return true if image was successfully saved, false otherwise
      * @throws JbillingAPIException when internal error occurs
      */
-    public boolean uploadLogo(byte[] inBytes)throws JbillingAPIException;
+    public boolean uploadLogo(byte[] inBytes) throws JbillingAPIException;
 }

@@ -49,28 +49,6 @@ public interface IWebServicesSessionBean {
     /*
      * INVOICES
      */
-    public InvoiceWS getInvoiceWS(Integer invoiceId)
-            throws SessionInternalError;
-
-    public InvoiceWS getLatestInvoice(Integer userId)
-            throws SessionInternalError;
-
-    public Integer[] getLastInvoices(Integer userId, Integer number)
-            throws SessionInternalError;
-
-    public Integer[] getInvoicesByDate(String since, String until)
-            throws SessionInternalError;
-
-    public Integer[] getUserInvoicesByDate(Integer userId, String since,
-            String until) throws SessionInternalError;
-
-    /**
-     * Deletes an invoice
-     *
-     * @param invoiceId The id of the invoice to delete
-     */
-    public void deleteInvoice(Integer invoiceId);
-
     /**
      * Generates invoices for orders not yet invoiced for this user. Optionally
      * only allow recurring orders to generate invoices. Returns the ids of the
@@ -79,6 +57,65 @@ public interface IWebServicesSessionBean {
     public Integer[] createInvoice(Integer userId, boolean onlyRecurring)
             throws SessionInternalError;
 
+    public InvoiceWS getInvoiceWS(Integer invoiceId) throws SessionInternalError;
+
+    /**
+     * Deletes an invoice
+     *
+     * @param invoiceId The id of the invoice to delete
+     */
+    public void deleteInvoice(Integer invoiceId);
+
+    public InvoiceWS getLatestInvoice(Integer userId) throws SessionInternalError;
+
+    public Integer[] getLastInvoices(Integer userId, Integer number) throws SessionInternalError;
+
+    public Integer[] getInvoicesByDate(String since, String until) throws SessionInternalError;
+
+    public Integer[] getUserInvoicesByDate(Integer userId, String since,
+            String until) throws SessionInternalError;
+
+    /**
+     * ------------------- INVOICE API EXTENSION --------------------------
+     */
+    /**
+     * Retrieves a list of all the {@link InvoiceWS invoices} in a given period
+     * of time. The method will return an array of the InvoiceWS objects.<br>
+     *
+     * If no invoices where generated for the specified period, an empty array
+     * is returned. If the parameters do not follow the required format
+     * (yyyy-mm-dd), null is returned.
+     *
+     * @param since the starting date for the data extraction
+     * @param until the ending date for the data extraction
+     * @return an array of <code>InvoiceWS</code> objects or an empty array if
+     * nothing found
+     * @throws SessionInternalError when internal error occurs
+     */
+    public InvoiceWS[] getInvoiceListByDate(String since, String until) throws SessionInternalError;
+
+    /**
+     * Generates and returns the paper invoice PDF for the given invoiceId.
+     * TODO: Extra check might require to make sure invoice belongs to user.
+     *
+     * @param userId an id of the customer
+     * @param invoiceId an id of the invoice that will be downloaded.
+     * @return an array of bytes for PDF invoice or null if nothing found.
+     * @throws SessionInternalError when internal error occurs
+     */
+    public byte[] getPaperInvoicePDF(Integer invoiceId) throws SessionInternalError;
+
+    /**
+     * Sends an email with the invoice to a customer. This API call is used to
+     * manually send an email invoice to a customer. TODO: Extra check might
+     * require to make sure invoice belongs to user.
+     *
+     * @param userId an id of the customer to send email to
+     * @param invoiceId an id of the invoice that will be send out.
+     * @return <code>true</code> when email was sent * * * * *      * successfully, <code>false</code> otherwise.
+     * @throws SessionInternalError when internal error occurs
+     */
+    public Boolean emailInvoice(Integer invoiceId, Integer userId) throws SessionInternalError;
 
     /*
      * USERS
@@ -114,7 +151,7 @@ public interface IWebServicesSessionBean {
     public UserWS getUserWS(Integer userId) throws SessionInternalError;
 
     /**
-     * Retrieves aall the contacts of a user
+     * Retrieves all the contacts of a user
      *
      * @param userId The id of the user to be returned
      */
@@ -186,6 +223,75 @@ public interface IWebServicesSessionBean {
             com.sapienter.jbilling.server.entity.CreditCardDTO creditCard)
             throws SessionInternalError;
 
+    public void updateAch(Integer userId, AchDTO ach) throws SessionInternalError;
+
+    public void setAuthPaymentType(Integer userId, Integer autoPaymentType, boolean use)
+            throws SessionInternalError;
+
+    public Integer getAuthPaymentType(Integer userId) throws SessionInternalError;
+
+    /**
+     * Implementation of the User Transitions List webservice. This accepts a
+     * start and end date as arguments, and produces an array of data containing
+     * the user transitions logged in the requested time range.
+     *
+     * @param from Date indicating the lower limit for the extraction of
+     * transition logs. It can be <code>null</code>, in such a case, the
+     * extraction will start where the last extraction left off. If no
+     * extractions have been done so far and this parameter is null, the
+     * function will extract from the oldest transition logged.
+     * @param to Date indicatin the upper limit for the extraction of transition
+     * logs. It can be <code>null</code>, in which case the extraction will have
+     * no upper limit.
+     * @return UserTransitionResponseWS[] an array of objects containing the
+     * result of the extraction, or <code>null</code> if there is no data thas
+     * satisfies the extraction parameters.
+     */
+    public UserTransitionResponseWS[] getUserTransitions(Date from, Date to)
+            throws SessionInternalError;
+
+    /**
+     * @return UserTransitionResponseWS[] an array of objects containing the
+     * result of the extraction, or <code>null</code> if there is no data thas
+     * satisfies the extraction parameters.
+     */
+    public UserTransitionResponseWS[] getUserTransitionsAfterId(Integer id)
+            throws SessionInternalError;
+
+    /**
+     * ------------------- USER API EXTENSION --------------------------
+     */
+    /**
+     * Retrieves a list of all {@link UserWS users} in a given status.
+     *
+     * @param statusId the status id that will be used for extraction
+     * @return an array of <code>UserWS</code> objects in a given status.
+     * @throws SessionInternalError when internal error occurs
+     */
+    public UserWS[] getUserListInStatus(Integer statusId) throws SessionInternalError;
+
+    /**
+     * Retrieves a list of all {@link UserWS customers} in a given status
+     * including sub-accounts. This call excludes any other users that are not
+     * Customers.
+     *
+     * @param statusId the status id that will be used for extraction
+     * @return a Collection of <code>UserWS</code> objects in a given status.
+     * @throws SessionInternalError when internal error occurs
+     */
+    public Collection<UserWS> getCustomersInStatus(Integer statusId) throws SessionInternalError;
+
+    /**
+     * Search for {@link UserWS users}, including sub-accounts by given search
+     * parameter. Only search users who are customers.
+     *
+     * @param searchValue the string parameter to search for
+     * @return an array of <code>UserWS</code> objects if any match found, null
+     * otherwise. Null also returned when search parameter is null
+     * @throws SessionInternalError when internal error occurs
+     */
+    public UserWS[] searchCustomers(String searchValue) throws SessionInternalError;
+
     /*
      * ORDERS
      */
@@ -201,8 +307,6 @@ public interface IWebServicesSessionBean {
     public OrderWS rateOrder(OrderWS order) throws SessionInternalError;
 
     public OrderWS[] rateOrders(OrderWS orders[]) throws SessionInternalError;
-
-    public void updateItem(ItemDTOEx item);
 
     public Integer createOrderAndInvoice(OrderWS order)
             throws SessionInternalError;
@@ -262,20 +366,8 @@ public interface IWebServicesSessionBean {
     public PaymentAuthorizationDTOEx processPayment(PaymentWS payment);
 
     /**
-     * Validate if the user can buy this. This depends on the balance type: -
-     * none: can always buy - pre paid: if there is enough dynamic balance -
-     * credit limit: only if credit limie - dynamix balance is enough
-     *
-     * @param userId
-     * @param itemId
-     * @param fields
-     * @return 0, if she can not. >o the number of quantities that she can buy
+     * ------------------- PAYMENT API EXTENSION --------------------------
      */
-    public ValidatePurchaseWS validatePurchase(Integer userId, Integer itemId,
-            String fields);
-
-    public ValidatePurchaseWS validateMultiPurchase(Integer userId,
-            Integer[] itemId, String[] fields);
 
     /*
      * ITEM
@@ -289,35 +381,15 @@ public interface IWebServicesSessionBean {
      */
     public ItemDTOEx[] getAllItems() throws SessionInternalError;
 
-    /**
-     * Implementation of the User Transitions List webservice. This accepts a
-     * start and end date as arguments, and produces an array of data containing
-     * the user transitions logged in the requested time range.
-     *
-     * @param from Date indicating the lower limit for the extraction of
-     * transition logs. It can be <code>null</code>, in such a case, the
-     * extraction will start where the last extraction left off. If no
-     * extractions have been done so far and this parameter is null, the
-     * function will extract from the oldest transition logged.
-     * @param to Date indicatin the upper limit for the extraction of transition
-     * logs. It can be <code>null</code>, in which case the extraction will have
-     * no upper limit.
-     * @return UserTransitionResponseWS[] an array of objects containing the
-     * result of the extraction, or <code>null</code> if there is no data thas
-     * satisfies the extraction parameters.
-     */
-    public UserTransitionResponseWS[] getUserTransitions(Date from, Date to)
-            throws SessionInternalError;
-
-    /**
-     * @return UserTransitionResponseWS[] an array of objects containing the
-     * result of the extraction, or <code>null</code> if there is no data thas
-     * satisfies the extraction parameters.
-     */
-    public UserTransitionResponseWS[] getUserTransitionsAfterId(Integer id)
-            throws SessionInternalError;
-
     public ItemDTOEx getItem(Integer itemId, Integer userId, String pricing);
+
+    public void updateItem(ItemDTOEx item);
+
+    public Integer createItemCategory(ItemTypeWS itemType)
+            throws SessionInternalError;
+
+    public void updateItemCategory(ItemTypeWS itemType)
+            throws SessionInternalError;
 
     public InvoiceWS getLatestInvoiceByItemType(Integer userId,
             Integer itemTypeId) throws SessionInternalError;
@@ -343,99 +415,32 @@ public interface IWebServicesSessionBean {
 
     public ItemTypeWS[] getAllItemCategories();
 
-    public Integer createItemCategory(ItemTypeWS itemType)
-            throws SessionInternalError;
+    /**
+     * Validate if the user can buy this. This depends on the balance type: -
+     * none: can always buy - pre paid: if there is enough dynamic balance -
+     * credit limit: only if credit limie - dynamix balance is enough
+     *
+     * @param userId
+     * @param itemId
+     * @param fields
+     * @return 0, if she can not. >o the number of quantities that she can buy
+     */
+    public ValidatePurchaseWS validatePurchase(Integer userId, Integer itemId,
+            String fields);
 
-    public void updateItemCategory(ItemTypeWS itemType)
-            throws SessionInternalError;
-
-    public void updateAch(Integer userId, AchDTO ach) throws SessionInternalError;
-
-    public void setAuthPaymentType(Integer userId, Integer autoPaymentType, boolean use)
-            throws SessionInternalError;
-
-    public Integer getAuthPaymentType(Integer userId) throws SessionInternalError;
+    public ValidatePurchaseWS validateMultiPurchase(Integer userId,
+            Integer[] itemId, String[] fields);
 
     public void generateRules(String rulesData) throws SessionInternalError;
 
-    /*-------------------------------------------------------------------------
-     * Added NEW APIs
-     *-------------------------------------------------------------------------
-     */
     /**
-     * Retrieves a list of all {@link UserWS users} in a given status.
      *
-     * @param statusId the status id that will be used for extraction
-     * @return an array of <code>UserWS</code> objects in a given status.
-     * @throws SessionInternalError when internal error occurs
+     * ------------------- MISC API EXTENSION --------------------------
      */
-    public UserWS[] getUserListInStatus(Integer statusId) throws SessionInternalError;
-    
-    /**
-     * Retrieves a list of all {@link UserWS customers} in a given status including
-     * sub-accounts. This call excludes any other users that are not Customers.
-     * @param statusId the status id that will be used for extraction
-     * @return a Collection of <code>UserWS</code> objects in a given status.
-     * @throws SessionInternalError when internal error occurs
-     */
-    public Collection<UserWS> getCustomersInStatus(Integer statusId) throws SessionInternalError;
-    
-    /**
-     * Search for {@link UserWS users}, including sub-accounts by given search parameter.
-     * Only search users who are customers. 
-     * 
-     * @param searchValue the string parameter to search for
-     * @return an array of <code>UserWS</code> objects if any match found, null
-     * otherwise. Null also returned when search parameter is null
-     * @throws SessionInternalError when internal error occurs
-     */
-    public UserWS[] searchCustomers(String searchValue) throws SessionInternalError;
-
-
-    /**
-     * Sends an email with the invoice to a customer. This API call is used to
-     * manually send an email invoice to a customer. TODO: Extra check might
-     * require to make sure invoice belongs to user.
-     *
-     * @param userId an id of the customer to send email to
-     * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent *
-     * successfully, <code>false</code> otherwise.
-     * @throws SessionInternalError when internal error occurs
-     */
-    public Boolean emailInvoice(Integer invoiceId, Integer userId) throws SessionInternalError;
-
-    /**
-     * Retrieves a list of all the {@link InvoiceWS invoices} in a given period
-     * of time. The method will return an array of the InvoiceWS objects.<br>
-     *
-     * If no invoices where generated for the specified period, an empty array
-     * is returned. If the parameters do not follow the required format
-     * (yyyy-mm-dd), null is returned.
-     *
-     * @param since the starting date for the data extraction
-     * @param until the ending date for the data extraction
-     * @return an array of <code>InvoiceWS</code> objects or an empty array if
-     * nothing found
-     * @throws SessionInternalError when internal error occurs
-     */
-    public InvoiceWS[] getInvoiceListByDate(String since, String until) throws SessionInternalError;
-    
-    /**
-     * Generates and returns the paper invoice PDF for the given invoiceId.
-     * TODO: Extra check might require to make sure invoice belongs to user.
-     *
-     * @param userId an id of the customer
-     * @param invoiceId an id of the invoice that will be downloaded.
-     * @return an array of bytes for PDF invoice or null if nothing found.
-     * @throws SessionInternalError when internal error occurs
-     */
-    public byte[] getPaperInvoicePDF(Integer invoiceId, Integer userId) throws SessionInternalError;
-    
     /**
      * Saves uploaded logo image file for the user's entity (company).
      *
-     * @param inBytes an array of bytes for image to upload.    
+     * @param inBytes an array of bytes for image to upload.
      * @return true if image was successfully saved, false otherwise
      * @throws SessionInternalError when internal error occurs
      */

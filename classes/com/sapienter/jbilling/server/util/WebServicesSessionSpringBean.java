@@ -105,7 +105,6 @@ import com.sapienter.jbilling.server.user.UserDTOEx;
 import com.sapienter.jbilling.server.user.UserTransitionResponseWS;
 import com.sapienter.jbilling.server.user.UserWS;
 import com.sapienter.jbilling.server.user.ValidatePurchaseWS;
-import com.sapienter.jbilling.server.user.db.AchDAS;
 import com.sapienter.jbilling.server.user.db.AchDTO;
 import com.sapienter.jbilling.server.user.db.CompanyDTO;
 import com.sapienter.jbilling.server.user.db.CreditCardDAS;
@@ -156,8 +155,46 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     /*
      * INVOICES
      */
-    public InvoiceWS getInvoiceWS(Integer invoiceId)
+    /**
+     * Generates invoices for orders not yet invoiced for this user. Optionally
+     * only allow recurring orders to generate invoices. Returns the ids of the
+     * invoices generated.
+     */
+    public Integer[] createInvoice(Integer userId, boolean onlyRecurring)
             throws SessionInternalError {
+        UserDTO user = new UserDAS().find(userId);
+        BillingProcessBL processBL = new BillingProcessBL();
+
+        BillingProcessConfigurationDTO config =
+                new BillingProcessConfigurationDAS().findByEntity(
+                user.getCompany());
+
+        // Create a mock billing process object, because the method
+        // we are calling was meant to be called by the billing process.
+        BillingProcessDTO billingProcess = new BillingProcessDTO();
+        billingProcess.setId(0);
+        billingProcess.setEntity(user.getCompany());
+        billingProcess.setBillingDate(new Date());
+        billingProcess.setPeriodUnit(config.getPeriodUnit());
+        billingProcess.setPeriodValue(config.getPeriodValue());
+        billingProcess.setIsReview(0);
+        billingProcess.setRetriesToDo(0);
+
+        InvoiceDTO[] newInvoices = processBL.generateInvoice(billingProcess,
+                user, false, onlyRecurring);
+
+        if (newInvoices != null) {
+            Integer[] invoiceIds = new Integer[newInvoices.length];
+            for (int i = 0; i < newInvoices.length; i++) {
+                invoiceIds[i] = newInvoices[i].getId();
+            }
+            return invoiceIds;
+        } else {
+            return new Integer[]{};
+        }
+    }
+
+    public InvoiceWS getInvoiceWS(Integer invoiceId) throws SessionInternalError {
         if (invoiceId == null) {
             return null;
         }
@@ -170,8 +207,18 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         return InvoiceBL.getWS(invoice);
     }
 
-    public InvoiceWS getLatestInvoice(Integer userId)
-            throws SessionInternalError {
+    /**
+     * Deletes an invoice
+     *
+     * @param invoiceId The id of the invoice to delete
+     */
+    public void deleteInvoice(Integer invoiceId) {
+        Integer executorId = getCallerId();
+        InvoiceBL invoice = new InvoiceBL(invoiceId);
+        invoice.delete(executorId);
+    }
+
+    public InvoiceWS getLatestInvoice(Integer userId) throws SessionInternalError {
         InvoiceWS retValue = null;
         try {
             if (userId == null) {
@@ -241,54 +288,71 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Deletes an invoice
-     *
-     * @param invoiceId The id of the invoice to delete
+     * ------------------- INVOICE API EXTENSION --------------------------
      */
-    public void deleteInvoice(Integer invoiceId) {
-        Integer executorId = getCallerId();
-        InvoiceBL invoice = new InvoiceBL(invoiceId);
-        invoice.delete(executorId);
+    /**
+     * Retrieves a list of all the {@link InvoiceWS invoices} in a given period
+     * of time. TODO: This method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#getInvoiceListByDate(java.lang.String,
+     * java.lang.String)
+     * @throws SessionInternalError when internal error occurs
+     */
+    public InvoiceWS[] getInvoiceListByDate(String since, String until) throws SessionInternalError {
+        try {
+            Date dSince = com.sapienter.jbilling.common.Util.parseDate(since);
+            Date dUntil = com.sapienter.jbilling.common.Util.parseDate(until);
+            if (since == null || until == null) {
+                return null;
+            }
+
+            Integer entityId = getCallerCompanyId();
+            InvoiceBL invoiceBl = new InvoiceBL();
+
+            Integer[] invoiceIds = invoiceBl.getInvoicesByCreateDateArray(entityId, dSince, dUntil);
+
+            InvoiceWS[] invoices = null;
+            invoices = new InvoiceWS[invoiceIds.length];
+            for (int f = 0; f < invoiceIds.length; f++) {
+                invoices[f] = invoiceBl.getWS(new InvoiceDAS().find(invoiceIds[f]));
+            }
+            return invoices;
+        } catch (Exception e) { // needed for the SQLException :(
+            LOG.error("Exception in WS - getInvoiceListByDate(): getting invoices by date "
+                    + since + " " + until, e);
+            throw new SessionInternalError("Error getting invoices by date");
+        }
     }
 
     /**
-     * Generates invoices for orders not yet invoiced for this user. Optionally
-     * only allow recurring orders to generate invoices. Returns the ids of the
-     * invoices generated.
+     * Generates and returns the paper invoice PDF for the given invoiceId.
+     * TODO: This method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#getPaperInvoicePDF(java.lang.Integer,
+     * java.lang.Integer)
+     * @throws SessionInternalError when internal error occurs
      */
-    public Integer[] createInvoice(Integer userId, boolean onlyRecurring)
-            throws SessionInternalError {
-        UserDTO user = new UserDAS().find(userId);
-        BillingProcessBL processBL = new BillingProcessBL();
-
-        BillingProcessConfigurationDTO config =
-                new BillingProcessConfigurationDAS().findByEntity(
-                user.getCompany());
-
-        // Create a mock billing process object, because the method
-        // we are calling was meant to be called by the billing process.
-        BillingProcessDTO billingProcess = new BillingProcessDTO();
-        billingProcess.setId(0);
-        billingProcess.setEntity(user.getCompany());
-        billingProcess.setBillingDate(new Date());
-        billingProcess.setPeriodUnit(config.getPeriodUnit());
-        billingProcess.setPeriodValue(config.getPeriodValue());
-        billingProcess.setIsReview(0);
-        billingProcess.setRetriesToDo(0);
-
-        InvoiceDTO[] newInvoices = processBL.generateInvoice(billingProcess,
-                user, false, onlyRecurring);
-
-        if (newInvoices != null) {
-            Integer[] invoiceIds = new Integer[newInvoices.length];
-            for (int i = 0; i < newInvoices.length; i++) {
-                invoiceIds[i] = newInvoices[i].getId();
-            }
-            return invoiceIds;
-        } else {
-            return new Integer[]{};
-        }
+    public byte[] getPaperInvoicePDF(Integer invoiceId) throws SessionInternalError {
+        IInvoiceSessionBean invoiceSession = (IInvoiceSessionBean) Context.getBean(Context.Name.INVOICE_SESSION);
+        return invoiceSession.getPDFInvoice(invoiceId);
     }
+
+    /**
+     * Sends an email with the invoice to a customer. This API call is used to
+     * manually send an email invoice to a customer. TODO: Extra check might
+     * require to make sure invoice belongs to user. TODO: This method is not
+     * secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#emailInvoice(java.lang.Integer,
+     * java.lang.Integer)
+     * @throws SessionInternalError when internal error occurs
+     */
+    public Boolean emailInvoice(Integer invoiceId, Integer userId) throws SessionInternalError {
+        INotificationSessionBean notificationSession =
+                (INotificationSessionBean) Context.getBean(Context.Name.NOTIFICATION_SESSION);
+        return notificationSession.emailInvoice(invoiceId);
+    }
+
 
     /*
      * USERS
@@ -304,8 +368,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * in the creation although they are not mandatory.
      * @return The id of the new user, or null if non was created
      */
-    public Integer createUser(UserWS newUser)
-            throws SessionInternalError {
+    public Integer createUser(UserWS newUser) throws SessionInternalError {
 
         validateUser(newUser);
         newUser.setUserId(0);
@@ -367,6 +430,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     public void updateUser(UserWS user)
             throws SessionInternalError {
 
+        // cause exception when customer contact missing
+        // should not be the case
         validateUser(user);
 
         UserBL bl = new UserBL(user.getUserId());
@@ -626,38 +691,6 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Pays given invoice, using the first credit card available for invoice'd
-     * user.
-     *
-     * @return <code>null</code> if invoice has not positive balance, or if user
-     * does not have credit card
-     * @return resulting authorization record. The payment itself can be found
-     * by calling getLatestPayment
-     */
-    public PaymentAuthorizationDTOEx payInvoice(Integer invoiceId) throws SessionInternalError {
-
-        if (invoiceId == null) {
-            throw new SessionInternalError("Can not pay null invoice");
-        }
-
-        final InvoiceDTO invoice = findInvoice(invoiceId);
-        CreditCardDTO creditCard = getCreditCard(invoice.getBaseUser().getUserId());
-        if (creditCard == null) {
-            return null;
-        }
-
-        PaymentDTOEx payment = doPayInvoice(invoice, creditCard);
-
-        PaymentAuthorizationDTOEx result = null;
-        if (payment != null) {
-            result = new PaymentAuthorizationDTOEx(payment.getAuthorization().getOldDTO());
-            result.setResult(new Integer(payment.getPaymentResult().getId()).equals(Constants.RESULT_OK));
-        }
-
-        return result;
-    }
-
-    /**
      * Updates a user's credit card.
      *
      * @param userId The id of the user updating credit card data.
@@ -678,6 +711,235 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
         sess.updateCreditCard(executorId, userId, cc);
 
+    }
+
+    @Override
+    public void updateAch(Integer userId, com.sapienter.jbilling.server.entity.AchDTO ach)
+            throws SessionInternalError {
+
+        if (ach != null && (ach.getAbaRouting() == null
+                || ach.getBankAccount() == null)) {
+            LOG.debug("WS - updateAch: " + "ACH validation error.");
+            throw new SessionInternalError("Missing ACH data.");
+        }
+
+        Integer executorId = getCallerId();
+        IUserSessionBean sess = (IUserSessionBean) Context.getBean(
+                Context.Name.USER_SESSION);
+        AchDTO ac = ach != null ? new AchDTO(ach) : null;
+
+        sess.updateACH(userId, executorId, ac);
+    }
+
+    @Override
+    public Integer getAuthPaymentType(Integer userId)
+            throws SessionInternalError {
+
+        IUserSessionBean sess = (IUserSessionBean) Context.getBean(
+                Context.Name.USER_SESSION);
+        return sess.getAuthPaymentType(userId);
+    }
+
+    @Override
+    public void setAuthPaymentType(Integer userId, Integer autoPaymentType, boolean use)
+            throws SessionInternalError {
+
+        IUserSessionBean sess = (IUserSessionBean) Context.getBean(
+                Context.Name.USER_SESSION);
+        sess.setAuthPaymentType(userId, autoPaymentType, use);
+    }
+
+    /**
+     * Implementation of the User Transitions List webservice. This accepts a
+     * start and end date as arguments, and produces an array of data containing
+     * the user transitions logged in the requested time range.
+     *
+     * @param from Date indicating the lower limit for the extraction of
+     * transition logs. It can be <code>null</code>, in such a case, the
+     * extraction will start where the last extraction left off. If no
+     * extractions have been done so far and this parameter is null, the
+     * function will extract from the oldest transition logged.
+     * @param to Date indicatin the upper limit for the extraction of transition
+     * logs. It can be <code>null</code>, in which case the extraction will have
+     * no upper limit.
+     * @return UserTransitionResponseWS[] an array of objects containing the
+     * result of the extraction, or <code>null</code> if there is no data thas
+     * satisfies the extraction parameters.
+     */
+    public UserTransitionResponseWS[] getUserTransitions(Date from, Date to)
+            throws SessionInternalError {
+
+        UserTransitionResponseWS[] result = null;
+        Integer last = null;
+        // Obtain the current entity and language Ids
+
+        UserBL user = new UserBL();
+        Integer callerId = getCallerId();
+        Integer entityId = getCallerCompanyId();
+        EventLogger evLog = EventLogger.getInstance();
+
+        if (from == null) {
+            last = evLog.getLastTransitionEvent(entityId);
+        }
+
+        if (last != null) {
+            result = user.getUserTransitionsById(entityId, last, to);
+        } else {
+            result = user.getUserTransitionsByDate(entityId, from, to);
+        }
+
+        if (result == null) {
+            LOG.info("Data retrieved but resultset is null");
+        } else {
+            LOG.info("Data retrieved. Result size = " + result.length);
+        }
+
+        // Log the last value returned if there was any. This happens always,
+        // unless the returned array is empty.
+        if (result != null && result.length > 0) {
+            LOG.info("Registering transition list event");
+            evLog.audit(callerId, null, Constants.TABLE_EVENT_LOG, callerId, EventLogger.MODULE_WEBSERVICES,
+                    EventLogger.USER_TRANSITIONS_LIST, result[result.length - 1].getId(),
+                    result[0].getId().toString(), null);
+        }
+        return result;
+    }
+
+    /**
+     * @return UserTransitionResponseWS[] an array of objects containing the
+     * result of the extraction, or <code>null</code> if there is no data thas
+     * satisfies the extraction parameters.
+     */
+    public UserTransitionResponseWS[] getUserTransitionsAfterId(Integer id)
+            throws SessionInternalError {
+
+        UserTransitionResponseWS[] result = null;
+        // Obtain the current entity and language Ids
+
+        UserBL user = new UserBL();
+        Integer callerId = getCallerId();
+        Integer entityId = getCallerCompanyId();
+        EventLogger evLog = EventLogger.getInstance();
+
+        result = user.getUserTransitionsById(entityId, id, null);
+
+        if (result == null) {
+            LOG.debug("Data retrieved but resultset is null");
+        } else {
+            LOG.debug("Data retrieved. Result size = " + result.length);
+        }
+
+        // Log the last value returned if there was any. This happens always,
+        // unless the returned array is empty.
+        if (result != null && result.length > 0) {
+            LOG.debug("Registering transition list event");
+            evLog.audit(callerId, null, Constants.TABLE_EVENT_LOG, callerId, EventLogger.MODULE_WEBSERVICES,
+                    EventLogger.USER_TRANSITIONS_LIST, result[result.length - 1].getId(),
+                    result[0].getId().toString(), null);
+        }
+        return result;
+    }
+
+    /**
+     * ------------------- USER API EXTENSION --------------------------
+     */
+    /**
+     * Retrieves a list of all {@link UserWS users} in a given status. TODO:
+     * This method is not secured or in a jUnit test
+     *
+     * @param statusId the status id that will be used for extraction
+     * @return an array of <code>UserWS</code> objects in a given status.
+     * @throws SessionInternalError
+     */
+    public UserWS[] getUserListInStatus(Integer statusId) throws SessionInternalError {
+        UserWS[] users = null;
+        Integer entityId = getCallerCompanyId();
+        Integer[] userIds = getUsersByStatus(statusId, entityId, true);
+
+        users = new UserWS[userIds.length];
+        for (int f = 0; f < userIds.length; f++) {
+            // get user details by id
+            UserWS dto = null;
+            // calling from dot.net seems to not have a context set. So then when calling
+            // getCallerPrincipal the client gets a 'No security context set' exception
+            // log.debug("principal = " + context.getCallerPrincipal().getName());
+            UserBL bl = new UserBL(userIds[f]);
+            users[f] = bl.getUserWS();
+        }
+        return users;
+    }
+
+    /**
+     * Retrieves a list of all {@link UserWS customers} in a given status
+     * including sub-accounts. This call excludes any other users that are not
+     * Customers.
+     *
+     * @see IWebServicesSessionBean#getCustomersInStatus(java.lang.Integer)
+     * @throws SessionInternalError when internal error occurs
+     */
+    public Collection<UserWS> getCustomersInStatus(Integer statusId) throws SessionInternalError {
+        Collection users = null;
+        Integer entityId = getCallerCompanyId();
+
+        Integer[] userIds = getUsersByStatus(statusId, entityId, true);
+        users = new ArrayList();
+
+        for (int f = 0; f < userIds.length; f++) {
+            UserBL bl = new UserBL(userIds[f]);
+            UserWS dto = bl.getUserWS();
+            // add only customers to return
+            if (Constants.TYPE_CUSTOMER.equals(dto.getMainRoleId())) {
+                users.add(dto);
+            }
+        }
+        return users;
+    }
+
+    /**
+     * Search for {@link UserWS users}, including sub-accounts by given search
+     * parameter. Only search users who are customers. <br> TODO: This method is
+     * not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#searchCustomers(java.lang.String)
+     * @throws SessionInternalError when internal error occurs
+     */
+    public UserWS[] searchCustomers(String searchValue) throws SessionInternalError {
+        if (searchValue == null || "".equals(searchValue)) {
+            return null;
+        }
+
+        UserWS[] users = null;
+        Integer entityId = getCallerCompanyId();
+        try {
+            Integer[] userIds = searchForCustomer(searchValue, entityId);
+            users = new UserWS[userIds.length];
+            for (int f = 0; f < userIds.length; f++) {
+                UserBL bl = new UserBL(userIds[f]);
+                users[f] = bl.getUserWS();
+            }
+            return users;
+        } catch (Exception e) {
+            LOG.error("WS - searchCustomers() ", e);
+            throw new SessionInternalError("Error searching for Customers");
+        }
+    }
+
+    public Integer[] searchForCustomer(String searchValue, Integer entityId) throws SessionInternalError {
+        try {
+            UserBL bl = new UserBL();
+            CachedRowSet users = bl.searchCustomer(entityId, searchValue);
+            LOG.debug("got collection. Now converting");
+            Integer[] ret = new Integer[users.size()];
+            int f = 0;
+            while (users.next()) {
+                ret[f] = users.getInt(1);
+                f++;
+            }
+            users.close();
+            return ret;
+        } catch (Exception e) { // can't remove because of SQLException :(
+            throw new SessionInternalError(e);
+        }
     }
 
     /*
@@ -741,20 +1003,6 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         return retValue;
     }
 
-    public void updateItem(ItemDTOEx item) {
-        UserBL bl = new UserBL(getCallerId());
-        Integer executorId = bl.getEntity().getUserId();
-        Integer languageId = bl.getEntity().getLanguageIdField();
-
-        // do some transformation from WS to DTO :(
-        ItemBL itemBL = new ItemBL();
-        ItemDTO dto = itemBL.getDTO(item);
-
-        IItemSessionBean itemSession = (IItemSessionBean) Context.getBean(
-                Context.Name.ITEM_SESSION);
-        itemSession.update(executorId, dto, languageId);
-    }
-
     public Integer createOrderAndInvoice(OrderWS order)
             throws SessionInternalError {
 
@@ -762,42 +1010,6 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         InvoiceDTO invoice = doCreateInvoice(orderId);
 
         return invoice == null ? null : invoice.getId();
-    }
-
-    private void processItemLine(OrderLineWS[] lines, Integer languageId,
-            Integer entityId, Integer userId, Integer currencyId,
-            String pricingFields)
-            throws SessionInternalError, PluggableTaskException, TaskException {
-        for (OrderLineWS line : lines) {
-            // get the related item
-            IItemSessionBean itemSession = (IItemSessionBean) Context.getBean(
-                    Context.Name.ITEM_SESSION);
-
-            // get pricing fields if they were set for the order
-            List<PricingField> fields = null;
-            if (pricingFields != null) {
-                fields = Arrays.asList(
-                        PricingField.getPricingFieldsValue(pricingFields));
-            }
-
-            ItemDTO item = itemSession.get(line.getItemId(),
-                    languageId, userId, currencyId,
-                    entityId, fields);
-
-            //ItemDAS itemDas = new ItemDAS();
-            //line.setItem(itemDas.find(line.getItemId()));
-            if (line.getUseItem().booleanValue()) {
-                if (item.getPrice() == null) {
-                    line.setPrice(item.getPercentage());
-                } else {
-                    line.setPrice(item.getPrice());
-                }
-                if (line.getDescription() == null
-                        || line.getDescription().length() == 0) {
-                    line.setDescription(item.getDescription());
-                }
-            }
-        }
     }
 
     public void updateOrder(OrderWS order)
@@ -1046,8 +1258,90 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         }
     }
 
+    private void processItemLine(OrderLineWS[] lines, Integer languageId,
+            Integer entityId, Integer userId, Integer currencyId,
+            String pricingFields)
+            throws SessionInternalError, PluggableTaskException, TaskException {
+        for (OrderLineWS line : lines) {
+            // get the related item
+            IItemSessionBean itemSession = (IItemSessionBean) Context.getBean(
+                    Context.Name.ITEM_SESSION);
+
+            // get pricing fields if they were set for the order
+            List<PricingField> fields = null;
+            if (pricingFields != null) {
+                fields = Arrays.asList(
+                        PricingField.getPricingFieldsValue(pricingFields));
+            }
+
+            ItemDTO item = itemSession.get(line.getItemId(),
+                    languageId, userId, currencyId,
+                    entityId, fields);
+
+            //ItemDAS itemDas = new ItemDAS();
+            //line.setItem(itemDas.find(line.getItemId()));
+            if (line.getUseItem().booleanValue()) {
+                if (item.getPrice() == null) {
+                    line.setPrice(item.getPercentage());
+                } else {
+                    line.setPrice(item.getPrice());
+                }
+                if (line.getDescription() == null
+                        || line.getDescription().length() == 0) {
+                    line.setDescription(item.getDescription());
+                }
+            }
+        }
+    }
+
     /*
      * PAYMENT
+     */
+    /**
+     * Pays given invoice, using the first credit card available for invoice'd
+     * user.
+     *
+     * @return <code>null</code> if invoice has not positive balance, or if user
+     * does not have credit card
+     * @return resulting authorization record. The payment itself can be found
+     * by calling getLatestPayment
+     */
+    public PaymentAuthorizationDTOEx payInvoice(Integer invoiceId) throws SessionInternalError {
+
+        if (invoiceId == null) {
+            throw new SessionInternalError("Can not pay null invoice");
+        }
+
+        final InvoiceDTO invoice = findInvoice(invoiceId);
+        CreditCardDTO creditCard = getCreditCard(invoice.getBaseUser().getUserId());
+        if (creditCard == null) {
+            return null;
+        }
+
+        PaymentDTOEx payment = doPayInvoice(invoice, creditCard);
+
+        PaymentAuthorizationDTOEx result = null;
+        if (payment != null) {
+            result = new PaymentAuthorizationDTOEx(payment.getAuthorization().getOldDTO());
+            result.setResult(new Integer(payment.getPaymentResult().getId()).equals(Constants.RESULT_OK));
+        }
+
+        return result;
+    }
+
+    /**
+     * Enters a payment and applies it to the given invoice. This method DOES
+     * NOT process the payment but only creates it as 'Entered'. The entered
+     * payment will later be processed by the billing process.
+     *
+     * Invoice ID is optional. If no invoice ID is given the payment will be
+     * applied to the payment user's account according to the configured entity
+     * preferences.
+     *
+     * @param payment payment to apply
+     * @param invoiceId invoice id
+     * @return created payment id
+     * @throws SessionInternalError
      */
     public Integer applyPayment(PaymentWS payment, Integer invoiceId)
             throws SessionInternalError {
@@ -1096,6 +1390,59 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         return payment.getManyWS(userId, number, languageId);
     }
 
+    public PaymentAuthorizationDTOEx processPayment(PaymentWS payment) {
+        validatePayment(payment);
+        Integer entityId = getCallerCompanyId();
+        PaymentDTOEx dto = new PaymentDTOEx(payment);
+
+        // payment without Credit Card or ACH, fetch the users primary payment instrument for use
+        if (payment.getCreditCard() == null && payment.getAch() == null) {
+            LOG.debug("processPayment() called without payment method, fetching users automatic payment instrument.");
+            PaymentDTO instrument;
+            try {
+                instrument = PaymentBL.findPaymentInstrument(entityId, payment.getUserId());
+            } catch (PluggableTaskException e) {
+                throw new SessionInternalError("Exception occurred fetching payment info plug-in.", e);
+            } catch (TaskException e) {
+                throw new SessionInternalError("Exception occurred with plug-in when fetching payment instrument.", e);
+            }
+
+            dto.setCreditCard(instrument.getCreditCard());
+            dto.setAch(instrument.getAch());
+        }
+
+        // populate payment method based on the payment instrument
+        if (dto.getCreditCard() != null) {
+            dto.setPaymentMethod(new PaymentMethodDTO(dto.getCreditCard().getCcType()));
+        }
+
+        if (dto.getAch() != null) {
+            dto.setPaymentMethod(new PaymentMethodDTO(Constants.PAYMENT_METHOD_ACH));
+        }
+
+        // process payment
+        IPaymentSessionBean session = (IPaymentSessionBean) Context.getBean(Context.Name.PAYMENT_SESSION);
+        Integer result = session.processAndUpdateInvoice(dto, null, entityId);
+        LOG.debug("paymentBean.processAndUpdateInvoice() Id=" + result);
+
+        PaymentAuthorizationDTOEx auth = null;
+        if (dto != null && dto.getAuthorization() != null) {
+            LOG.debug("PaymentAuthorizationDTO Id =" + dto.getAuthorization().getId());
+            auth = new PaymentAuthorizationDTOEx(dto.getAuthorization().getOldDTO());
+            LOG.debug("PaymentAuthorizationDTOEx Id =" + auth.getId());
+            auth.setResult(result.equals(Constants.RESULT_OK));
+
+        } else {
+            auth = new PaymentAuthorizationDTOEx();
+            auth.setResult(result.equals(Constants.RESULT_FAIL));
+        }
+        return auth;
+    }
+
+    /**
+     * ------------------- PAYMENT API EXTENSION --------------------------
+     */
+
     /*
      * ITEM
      */
@@ -1126,97 +1473,6 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         return itemBL.getAllItems(entityId);
     }
 
-    /**
-     * Implementation of the User Transitions List webservice. This accepts a
-     * start and end date as arguments, and produces an array of data containing
-     * the user transitions logged in the requested time range.
-     *
-     * @param from Date indicating the lower limit for the extraction of
-     * transition logs. It can be <code>null</code>, in such a case, the
-     * extraction will start where the last extraction left off. If no
-     * extractions have been done so far and this parameter is null, the
-     * function will extract from the oldest transition logged.
-     * @param to Date indicatin the upper limit for the extraction of transition
-     * logs. It can be <code>null</code>, in which case the extraction will have
-     * no upper limit.
-     * @return UserTransitionResponseWS[] an array of objects containing the
-     * result of the extraction, or <code>null</code> if there is no data thas
-     * satisfies the extraction parameters.
-     */
-    public UserTransitionResponseWS[] getUserTransitions(Date from, Date to)
-            throws SessionInternalError {
-
-        UserTransitionResponseWS[] result = null;
-        Integer last = null;
-        // Obtain the current entity and language Ids
-
-        UserBL user = new UserBL();
-        Integer callerId = getCallerId();
-        Integer entityId = getCallerCompanyId();
-        EventLogger evLog = EventLogger.getInstance();
-
-        if (from == null) {
-            last = evLog.getLastTransitionEvent(entityId);
-        }
-
-        if (last != null) {
-            result = user.getUserTransitionsById(entityId, last, to);
-        } else {
-            result = user.getUserTransitionsByDate(entityId, from, to);
-        }
-
-        if (result == null) {
-            LOG.info("Data retrieved but resultset is null");
-        } else {
-            LOG.info("Data retrieved. Result size = " + result.length);
-        }
-
-        // Log the last value returned if there was any. This happens always,
-        // unless the returned array is empty.
-        if (result != null && result.length > 0) {
-            LOG.info("Registering transition list event");
-            evLog.audit(callerId, null, Constants.TABLE_EVENT_LOG, callerId, EventLogger.MODULE_WEBSERVICES,
-                    EventLogger.USER_TRANSITIONS_LIST, result[result.length - 1].getId(),
-                    result[0].getId().toString(), null);
-        }
-        return result;
-    }
-
-    /**
-     * @return UserTransitionResponseWS[] an array of objects containing the
-     * result of the extraction, or <code>null</code> if there is no data thas
-     * satisfies the extraction parameters.
-     */
-    public UserTransitionResponseWS[] getUserTransitionsAfterId(Integer id)
-            throws SessionInternalError {
-
-        UserTransitionResponseWS[] result = null;
-        // Obtain the current entity and language Ids
-
-        UserBL user = new UserBL();
-        Integer callerId = getCallerId();
-        Integer entityId = getCallerCompanyId();
-        EventLogger evLog = EventLogger.getInstance();
-
-        result = user.getUserTransitionsById(entityId, id, null);
-
-        if (result == null) {
-            LOG.debug("Data retrieved but resultset is null");
-        } else {
-            LOG.debug("Data retrieved. Result size = " + result.length);
-        }
-
-        // Log the last value returned if there was any. This happens always,
-        // unless the returned array is empty.
-        if (result != null && result.length > 0) {
-            LOG.debug("Registering transition list event");
-            evLog.audit(callerId, null, Constants.TABLE_EVENT_LOG, callerId, EventLogger.MODULE_WEBSERVICES,
-                    EventLogger.USER_TRANSITIONS_LIST, result[result.length - 1].getId(),
-                    result[0].getId().toString(), null);
-        }
-        return result;
-    }
-
     public ItemDTOEx getItem(Integer itemId, Integer userId, String pricing) {
         PricingField[] fields = PricingField.getPricingFieldsValue(pricing);
 
@@ -1238,6 +1494,20 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
         ItemDTOEx retValue = helper.getWS(helper.getDTO(languageId, userId, entityId, currencyId));
         return retValue;
+    }
+
+    public void updateItem(ItemDTOEx item) {
+        UserBL bl = new UserBL(getCallerId());
+        Integer executorId = bl.getEntity().getUserId();
+        Integer languageId = bl.getEntity().getLanguageIdField();
+
+        // do some transformation from WS to DTO :(
+        ItemBL itemBL = new ItemBL();
+        ItemDTO dto = itemBL.getDTO(item);
+
+        IItemSessionBean itemSession = (IItemSessionBean) Context.getBean(
+                Context.Name.ITEM_SESSION);
+        itemSession.update(executorId, dto, languageId);
     }
 
     public Integer createItemCategory(ItemTypeWS itemType)
@@ -1269,6 +1539,263 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         itemTypeBL.update(executorId, dto);
     }
 
+    // TODO: This method is not secured or in a jUnit test
+    public InvoiceWS getLatestInvoiceByItemType(Integer userId, Integer itemTypeId)
+            throws SessionInternalError {
+        InvoiceWS retValue = null;
+        try {
+            if (userId == null) {
+                return null;
+            }
+            InvoiceBL bl = new InvoiceBL();
+            Integer invoiceId = bl.getLastByUserAndItemType(userId, itemTypeId);
+            if (invoiceId != null) {
+                retValue = bl.getWS(new InvoiceDAS().find(invoiceId));
+            }
+            return retValue;
+        } catch (Exception e) { // forced by SQLException
+            LOG.error("Exception in web service: getting latest invoice"
+                    + " for user " + userId, e);
+            throw new SessionInternalError("Error getting latest invoice");
+        }
+    }
+
+    /**
+     * Return 'number' most recent invoices that contain a line item with an
+     * item of the given item type.
+     */
+    // TODO: This method is not secured or in a jUnit test
+    public Integer[] getLastInvoicesByItemType(Integer userId, Integer itemTypeId, Integer number)
+            throws SessionInternalError {
+        if (userId == null || itemTypeId == null || number == null) {
+            return null;
+        }
+
+        InvoiceBL bl = new InvoiceBL();
+        return bl.getManyByItemTypeWS(userId, itemTypeId, number);
+    }
+
+    // TODO: This method is not secured or in a jUnit test
+    public OrderWS getLatestOrderByItemType(Integer userId, Integer itemTypeId)
+            throws SessionInternalError {
+        if (userId == null) {
+            throw new SessionInternalError("User id can not be null");
+        }
+        if (itemTypeId == null) {
+            throw new SessionInternalError("itemTypeId can not be null");
+        }
+        OrderWS retValue = null;
+        // get the info from the caller
+        UserBL userbl = new UserBL(getCallerId());
+        Integer languageId = userbl.getEntity().getLanguageIdField();
+
+        // now get the order
+        OrderBL bl = new OrderBL();
+        Integer orderId = bl.getLatestByItemType(userId, itemTypeId);
+        if (orderId != null) {
+            bl.set(orderId);
+            retValue = bl.getWS(languageId);
+        }
+        return retValue;
+    }
+
+    // TODO: This method is not secured or in a jUnit test
+    public Integer[] getLastOrdersByItemType(Integer userId, Integer itemTypeId, Integer number)
+            throws SessionInternalError {
+        if (userId == null || number == null) {
+            return null;
+        }
+        OrderBL order = new OrderBL();
+        return order.getListIdsByItemType(userId, itemTypeId, number);
+    }
+
+    public BigDecimal isUserSubscribedTo(Integer userId, Integer itemId) {
+        OrderDAS das = new OrderDAS();
+        return das.findIsUserSubscribedTo(userId, itemId);
+    }
+
+    public Integer[] getUserItemsByCategory(Integer userId, Integer categoryId) {
+        Integer[] result = null;
+        OrderDAS das = new OrderDAS();
+        result = das.findUserItemsByCategory(userId, categoryId);
+        return result;
+    }
+
+    public ItemDTOEx[] getItemByCategory(Integer itemTypeId) {
+        return new ItemBL().getAllItemsByType(itemTypeId);
+    }
+
+    public ItemTypeWS[] getAllItemCategories() {
+        return new ItemTypeBL().getAllItemTypes();
+    }
+
+    public ValidatePurchaseWS validatePurchase(Integer userId, Integer itemId,
+            String fields) {
+        Integer[] itemIds = null;
+        if (itemId != null) {
+            itemIds = new Integer[]{itemId};
+        }
+
+        String[] fieldsArray = null;
+        if (fields != null) {
+            fieldsArray = new String[]{fields};
+        }
+
+        return doValidatePurchase(userId, itemIds, fieldsArray);
+    }
+
+    public ValidatePurchaseWS validateMultiPurchase(Integer userId,
+            Integer[] itemIds, String[] fields) {
+
+        return doValidatePurchase(userId, itemIds, fields);
+    }
+
+    private ValidatePurchaseWS doValidatePurchase(Integer userId,
+            Integer[] itemIds, String[] fields) {
+
+        if (userId == null || (itemIds == null && fields == null)) {
+            return null;
+        }
+
+        List<List<PricingField>> fieldsList = null;
+        if (fields != null) {
+            fieldsList = new ArrayList<List<PricingField>>(fields.length);
+            for (int i = 0; i < fields.length; i++) {
+                fieldsList.add(new ArrayList(Arrays.asList(
+                        PricingField.getPricingFieldsValue(fields[i]))));
+            }
+        }
+
+        List<Integer> itemIdsList = null;
+        List<BigDecimal> prices = new ArrayList<BigDecimal>();
+        List<ItemDTO> items = new ArrayList<ItemDTO>();
+
+        if (itemIds != null) {
+            itemIdsList = new ArrayList(Arrays.asList(itemIds));
+        } else if (fields != null) {
+            itemIdsList = new LinkedList<Integer>();
+
+            for (List<PricingField> pricingFields : fieldsList) {
+                try {
+                    // Since there is no item, run the mediation process rules
+                    // to create line/s. This will run pricing and 
+                    // item management rules as well
+
+                    // fields need to be in records
+                    Record record = new Record();
+                    for (PricingField field : pricingFields) {
+                        record.addField(field, false); // don't care about isKey
+                    }
+                    List<Record> records = new ArrayList<Record>(1);
+                    records.add(record);
+
+                    PluggableTaskManager<IMediationProcess> tm =
+                            new PluggableTaskManager<IMediationProcess>(
+                            getCallerCompanyId(),
+                            Constants.PLUGGABLE_TASK_MEDIATION_PROCESS);
+                    IMediationProcess processTask = tm.getNextClass();
+
+                    MediationResult result = new MediationResult("WS", false);
+                    result.setUserId(userId);
+                    result.setEventDate(new Date());
+                    ArrayList results = new ArrayList(1);
+                    results.add(result);
+                    processTask.process(records, results, "WS");
+
+                    // from the lines, get the items and prices
+                    for (OrderLineDTO line : result.getDiffLines()) {
+                        items.add(new ItemBL(line.getItemId()).getEntity());
+                        prices.add(line.getAmount());
+                    }
+                } catch (Exception e) {
+                    // log stacktrace
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+                    pw.close();
+                    LOG.error("Validate Purchase error: " + e.getMessage()
+                            + "\n" + sw.toString());
+
+                    ValidatePurchaseWS result = new ValidatePurchaseWS();
+                    result.setSuccess(false);
+                    result.setAuthorized(false);
+                    result.setQuantity(BigDecimal.ZERO);
+                    result.setMessage(new String[]{"Error: "
+                                + e.getMessage()});
+
+                    return result;
+                }
+            }
+        } else {
+            return null;
+        }
+
+        // find the prices first
+        // this will do nothing if the mediation process was uses. In that case
+        // the itemIdsList will be empty
+        int itemNum = 0;
+        for (Integer itemId : itemIdsList) {
+            ItemBL item = new ItemBL(itemId);
+
+            if (fieldsList != null && !fieldsList.isEmpty()) {
+                int fieldsIndex = itemNum;
+                // just get first set of fields if only one set 
+                // for many items
+                if (fieldsIndex > fieldsList.size()) {
+                    fieldsIndex = 0;
+                }
+                item.setPricingFields(fieldsList.get(fieldsIndex));
+            }
+
+            prices.add(item.getPrice(userId,
+                    getCallerCompanyId()));
+            items.add(item.getEntity());
+            itemNum++;
+        }
+
+        ValidatePurchaseWS ret = new UserBL(userId).validatePurchase(items,
+                prices, fieldsList);
+        return ret;
+    }
+
+    public void generateRules(String rulesData) throws SessionInternalError {
+        try {
+            PluggableTaskManager<IRulesGenerator> tm =
+                    new PluggableTaskManager<IRulesGenerator>(
+                    getCallerCompanyId(),
+                    Constants.PLUGGABLE_TASK_RULES_GENERATOR);
+            IRulesGenerator rulesGenerator = tm.getNextClass();
+
+            rulesGenerator.unmarshal(rulesData);
+            rulesGenerator.process();
+
+        } catch (Exception e) {
+            throw new SessionInternalError(e);
+        }
+    }
+
+    /**
+     *
+     * ------------------- MISC API EXTENSION --------------------------
+     */
+    /**
+     * Saves uploaded logo image file for the user's entity (company).
+     *
+     * @param inBytes an array of bytes for image to upload.
+     * @return true if image was successfully saved, false otherwise
+     * @throws SessionInternalError when internal error occurs
+     */
+    public boolean uploadLogo(byte[] inBytes) throws SessionInternalError {
+        IInvoiceSessionBean invoiceSession = (IInvoiceSessionBean) Context.getBean(Context.Name.INVOICE_SESSION);
+        Integer entityId = getCallerCompanyId();
+        return invoiceSession.uploadLogo(inBytes, entityId);
+    }
+
+    /**
+     *
+     * ------------------- PRIVATE HELPER METHODS FOR WEB SERVICE --------------
+     *
+     */
     private Integer zero2null(Integer var) {
         if (var != null && var.intValue() == 0) {
             return null;
@@ -1639,500 +2166,5 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         final InvoiceDTO invoice;
         invoice = new InvoiceBL(invoiceId).getEntity();
         return invoice;
-    }
-
-    // TODO: This method is not secured or in a jUnit test
-    public InvoiceWS getLatestInvoiceByItemType(Integer userId, Integer itemTypeId)
-            throws SessionInternalError {
-        InvoiceWS retValue = null;
-        try {
-            if (userId == null) {
-                return null;
-            }
-            InvoiceBL bl = new InvoiceBL();
-            Integer invoiceId = bl.getLastByUserAndItemType(userId, itemTypeId);
-            if (invoiceId != null) {
-                retValue = bl.getWS(new InvoiceDAS().find(invoiceId));
-            }
-            return retValue;
-        } catch (Exception e) { // forced by SQLException
-            LOG.error("Exception in web service: getting latest invoice"
-                    + " for user " + userId, e);
-            throw new SessionInternalError("Error getting latest invoice");
-        }
-    }
-
-    /**
-     * Return 'number' most recent invoices that contain a line item with an
-     * item of the given item type.
-     */
-    // TODO: This method is not secured or in a jUnit test
-    public Integer[] getLastInvoicesByItemType(Integer userId, Integer itemTypeId, Integer number)
-            throws SessionInternalError {
-        if (userId == null || itemTypeId == null || number == null) {
-            return null;
-        }
-
-        InvoiceBL bl = new InvoiceBL();
-        return bl.getManyByItemTypeWS(userId, itemTypeId, number);
-    }
-
-    // TODO: This method is not secured or in a jUnit test
-    public OrderWS getLatestOrderByItemType(Integer userId, Integer itemTypeId)
-            throws SessionInternalError {
-        if (userId == null) {
-            throw new SessionInternalError("User id can not be null");
-        }
-        if (itemTypeId == null) {
-            throw new SessionInternalError("itemTypeId can not be null");
-        }
-        OrderWS retValue = null;
-        // get the info from the caller
-        UserBL userbl = new UserBL(getCallerId());
-        Integer languageId = userbl.getEntity().getLanguageIdField();
-
-        // now get the order
-        OrderBL bl = new OrderBL();
-        Integer orderId = bl.getLatestByItemType(userId, itemTypeId);
-        if (orderId != null) {
-            bl.set(orderId);
-            retValue = bl.getWS(languageId);
-        }
-        return retValue;
-    }
-
-    // TODO: This method is not secured or in a jUnit test
-    public Integer[] getLastOrdersByItemType(Integer userId, Integer itemTypeId, Integer number)
-            throws SessionInternalError {
-        if (userId == null || number == null) {
-            return null;
-        }
-        OrderBL order = new OrderBL();
-        return order.getListIdsByItemType(userId, itemTypeId, number);
-    }
-
-    public BigDecimal isUserSubscribedTo(Integer userId, Integer itemId) {
-        OrderDAS das = new OrderDAS();
-        return das.findIsUserSubscribedTo(userId, itemId);
-    }
-
-    public Integer[] getUserItemsByCategory(Integer userId, Integer categoryId) {
-        Integer[] result = null;
-        OrderDAS das = new OrderDAS();
-        result = das.findUserItemsByCategory(userId, categoryId);
-        return result;
-    }
-
-    public ItemDTOEx[] getItemByCategory(Integer itemTypeId) {
-        return new ItemBL().getAllItemsByType(itemTypeId);
-    }
-
-    public ItemTypeWS[] getAllItemCategories() {
-        return new ItemTypeBL().getAllItemTypes();
-    }
-
-    public PaymentAuthorizationDTOEx processPayment(PaymentWS payment) {
-        validatePayment(payment);
-        Integer entityId = getCallerCompanyId();
-        PaymentDTOEx dto = new PaymentDTOEx(payment);
-
-        // payment without Credit Card or ACH, fetch the users primary payment instrument for use
-        if (payment.getCreditCard() == null && payment.getAch() == null) {
-            LOG.debug("processPayment() called without payment method, fetching users automatic payment instrument.");
-            PaymentDTO instrument;
-            try {
-                instrument = PaymentBL.findPaymentInstrument(entityId, payment.getUserId());
-            } catch (PluggableTaskException e) {
-                throw new SessionInternalError("Exception occurred fetching payment info plug-in.", e);
-            } catch (TaskException e) {
-                throw new SessionInternalError("Exception occurred with plug-in when fetching payment instrument.", e);
-            }
-
-            dto.setCreditCard(instrument.getCreditCard());
-            dto.setAch(instrument.getAch());
-        }
-
-        // populate payment method based on the payment instrument
-        if (dto.getCreditCard() != null) {
-            dto.setPaymentMethod(new PaymentMethodDTO(dto.getCreditCard().getCcType()));
-        }
-
-        if (dto.getAch() != null) {
-            dto.setPaymentMethod(new PaymentMethodDTO(Constants.PAYMENT_METHOD_ACH));
-        }
-
-        // process payment
-        IPaymentSessionBean session = (IPaymentSessionBean) Context.getBean(Context.Name.PAYMENT_SESSION);
-        Integer result = session.processAndUpdateInvoice(dto, null, entityId);
-        LOG.debug("paymentBean.processAndUpdateInvoice() Id=" + result);
-
-        PaymentAuthorizationDTOEx auth = null;
-        if (dto != null && dto.getAuthorization() != null) {
-            LOG.debug("PaymentAuthorizationDTO Id =" + dto.getAuthorization().getId());
-            auth = new PaymentAuthorizationDTOEx(dto.getAuthorization().getOldDTO());
-            LOG.debug("PaymentAuthorizationDTOEx Id =" + auth.getId());
-            auth.setResult(result.equals(Constants.RESULT_OK));
-
-        } else {
-            auth = new PaymentAuthorizationDTOEx();
-            auth.setResult(result.equals(Constants.RESULT_FAIL));
-        }
-        return auth;
-    }
-
-    public ValidatePurchaseWS validatePurchase(Integer userId, Integer itemId,
-            String fields) {
-        Integer[] itemIds = null;
-        if (itemId != null) {
-            itemIds = new Integer[]{itemId};
-        }
-
-        String[] fieldsArray = null;
-        if (fields != null) {
-            fieldsArray = new String[]{fields};
-        }
-
-        return doValidatePurchase(userId, itemIds, fieldsArray);
-    }
-
-    public ValidatePurchaseWS validateMultiPurchase(Integer userId,
-            Integer[] itemIds, String[] fields) {
-
-        return doValidatePurchase(userId, itemIds, fields);
-    }
-
-    private ValidatePurchaseWS doValidatePurchase(Integer userId,
-            Integer[] itemIds, String[] fields) {
-
-        if (userId == null || (itemIds == null && fields == null)) {
-            return null;
-        }
-
-        List<List<PricingField>> fieldsList = null;
-        if (fields != null) {
-            fieldsList = new ArrayList<List<PricingField>>(fields.length);
-            for (int i = 0; i < fields.length; i++) {
-                fieldsList.add(new ArrayList(Arrays.asList(
-                        PricingField.getPricingFieldsValue(fields[i]))));
-            }
-        }
-
-        List<Integer> itemIdsList = null;
-        List<BigDecimal> prices = new ArrayList<BigDecimal>();
-        List<ItemDTO> items = new ArrayList<ItemDTO>();
-
-        if (itemIds != null) {
-            itemIdsList = new ArrayList(Arrays.asList(itemIds));
-        } else if (fields != null) {
-            itemIdsList = new LinkedList<Integer>();
-
-            for (List<PricingField> pricingFields : fieldsList) {
-                try {
-                    // Since there is no item, run the mediation process rules
-                    // to create line/s. This will run pricing and 
-                    // item management rules as well
-
-                    // fields need to be in records
-                    Record record = new Record();
-                    for (PricingField field : pricingFields) {
-                        record.addField(field, false); // don't care about isKey
-                    }
-                    List<Record> records = new ArrayList<Record>(1);
-                    records.add(record);
-
-                    PluggableTaskManager<IMediationProcess> tm =
-                            new PluggableTaskManager<IMediationProcess>(
-                            getCallerCompanyId(),
-                            Constants.PLUGGABLE_TASK_MEDIATION_PROCESS);
-                    IMediationProcess processTask = tm.getNextClass();
-
-                    MediationResult result = new MediationResult("WS", false);
-                    result.setUserId(userId);
-                    result.setEventDate(new Date());
-                    ArrayList results = new ArrayList(1);
-                    results.add(result);
-                    processTask.process(records, results, "WS");
-
-                    // from the lines, get the items and prices
-                    for (OrderLineDTO line : result.getDiffLines()) {
-                        items.add(new ItemBL(line.getItemId()).getEntity());
-                        prices.add(line.getAmount());
-                    }
-                } catch (Exception e) {
-                    // log stacktrace
-                    StringWriter sw = new StringWriter();
-                    PrintWriter pw = new PrintWriter(sw);
-                    e.printStackTrace(pw);
-                    pw.close();
-                    LOG.error("Validate Purchase error: " + e.getMessage()
-                            + "\n" + sw.toString());
-
-                    ValidatePurchaseWS result = new ValidatePurchaseWS();
-                    result.setSuccess(false);
-                    result.setAuthorized(false);
-                    result.setQuantity(BigDecimal.ZERO);
-                    result.setMessage(new String[]{"Error: "
-                                + e.getMessage()});
-
-                    return result;
-                }
-            }
-        } else {
-            return null;
-        }
-
-        // find the prices first
-        // this will do nothing if the mediation process was uses. In that case
-        // the itemIdsList will be empty
-        int itemNum = 0;
-        for (Integer itemId : itemIdsList) {
-            ItemBL item = new ItemBL(itemId);
-
-            if (fieldsList != null && !fieldsList.isEmpty()) {
-                int fieldsIndex = itemNum;
-                // just get first set of fields if only one set 
-                // for many items
-                if (fieldsIndex > fieldsList.size()) {
-                    fieldsIndex = 0;
-                }
-                item.setPricingFields(fieldsList.get(fieldsIndex));
-            }
-
-            prices.add(item.getPrice(userId,
-                    getCallerCompanyId()));
-            items.add(item.getEntity());
-            itemNum++;
-        }
-
-        ValidatePurchaseWS ret = new UserBL(userId).validatePurchase(items,
-                prices, fieldsList);
-        return ret;
-    }
-
-    @Override
-    public void updateAch(Integer userId, com.sapienter.jbilling.server.entity.AchDTO ach)
-            throws SessionInternalError {
-
-        if (ach != null && (ach.getAbaRouting() == null
-                || ach.getBankAccount() == null)) {
-            LOG.debug("WS - updateAch: " + "ACH validation error.");
-            throw new SessionInternalError("Missing ACH data.");
-        }
-
-        Integer executorId = getCallerId();
-        IUserSessionBean sess = (IUserSessionBean) Context.getBean(
-                Context.Name.USER_SESSION);
-        AchDTO ac = ach != null ? new AchDTO(ach) : null;
-
-        sess.updateACH(userId, executorId, ac);
-    }
-
-    @Override
-    public Integer getAuthPaymentType(Integer userId)
-            throws SessionInternalError {
-
-        IUserSessionBean sess = (IUserSessionBean) Context.getBean(
-                Context.Name.USER_SESSION);
-        return sess.getAuthPaymentType(userId);
-    }
-
-    @Override
-    public void setAuthPaymentType(Integer userId, Integer autoPaymentType, boolean use)
-            throws SessionInternalError {
-
-        IUserSessionBean sess = (IUserSessionBean) Context.getBean(
-                Context.Name.USER_SESSION);
-        sess.setAuthPaymentType(userId, autoPaymentType, use);
-    }
-
-    public void generateRules(String rulesData) throws SessionInternalError {
-        try {
-            PluggableTaskManager<IRulesGenerator> tm =
-                    new PluggableTaskManager<IRulesGenerator>(
-                    getCallerCompanyId(),
-                    Constants.PLUGGABLE_TASK_RULES_GENERATOR);
-            IRulesGenerator rulesGenerator = tm.getNextClass();
-
-            rulesGenerator.unmarshal(rulesData);
-            rulesGenerator.process();
-
-        } catch (Exception e) {
-            throw new SessionInternalError(e);
-        }
-    }
-    /*-------------------------------------------------------------------------
-     * Added NEW APIs
-     *-------------------------------------------------------------------------
-     */
-
-    /**
-     * Retrieves a list of all {@link UserWS users} in a given status.
-     *
-     * @param statusId the status id that will be used for extraction
-     * @return an array of <code>UserWS</code> objects in a given status.
-     * @throws SessionInternalError
-     */
-    public UserWS[] getUserListInStatus(Integer statusId) throws SessionInternalError {
-        UserWS[] users = null;
-        Integer entityId = getCallerCompanyId();
-        Integer[] userIds = getUsersByStatus(statusId, entityId, true);
-
-        users = new UserWS[userIds.length];
-        for (int f = 0; f < userIds.length; f++) {
-            // get user details by id
-            UserWS dto = null;
-            // calling from dot.net seems to not have a context set. So then when calling
-            // getCallerPrincipal the client gets a 'No security context set' exception
-            // log.debug("principal = " + context.getCallerPrincipal().getName());
-            UserBL bl = new UserBL(userIds[f]);
-            users[f] = bl.getUserWS();
-        }
-        return users;
-    }
-
-    /**
-     * Retrieves a list of all {@link UserWS customers} in a given status
-     * including sub-accounts. This call excludes any other users that are not
-     * Customers.
-     *
-     * @see IWebServicesSessionBean#getCustomersInStatus(java.lang.Integer)
-     * @throws SessionInternalError when internal error occurs
-     */
-    public Collection<UserWS> getCustomersInStatus(Integer statusId) throws SessionInternalError {
-        Collection users = null;
-        Integer entityId = getCallerCompanyId();
-
-        Integer[] userIds = getUsersByStatus(statusId, entityId, true);
-        users = new ArrayList();
-
-        for (int f = 0; f < userIds.length; f++) {
-            UserBL bl = new UserBL(userIds[f]);
-            UserWS dto = bl.getUserWS();
-            // add only customers to return
-            if (Constants.TYPE_CUSTOMER.equals(dto.getMainRoleId())) {
-                users.add(dto);
-            }
-        }
-        return users;
-    }
-
-    /**
-     * Search for {@link UserWS users}, including sub-accounts by given search
-     * parameter. Only search users who are customers. <br> Not going through
-     * JBilling generic search, rolled out own one. <br>
-     * {@link UserBL#searchCustomer(java.lang.Integer, java.lang.String)} is
-     * used to get array of users ids then populate UserWS object
-     *
-     * @see IWebServicesSessionBean#searchCustomers(java.lang.String)
-     * @throws SessionInternalError when internal error occurs
-     */
-    public UserWS[] searchCustomers(String searchValue) throws SessionInternalError {
-        if (searchValue == null || "".equals(searchValue)) {
-            return null;
-        }
-
-        UserWS[] users = null;
-        Integer entityId = getCallerCompanyId();
-
-        Integer[] userIds = searchForCustomer(searchValue, entityId);
-        users = new UserWS[userIds.length];
-        for (int f = 0; f < userIds.length; f++) {
-            UserBL bl = new UserBL(userIds[f]);
-            users[f] = bl.getUserWS();
-        }
-        return users;
-    }
-
-    public Integer[] searchForCustomer(String searchValue, Integer entityId) throws SessionInternalError {
-        try {
-            UserBL bl = new UserBL();
-            CachedRowSet users = bl.searchCustomer(entityId, searchValue);
-            LOG.debug("got collection. Now converting");
-            Integer[] ret = new Integer[users.size()];
-            int f = 0;
-            while (users.next()) {
-                ret[f] = users.getInt(1);
-                f++;
-            }
-            users.close();
-            return ret;
-        } catch (Exception e) { // can't remove because of SQLException :(
-            throw new SessionInternalError(e);
-        }
-    }
-
-    /**
-     * Sends an email with the invoice to a customer. This API call is used to
-     * manually send an email invoice to a customer. TODO: Extra check might
-     * require to make sure invoice belongs to user.
-     *
-     * @see IWebServicesSessionBean#emailInvoice(java.lang.Integer,
-     * java.lang.Integer)
-     * @throws SessionInternalError when internal error occurs
-     */
-    public Boolean emailInvoice(Integer invoiceId, Integer userId) throws SessionInternalError {
-        INotificationSessionBean notificationSession =
-                (INotificationSessionBean) Context.getBean(Context.Name.NOTIFICATION_SESSION);
-        return notificationSession.emailInvoice(invoiceId);
-    }
-
-    /**
-     * Retrieves a list of all the {@link InvoiceWS invoices} in a given period
-     * of time. The method will return an array of the InvoiceWS objects.
-     *
-     * @see IWebServicesSessionBean#getInvoiceListByDate(java.lang.String,
-     * java.lang.String)
-     * @throws SessionInternalError when internal error occurs
-     */
-    public InvoiceWS[] getInvoiceListByDate(String since, String until) throws SessionInternalError {
-        try {
-            Date dSince = com.sapienter.jbilling.common.Util.parseDate(since);
-            Date dUntil = com.sapienter.jbilling.common.Util.parseDate(until);
-            if (since == null || until == null) {
-                return null;
-            }
-
-            Integer entityId = getCallerCompanyId();
-            InvoiceBL invoiceBl = new InvoiceBL();
-
-            Integer[] invoiceIds = invoiceBl.getInvoicesByCreateDateArray(entityId, dSince, dUntil);
-
-            InvoiceWS[] invoices = null;
-            invoices = new InvoiceWS[invoiceIds.length];
-            for (int f = 0; f < invoiceIds.length; f++) {
-                invoices[f] = invoiceBl.getWS(new InvoiceDAS().find(invoiceIds[f]));
-            }
-            return invoices;
-        } catch (Exception e) { // needed for the SQLException :(
-            LOG.error("Exception in WS - getInvoiceListByDate(): getting invoices by date"
-                    + since + until, e);
-            throw new SessionInternalError("Error getting invoices by date");
-        }
-    }
-
-    /**
-     * Generates and returns the paper invoice PDF for the given invoiceId.
-     * TODO: Extra check might require to make sure invoice belongs to user.
-     *
-     * @see IWebServicesSessionBean#getPaperInvoicePDF(java.lang.Integer,
-     * java.lang.Integer)
-     * @throws SessionInternalError when internal error occurs
-     */
-    public byte[] getPaperInvoicePDF(Integer invoiceId, Integer userId) throws SessionInternalError {
-        IInvoiceSessionBean invoiceSession = (IInvoiceSessionBean) Context.getBean(Context.Name.INVOICE_SESSION);
-        return invoiceSession.getPDFInvoice(invoiceId);
-    }
-
-    /**
-     * Saves uploaded logo image file for the user's entity (company).
-     *
-     * @param inBytes an array of bytes for image to upload.   
-     * @return true if image was successfully saved, false otherwise
-     * @throws SessionInternalError when internal error occurs
-     */
-    public boolean uploadLogo(byte[] inBytes) throws SessionInternalError {
-        IInvoiceSessionBean invoiceSession = (IInvoiceSessionBean) Context.getBean(Context.Name.INVOICE_SESSION);
-        Integer entityId = getCallerCompanyId();
-        return invoiceSession.uploadLogo(inBytes, entityId);
     }
 }
