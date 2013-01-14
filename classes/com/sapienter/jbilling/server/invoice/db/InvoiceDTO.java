@@ -93,6 +93,7 @@ public class InvoiceDTO implements Serializable {
     private String customerNotes;
     private String publicNumber;
     private Date lastReminder;
+    private Date sentOn;
     private Integer overdueStep;
     private Date createTimestamp;
     private Collection<InvoiceLineDTO> invoiceLines = new HashSet<InvoiceLineDTO>(0);
@@ -126,6 +127,7 @@ public class InvoiceDTO implements Serializable {
         this.setInvoices(invoice.getInvoices());
         this.setIsReview(invoice.getIsReview());
         this.setLastReminder(invoice.getLastReminder());
+        this.setSentOn(invoice.getSentOn());
         this.setOrderProcesses(invoice.getOrderProcesses());
         this.setOverdueStep(invoice.getOverdueStep());
         this.setPaperInvoiceBatch(invoice.getPaperInvoiceBatch());
@@ -371,6 +373,15 @@ public class InvoiceDTO implements Serializable {
 
     public void setLastReminder(Date lastReminder) {
         this.lastReminder = lastReminder;
+    }
+    
+    @Column(name = "sent_on", length = 29)
+    public Date getSentOn() {
+        return this.sentOn;
+    }
+
+    public void setSentOn(Date sentOn) {
+        this.sentOn = sentOn;
     }
 
     @Column(name = "overdue_step")

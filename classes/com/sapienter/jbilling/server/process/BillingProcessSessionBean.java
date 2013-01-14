@@ -465,6 +465,10 @@ public class BillingProcessSessionBean implements IBillingProcessSessionBean {
 
                 for (int msg = 0; msg < invoiceMessage.length; msg++) {
                     notificationSess.notify(userId, invoiceMessage[msg]);
+                    
+                    // Update sentOn date
+                    Calendar cal = Calendar.getInstance();
+                    invoice.getEntity().setSentOn(cal.getTime());
                 }
             } catch (NotificationNotFoundException e) {
                 LOG.warn("Invoice message not defined for entity " + entityId + " Invoice email not sent");

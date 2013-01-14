@@ -746,6 +746,7 @@ public class InvoiceBL extends ResultList implements Serializable, InvoiceSQL {
         retValue.setCreateDateTime(i.getCreateDatetime());
         retValue.setCreateTimeStamp(i.getCreateTimestamp());
         retValue.setLastReminder(i.getLastReminder());
+        retValue.setSentOn(i.getSentOn());
         retValue.setDueDate(i.getDueDate());
         retValue.setTotal(i.getTotal());
         retValue.setToProcess(i.getToProcess());

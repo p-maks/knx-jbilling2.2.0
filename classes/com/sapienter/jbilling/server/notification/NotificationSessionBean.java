@@ -34,6 +34,7 @@ import com.sapienter.jbilling.server.pluggableTask.admin.PluggableTaskManager;
 import com.sapienter.jbilling.server.user.UserBL;
 import com.sapienter.jbilling.server.user.db.UserDTO;
 import com.sapienter.jbilling.server.util.Constants;
+import java.util.Calendar;
 
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,7 +64,10 @@ public class NotificationSessionBean implements INotificationSessionBean {
             MessageDTO message = notif.getInvoiceEmailMessage(entityId, 
                     languageId, invoice.getEntity());
             retValue = notify(user.getEntity(), message);
-        
+            
+            // update sent on field for invoice
+            Calendar cal = Calendar.getInstance();
+            invoice.getEntity().setSentOn(cal.getTime());        
         } catch (NotificationNotFoundException e) {
             retValue = new Boolean(false);
         } 

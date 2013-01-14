@@ -40,6 +40,7 @@ public class InvoiceWS implements Serializable {
     private Date createDateTime;
     private Date createTimeStamp;
     private Date lastReminder;
+    private Date sentOn;
     private Date dueDate;
     private String total;
     private Integer toProcess;
@@ -94,6 +95,14 @@ public class InvoiceWS implements Serializable {
 
     public void setLastReminder(Date lastReminder) {
         this.lastReminder = lastReminder;
+    }
+
+    public Date getSentOn() {
+        return this.sentOn;
+    }
+
+    public void setSentOn(Date sentOn) {
+        this.sentOn = sentOn;
     }
 
     public Date getDueDate() {
