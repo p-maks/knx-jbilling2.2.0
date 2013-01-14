@@ -98,11 +98,13 @@ import com.sapienter.jbilling.server.process.db.BillingProcessConfigurationDTO;
 import com.sapienter.jbilling.server.process.db.BillingProcessDTO;
 import com.sapienter.jbilling.server.user.AchBL;
 import com.sapienter.jbilling.server.rule.task.IRulesGenerator;
+import com.sapienter.jbilling.server.user.CompanyWS;
 import com.sapienter.jbilling.server.user.ContactBL;
 import com.sapienter.jbilling.server.user.ContactDTOEx;
 import com.sapienter.jbilling.server.user.ContactWS;
 import com.sapienter.jbilling.server.user.CreateResponseWS;
 import com.sapienter.jbilling.server.user.CreditCardBL;
+import com.sapienter.jbilling.server.user.EntityBL;
 import com.sapienter.jbilling.server.user.IUserSessionBean;
 import com.sapienter.jbilling.server.user.UserBL;
 import com.sapienter.jbilling.server.user.UserDTOEx;
@@ -110,6 +112,7 @@ import com.sapienter.jbilling.server.user.UserTransitionResponseWS;
 import com.sapienter.jbilling.server.user.UserWS;
 import com.sapienter.jbilling.server.user.ValidatePurchaseWS;
 import com.sapienter.jbilling.server.user.db.AchDTO;
+import com.sapienter.jbilling.server.user.db.CompanyDAS;
 import com.sapienter.jbilling.server.user.db.CompanyDTO;
 import com.sapienter.jbilling.server.user.db.CreditCardDAS;
 import com.sapienter.jbilling.server.user.db.CreditCardDTO;
@@ -493,10 +496,10 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             sess.updateCreditCard(executorId, user.getUserId(),
                     new CreditCardDTO(user.getCreditCard()));
         }
-        
+
         //udpate customerdto here - notes, automaticPaymentMethod, invoiceDeliveryMethod, excludeAgeing
         CustomerDTO cust = UserBL.getUserEntity(user.getUserId()).getCustomer();
-        if (null != cust) {           
+        if (null != cust) {
             cust.setNotes(user.getNotes());
             //cust.setAutoPaymentType(user.getAutomaticPaymentType());          
             cust.setInvoiceDeliveryMethod(new InvoiceDeliveryMethodDTO(user.getInvoiceDeliveryMethodId()));
@@ -1814,6 +1817,30 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         } catch (Exception e) {
             throw new SessionInternalError(e);
         }
+    }
+
+    /*
+     * ORGANIZATION
+     */
+    /**
+     * Retrieves caller's {@link CompanyWS company} details
+     *
+     * @see IWebServicesSessionBean#getCompany()
+     */
+    public CompanyWS getCompany() {
+        CompanyDTO company = new CompanyDAS().find(getCallerCompanyId());
+        LOG.debug(company);
+        return new CompanyWS(company);
+    }
+
+    /**
+     * Updates company details for caller
+     *
+     * @see
+     * IWebServicesSessionBean#updateCompany(com.sapienter.jbilling.server.user.CompanyWS)
+     */
+    public void updateCompany(CompanyWS companyWS) {
+        new EntityBL().updateEntityAndContact(companyWS, getCallerCompanyId(), getCallerId());
     }
 
     /*

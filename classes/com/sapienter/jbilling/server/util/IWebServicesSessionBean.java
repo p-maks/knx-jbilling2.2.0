@@ -39,6 +39,7 @@ import com.sapienter.jbilling.server.user.UserWS;
 import com.sapienter.jbilling.server.user.ValidatePurchaseWS;
 import com.sapienter.jbilling.server.entity.AchDTO;
 import com.sapienter.jbilling.server.notification.MessageDTO;
+import com.sapienter.jbilling.server.user.CompanyWS;
 import java.util.Collection;
 
 /**
@@ -113,8 +114,7 @@ public interface IWebServicesSessionBean {
      *
      * @param userId an id of the customer to send email to
      * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent * * * * * * *
-     * successfully, <code>false</code> otherwise.
+     * @return <code>true</code> when email was sent * * * * * * *      * successfully, <code>false</code> otherwise.
      * @throws SessionInternalError when internal error occurs
      */
     public Boolean emailInvoice(Integer invoiceId, Integer userId) throws SessionInternalError;
@@ -443,6 +443,23 @@ public interface IWebServicesSessionBean {
             Integer[] itemId, String[] fields);
 
     public void generateRules(String rulesData) throws SessionInternalError;
+
+    /*
+     * ORGANIZATION
+     */
+    /**
+     * Retrieves caller's {@link CompanyWS company} details
+     *
+     * @return a <code>CompanyWS</code> details
+     */
+    public CompanyWS getCompany();
+
+    /**
+     * Updates company details for caller
+     *
+     * @param companyWS a company details to update
+     */
+    public void updateCompany(CompanyWS companyWS);
 
     /*
      * NOTIFICATIONS

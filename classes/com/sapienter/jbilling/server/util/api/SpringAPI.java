@@ -33,6 +33,7 @@ import com.sapienter.jbilling.server.order.OrderLineWS;
 import com.sapienter.jbilling.server.order.OrderWS;
 import com.sapienter.jbilling.server.payment.PaymentAuthorizationDTOEx;
 import com.sapienter.jbilling.server.payment.PaymentWS;
+import com.sapienter.jbilling.server.user.CompanyWS;
 import com.sapienter.jbilling.server.user.ContactWS;
 import com.sapienter.jbilling.server.user.CreateResponseWS;
 import com.sapienter.jbilling.server.user.UserTransitionResponseWS;
@@ -387,13 +388,14 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
+
     /**
      * Retrieves a list of customer ids by given search parameter.
      *
-     * @see JbillingAPI#searchCustomerIds(java.lang.String) 
+     * @see JbillingAPI#searchCustomerIds(java.lang.String)
      * @throws JbillingAPIException when internal error occurs
      */
-    public Integer[] searchCustomerIds(String searchValue) throws JbillingAPIException{
+    public Integer[] searchCustomerIds(String searchValue) throws JbillingAPIException {
         try {
             return session.searchCustomerIds(searchValue);
         } catch (Exception e) {
@@ -750,6 +752,25 @@ public class SpringAPI implements JbillingAPI {
     public void generateRules(String rulesData) throws JbillingAPIException {
         try {
             session.generateRules(rulesData);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /*
+     * ORGANIZATION
+     */
+    public CompanyWS getCompany() throws JbillingAPIException {
+        try {
+            return session.getCompany();
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    public void updateCompany(CompanyWS companyWS) throws JbillingAPIException {
+        try {
+            session.updateCompany(companyWS);
         } catch (Exception e) {
             throw new JbillingAPIException(e);
         }

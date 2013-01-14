@@ -38,6 +38,7 @@ import com.sapienter.jbilling.server.user.ValidatePurchaseWS;
 import com.sapienter.jbilling.server.entity.AchDTO;
 import com.sapienter.jbilling.server.entity.CreditCardDTO;
 import com.sapienter.jbilling.server.notification.MessageDTO;
+import com.sapienter.jbilling.server.user.CompanyWS;
 import java.util.Collection;
 
 public interface JbillingAPI {
@@ -97,7 +98,7 @@ public interface JbillingAPI {
      *
      * @param userId an id of the customer to send email to
      * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent * *
+     * @return <code>true</code> when email was sent * * *
      * successfully, <code>false</code> otherwise.
      * @throws JbillingAPIException when internal error occurs
      */
@@ -301,8 +302,15 @@ public interface JbillingAPI {
     public void generateRules(String rulesData) throws JbillingAPIException;
 
     /*
+     * ORGANIZATION
+     */
+    public CompanyWS getCompany() throws JbillingAPIException;
+
+    public void updateCompany(CompanyWS companyWS) throws JbillingAPIException;
+    /*
      * NOTIFICATIONS
      */
+
     public MessageDTO[] getNotificationMessages() throws JbillingAPIException;
 
     public Integer createUpdateNofications(Integer messageId, MessageDTO dto) throws JbillingAPIException;
