@@ -1,23 +1,22 @@
 /*
-    jBilling - The Enterprise Open Source Billing System
-    Copyright (C) 2003-2009 Enterprise jBilling Software Ltd. and Emiliano Conde
+ jBilling - The Enterprise Open Source Billing System
+ Copyright (C) 2003-2009 Enterprise jBilling Software Ltd. and Emiliano Conde
 
-    This file is part of jbilling.
+ This file is part of jbilling.
 
-    jbilling is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ jbilling is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    jbilling is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
+ jbilling is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-    You should have received a copy of the GNU Affero General Public License
-    along with jbilling.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU Affero General Public License
+ along with jbilling.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.sapienter.jbilling.server.invoice;
 
 import com.sapienter.jbilling.server.entity.InvoiceLineDTO;
@@ -25,7 +24,6 @@ import com.sapienter.jbilling.server.util.Constants;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-
 
 /**
  * @author Emil
@@ -37,7 +35,6 @@ public class InvoiceWS implements Serializable {
     private Integer userId = null;
     private InvoiceLineDTO invoiceLines[] = null;
     private Integer orders[] = null;
-
     // original DTO
     private Integer id;
     private Date createDateTime;
@@ -60,6 +57,8 @@ public class InvoiceWS implements Serializable {
     private BigDecimal totalAsDecimal;
     private BigDecimal balanceAsDecimal;
     private BigDecimal carriedBalanceAsDecimal;
+    //additional field
+    private String statusDescr;
 
     public InvoiceWS() {
         super();
@@ -110,7 +109,7 @@ public class InvoiceWS implements Serializable {
     }
 
     public BigDecimal getTotalAsDecimal() {
-        if(totalAsDecimal != null){
+        if (totalAsDecimal != null) {
             return totalAsDecimal;
         }
         return (total == null ? null : new BigDecimal(total));
@@ -121,14 +120,17 @@ public class InvoiceWS implements Serializable {
     }
 
     /**
-     * <strong>Note:</strong> Subsequent call to getTotal returns value rounded to 2 decimals.
-     * Use getTotalAsDecimal if precision is important, i.e. for calculations
+     * <strong>Note:</strong> Subsequent call to getTotal returns value rounded
+     * to 2 decimals. Use getTotalAsDecimal if precision is important, i.e. for
+     * calculations
+     *
      * @param quantity
      */
     public void setTotal(BigDecimal total) {
         this.totalAsDecimal = total;
-        if (total != null)
+        if (total != null) {
             this.total = total.setScale(Constants.BIGDECIMAL_SCALE_STR, Constants.BIGDECIMAL_ROUND).toString();
+        }
     }
 
     public Integer getToProcess() {
@@ -152,7 +154,7 @@ public class InvoiceWS implements Serializable {
     }
 
     public BigDecimal getBalanceAsDecimal() {
-        if(balanceAsDecimal != null) {
+        if (balanceAsDecimal != null) {
             return balanceAsDecimal;
         }
         return (balance == null ? null : new BigDecimal(balance));
@@ -163,14 +165,17 @@ public class InvoiceWS implements Serializable {
     }
 
     /**
-     * <strong>Note:</strong> Subsequent call to getBalance returns value rounded to 2 decimals.
-     * Use getBalanceAsDecimal if precision is important, i.e. for calculations
+     * <strong>Note:</strong> Subsequent call to getBalance returns value
+     * rounded to 2 decimals. Use getBalanceAsDecimal if precision is important,
+     * i.e. for calculations
+     *
      * @param quantity
      */
     public void setBalance(BigDecimal balance) {
         this.balanceAsDecimal = balance;
-        if (balance != null)
+        if (balance != null) {
             this.balance = balance.setScale(Constants.BIGDECIMAL_SCALE_STR, Constants.BIGDECIMAL_ROUND).toString();
+        }
     }
 
     public String getCarriedBalance() {
@@ -178,8 +183,9 @@ public class InvoiceWS implements Serializable {
     }
 
     public BigDecimal getCarriedBalanceAsDecimal() {
-        if(carriedBalanceAsDecimal != null)
+        if (carriedBalanceAsDecimal != null) {
             return carriedBalanceAsDecimal;
+        }
         return (carriedBalance == null ? null : new BigDecimal(carriedBalance));
     }
 
@@ -188,14 +194,17 @@ public class InvoiceWS implements Serializable {
     }
 
     /**
-     * <strong>Note:</strong> Subsequent call to getCarriedBalance returns value rounded to 2 decimals.
-     * Use getCarriedBalanceAsDecimal if precision is important, i.e. for calculations
+     * <strong>Note:</strong> Subsequent call to getCarriedBalance returns value
+     * rounded to 2 decimals. Use getCarriedBalanceAsDecimal if precision is
+     * important, i.e. for calculations
+     *
      * @param quantity
      */
     public void setCarriedBalance(BigDecimal carriedBalance) {
         this.carriedBalanceAsDecimal = carriedBalance;
-        if (carriedBalance != null)
+        if (carriedBalance != null) {
             this.carriedBalance = carriedBalance.setScale(Constants.BIGDECIMAL_SCALE_STR, Constants.BIGDECIMAL_ROUND).toString();
+        }
     }
 
     public Integer getInProcessPayment() {
@@ -300,6 +309,14 @@ public class InvoiceWS implements Serializable {
 
     public void setPayments(Integer[] payments) {
         this.payments = payments;
+    }
+
+    public String getStatusDescr() {
+        return statusDescr;
+    }
+
+    public void setStatusDescr(String statusDescr) {
+        this.statusDescr = statusDescr;
     }
 
     @Override

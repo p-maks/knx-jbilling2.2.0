@@ -209,8 +209,12 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         if (invoice.getDeleted() == 1 || invoice.getIsReview() == 1) {
             return null;
         }
-
-        return InvoiceBL.getWS(invoice);
+        InvoiceWS wsDto = InvoiceBL.getWS(invoice);
+        // get status description for invoice
+        if (null != invoice.getInvoiceStatus()) {
+            wsDto.setStatusDescr(invoice.getInvoiceStatus().getDescription(getCallerLanguageId()));
+        }
+        return wsDto;
     }
 
     /**
@@ -233,7 +237,12 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             InvoiceBL bl = new InvoiceBL();
             Integer invoiceId = bl.getLastByUser(userId);
             if (invoiceId != null) {
-                retValue = bl.getWS(new InvoiceDAS().find(invoiceId));
+                InvoiceDTO invoice = new InvoiceDAS().find(invoiceId);
+                retValue = bl.getWS(invoice);
+                // get status description for invoice
+                if (null != invoice.getInvoiceStatus()) {
+                    retValue.setStatusDescr(invoice.getInvoiceStatus().getDescription(getCallerLanguageId()));
+                }
             }
             return retValue;
         } catch (Exception e) { // needed because the sql exception :(
@@ -320,7 +329,12 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             InvoiceWS[] invoices = null;
             invoices = new InvoiceWS[invoiceIds.length];
             for (int f = 0; f < invoiceIds.length; f++) {
-                invoices[f] = invoiceBl.getWS(new InvoiceDAS().find(invoiceIds[f]));
+                InvoiceDTO invoice = new InvoiceDAS().find(invoiceIds[f]);
+                InvoiceWS invWS = invoiceBl.getWS(invoice);
+                // get status description for invoice
+                if (null != invoice.getInvoiceStatus()) {
+                    invWS.setStatusDescr(invoice.getInvoiceStatus().getDescription(getCallerLanguageId()));
+                }
             }
             return invoices;
         } catch (Exception e) { // needed for the SQLException :(
