@@ -217,6 +217,11 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         if (null != invoice.getInvoiceStatus()) {
             wsDto.setStatusDescr(invoice.getInvoiceStatus().getDescription(getCallerLanguageId()));
         }
+
+        // get user details
+        UserBL bl = new UserBL(wsDto.getUserId());
+        wsDto.setUser(bl.getUserWS());
+        
         return wsDto;
     }
 
@@ -246,6 +251,10 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                 if (null != invoice.getInvoiceStatus()) {
                     retValue.setStatusDescr(invoice.getInvoiceStatus().getDescription(getCallerLanguageId()));
                 }
+                
+                // get user details
+                UserBL ubl = new UserBL(retValue.getUserId());
+                retValue.setUser(ubl.getUserWS());
             }
             return retValue;
         } catch (Exception e) { // needed because the sql exception :(
@@ -311,7 +320,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     /**
      * Retrieves a list of all the {@link InvoiceWS invoices} in a given period
      * of time. TODO: This method is not secured or in a jUnit test
-     *
+     * TODO: Performance issue when returns large number of rows
      * @see IWebServicesSessionBean#getInvoiceListByDate(java.lang.String,
      * java.lang.String)
      * @throws SessionInternalError when internal error occurs
@@ -338,6 +347,10 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                 if (null != invoice.getInvoiceStatus()) {
                     invWS.setStatusDescr(invoice.getInvoiceStatus().getDescription(getCallerLanguageId()));
                 }
+                
+                // get user details
+                UserBL ubl = new UserBL(invWS.getUserId());
+                invWS.setUser(ubl.getUserWS());
             }
             return invoices;
         } catch (Exception e) { // needed for the SQLException :(
@@ -1823,7 +1836,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * ORGANIZATION
      */
     /**
-     * Retrieves caller's {@link CompanyWS company} details
+     * Retrieves caller's {@link CompanyWS company} details. TODO: This method
+     * is not secured or in a jUnit test
      *
      * @see IWebServicesSessionBean#getCompany()
      */
@@ -1834,7 +1848,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
-     * Updates company details for caller
+     * Updates company details for caller. TODO: This method is not secured or
+     * in a jUnit test
      *
      * @see
      * IWebServicesSessionBean#updateCompany(com.sapienter.jbilling.server.user.CompanyWS)
@@ -1901,7 +1916,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * ------------------- MISC API EXTENSION --------------------------
      */
     /**
-     * Saves uploaded logo image file for the user's entity (company).
+     * Saves uploaded logo image file for the user's entity (company). TODO:
+     * This method is not secured or in a jUnit test
      *
      * @param inBytes an array of bytes for image to upload.
      * @return true if image was successfully saved, false otherwise

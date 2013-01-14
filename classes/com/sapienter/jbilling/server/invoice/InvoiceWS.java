@@ -20,6 +20,7 @@
 package com.sapienter.jbilling.server.invoice;
 
 import com.sapienter.jbilling.server.entity.InvoiceLineDTO;
+import com.sapienter.jbilling.server.user.UserWS;
 import com.sapienter.jbilling.server.util.Constants;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -60,6 +61,7 @@ public class InvoiceWS implements Serializable {
     private BigDecimal carriedBalanceAsDecimal;
     //additional field
     private String statusDescr;
+    private UserWS user;
 
     public InvoiceWS() {
         super();
@@ -326,6 +328,14 @@ public class InvoiceWS implements Serializable {
 
     public void setStatusDescr(String statusDescr) {
         this.statusDescr = statusDescr;
+    }
+    
+    public UserWS getUser() {
+        return user;
+    }
+
+    public void setUser(UserWS user) {
+        this.user = user;
     }
 
     @Override
