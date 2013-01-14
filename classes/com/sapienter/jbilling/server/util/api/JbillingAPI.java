@@ -37,6 +37,7 @@ import com.sapienter.jbilling.server.user.UserWS;
 import com.sapienter.jbilling.server.user.ValidatePurchaseWS;
 import com.sapienter.jbilling.server.entity.AchDTO;
 import com.sapienter.jbilling.server.entity.CreditCardDTO;
+import com.sapienter.jbilling.server.notification.MessageDTO;
 import java.util.Collection;
 
 public interface JbillingAPI {
@@ -290,6 +291,10 @@ public interface JbillingAPI {
 
     public void generateRules(String rulesData) throws JbillingAPIException;
 
+    /*
+     * NOTIFICATIONS
+     */
+    public MessageDTO[] getNotificationMessages() throws JbillingAPIException;
     /**
      *
      * ------------------- MISC API EXTENSION --------------------------

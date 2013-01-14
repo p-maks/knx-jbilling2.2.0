@@ -28,6 +28,7 @@ import com.sapienter.jbilling.server.invoice.InvoiceWS;
 import com.sapienter.jbilling.server.item.ItemDTOEx;
 import com.sapienter.jbilling.server.item.PricingField;
 import com.sapienter.jbilling.server.item.ItemTypeWS;
+import com.sapienter.jbilling.server.notification.MessageDTO;
 import com.sapienter.jbilling.server.order.OrderLineWS;
 import com.sapienter.jbilling.server.order.OrderWS;
 import com.sapienter.jbilling.server.payment.PaymentAuthorizationDTOEx;
@@ -741,6 +742,16 @@ public class SpringAPI implements JbillingAPI {
         }
     }
 
+    /*
+     * NOTIFICATIONS
+     */
+    public MessageDTO[] getNotificationMessages() throws JbillingAPIException{
+        try {
+            return session.getNotificationMessages();
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
     /**
      *
      * ------------------- MISC API EXTENSION --------------------------

@@ -70,6 +70,8 @@ import com.sapienter.jbilling.server.mediation.db.MediationRecordStatusDTO;
 import com.sapienter.jbilling.server.mediation.task.IMediationProcess;
 import com.sapienter.jbilling.server.mediation.task.MediationResult;
 import com.sapienter.jbilling.server.notification.INotificationSessionBean;
+import com.sapienter.jbilling.server.notification.MessageDTO;
+import com.sapienter.jbilling.server.notification.NotificationBL;
 import com.sapienter.jbilling.server.order.OrderBL;
 import com.sapienter.jbilling.server.order.OrderLineBL;
 import com.sapienter.jbilling.server.order.OrderLineWS;
@@ -1771,6 +1773,36 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
         } catch (Exception e) {
             throw new SessionInternalError(e);
+        }
+    }
+
+    /*
+     * NOTIFICATIONS
+     */
+    public MessageDTO[] getNotificationMessages() throws SessionInternalError {
+        try {
+            NotificationBL list = new NotificationBL();
+            Integer languageId = getCallerLanguageId();
+            Integer entityId = getCallerCompanyId();
+            CachedRowSet notifs = list.getTypeList(languageId);
+
+            LOG.debug("got collection. Now converting");
+            MessageDTO[] ret = new MessageDTO[notifs.size()];
+            int f = 0;
+            INotificationSessionBean notificationSession =
+                    (INotificationSessionBean) Context.getBean(Context.Name.NOTIFICATION_SESSION);
+            while (notifs.next()) {
+
+                MessageDTO msg = notificationSession.getDTO(notifs.getInt(1), languageId, entityId);
+                msg.setTypeDescription(notifs.getString(2));
+                ret[f] = msg;
+                f++;
+            }
+            notifs.close();
+            return ret;
+        } catch (Exception e) { // can't remove because of the SQL Exception :(
+            LOG.error("WS - getNotificationMessages: could not retrieve notification messages ", e);
+            throw new SessionInternalError("Error getting Notification messages");
         }
     }
 
