@@ -48,6 +48,7 @@ import sun.jdbc.rowset.CachedRowSet;
 import com.sapienter.jbilling.common.GatewayBL;
 import com.sapienter.jbilling.common.JBCrypto;
 import com.sapienter.jbilling.common.SessionInternalError;
+import com.sapienter.jbilling.server.customer.CustomerBL;
 import com.sapienter.jbilling.server.invoice.IInvoiceSessionBean;
 import com.sapienter.jbilling.server.invoice.InvoiceBL;
 import com.sapienter.jbilling.server.invoice.InvoiceWS;
@@ -926,9 +927,21 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         }
     }
 
-    public Integer[] searchForCustomer(String searchValue, Integer entityId) throws SessionInternalError {
+    /**
+     * Retrieves a list of customers by given search parameter. TODO: This
+     * method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#searchCustomerIds(java.lang.String)
+     * @throws SessionInternalError
+     */
+    public Integer[] searchCustomerIds(String searchValue) throws SessionInternalError {
+        Integer entityId = getCallerCompanyId();
+        return searchForCustomer(searchValue, entityId);
+    }
+
+    private Integer[] searchForCustomer(String searchValue, Integer entityId) throws SessionInternalError {
         try {
-            UserBL bl = new UserBL();
+            CustomerBL bl = new CustomerBL();
             CachedRowSet users = bl.searchCustomer(entityId, searchValue);
             LOG.debug("got collection. Now converting");
             Integer[] ret = new Integer[users.size()];

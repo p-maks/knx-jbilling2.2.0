@@ -138,5 +138,29 @@ public interface CustomerSQL {
         "  and urm.role_id = " + Constants.TYPE_CUSTOMER +
         "  and cu.user_id = c.id " +
         " order by 3,4,5";
+    
+    // search for customers only, including sub-accounts
+    // and checks only primary contact for user
+    // limit to max 500 records to return
+    static final String searchCustomer =
+            " SELECT c.id"
+            + " FROM contact a, contact_map b, base_user c, jbilling_table d,"
+            + " user_role_map urm, customer cu, contact_type ct "
+            + " WHERE a.id = b.contact_id "
+            + " AND b.foreign_id = c.id "
+            + " AND b.table_id = d.id "
+            + " AND b.type_id = ct.id "
+            + " AND ct.is_primary = 1 "
+            + " AND d.name = 'base_user' "
+            + " AND c.entity_id = ? "
+            + " AND c.deleted = 0 "
+            + " AND a.deleted = 0 "
+            + " AND c.status_id != 8 "
+            + " AND c.id = urm.user_id "
+            + " AND urm.role_id = " + Constants.TYPE_CUSTOMER
+            + " AND cu.user_id = c.id "
+            + " AND (a.email LIKE ? OR a.organization_name LIKE ? "
+            + " OR a.last_name LIKE ? OR a.first_name LIKE ? OR c.user_name LIKE ?) "
+            + " ORDER BY 1 DESC LIMIT 500";
 
 }

@@ -97,7 +97,8 @@ public interface JbillingAPI {
      *
      * @param userId an id of the customer to send email to
      * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent *      * successfully, <code>false</code> otherwise.
+     * @return <code>true</code> when email was sent * *
+     * successfully, <code>false</code> otherwise.
      * @throws JbillingAPIException when internal error occurs
      */
     public Boolean emailInvoice(Integer invoiceId, Integer userId) throws JbillingAPIException;
@@ -188,6 +189,15 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public UserWS[] searchCustomers(String searchValue) throws JbillingAPIException;
+
+    /**
+     * Retrieves a list of customer ids by given search parameter.
+     *
+     * @param searchValue the search parameter string
+     * @return an array of user ids or null if nothing found
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Integer[] searchCustomerIds(String searchValue) throws JbillingAPIException;
 
     /*
      * ORDERS

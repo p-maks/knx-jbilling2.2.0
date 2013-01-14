@@ -387,6 +387,19 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
+    /**
+     * Retrieves a list of customer ids by given search parameter.
+     *
+     * @see JbillingAPI#searchCustomerIds(java.lang.String) 
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Integer[] searchCustomerIds(String searchValue) throws JbillingAPIException{
+        try {
+            return session.searchCustomerIds(searchValue);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
 
     /*
      * ORDERS

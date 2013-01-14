@@ -110,5 +110,28 @@ public final class CustomerBL extends ResultList implements CustomerSQL {
         conn.close();
         return cachedResults;
     }
+    
+    /**
+     * Search for customers only, including sub-accounts and checks only primary
+     * contact for user. Fields that are compared to: email, organisation, first
+     * name, last name and login name.
+     *
+     * @param entityId the entity id that users belong to
+     * @param searchValue the string value to search for
+     * @return
+     */
+    public CachedRowSet searchCustomer(Integer entityId, String searchValue) throws SQLException, Exception {
+
+        prepareStatement(CustomerSQL.searchCustomer);
+        cachedResults.setInt(1, entityId.intValue());
+        cachedResults.setString(2, searchValue);
+        cachedResults.setString(3, searchValue);
+        cachedResults.setString(4, searchValue);
+        cachedResults.setString(5, searchValue);
+        cachedResults.setString(6, searchValue);
+        execute();
+        conn.close();
+        return cachedResults;
+    }
 
 }
