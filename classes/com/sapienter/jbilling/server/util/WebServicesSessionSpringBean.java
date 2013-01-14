@@ -54,6 +54,7 @@ import com.sapienter.jbilling.server.invoice.InvoiceBL;
 import com.sapienter.jbilling.server.invoice.InvoiceWS;
 import com.sapienter.jbilling.server.invoice.db.InvoiceDAS;
 import com.sapienter.jbilling.server.invoice.db.InvoiceDTO;
+import com.sapienter.jbilling.server.invoice.db.InvoiceDeliveryMethodDTO;
 import com.sapienter.jbilling.server.item.IItemSessionBean;
 import com.sapienter.jbilling.server.item.ItemBL;
 import com.sapienter.jbilling.server.item.ItemDTOEx;
@@ -112,6 +113,8 @@ import com.sapienter.jbilling.server.user.db.AchDTO;
 import com.sapienter.jbilling.server.user.db.CompanyDTO;
 import com.sapienter.jbilling.server.user.db.CreditCardDAS;
 import com.sapienter.jbilling.server.user.db.CreditCardDTO;
+import com.sapienter.jbilling.server.user.db.CustomerDAS;
+import com.sapienter.jbilling.server.user.db.CustomerDTO;
 import com.sapienter.jbilling.server.user.db.UserDAS;
 import com.sapienter.jbilling.server.user.db.UserDTO;
 import com.sapienter.jbilling.server.util.api.WebServicesConstants;
@@ -475,6 +478,16 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                     Context.Name.USER_SESSION);
             sess.updateCreditCard(executorId, user.getUserId(),
                     new CreditCardDTO(user.getCreditCard()));
+        }
+        
+        //udpate customerdto here - notes, automaticPaymentMethod, invoiceDeliveryMethod, excludeAgeing
+        CustomerDTO cust = UserBL.getUserEntity(user.getUserId()).getCustomer();
+        if (null != cust) {           
+            cust.setNotes(user.getNotes());
+            //cust.setAutoPaymentType(user.getAutomaticPaymentType());          
+            cust.setInvoiceDeliveryMethod(new InvoiceDeliveryMethodDTO(user.getInvoiceDeliveryMethodId()));
+            cust.setExcludeAging(user.getExcludeAgeing().booleanValue() ? 1 : 0);
+            new CustomerDAS().save(cust);
         }
     }
 
