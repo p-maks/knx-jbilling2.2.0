@@ -345,8 +345,10 @@ public class InvoiceWS implements Serializable {
         }
 
         str.append(" orders = ");
-        for (int f = 0; f < orders.length; f++) {
-            str.append(orders[f].toString());
+        if (orders != null) {
+            for (int f = 0; f < orders.length; f++) {
+                str.append(orders[f].toString());
+            }
         }
 
         str.append("InvoiceDTO = [").append(super.toString());
