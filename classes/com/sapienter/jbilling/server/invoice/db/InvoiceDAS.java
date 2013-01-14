@@ -319,6 +319,25 @@ public class InvoiceDAS extends AbstractDAS<InvoiceDTO> {
 
         return (criteria.uniqueResult() == null ? BigDecimal.ZERO : (BigDecimal) criteria.uniqueResult());
     }
+    
+    /**
+     * Returns the sum total balance of all unpaid invoices for the given
+     * user.
+     *
+     * @param userId user id
+     * @return total balance of all unpaid invoices.
+     */
+    public BigDecimal findTotalAmountOwed(Integer userId) {
+        Criteria criteria = getSession().createCriteria(InvoiceDTO.class);
+        addUserCriteria(criteria, userId);
+        criteria.createAlias("invoiceStatus", "status");
+        criteria.add(Restrictions.ne("status.id", Constants.INVOICE_STATUS_PAID));
+        criteria.add(Restrictions.eq("isReview", 0));
+        criteria.setProjection(Projections.sum("balance"));
+        criteria.setComment("InvoiceDAS.findTotalAmountOwed");
+
+        return (criteria.uniqueResult() == null ? BigDecimal.ZERO : (BigDecimal) criteria.uniqueResult());
+    }
 
 	/*
 	 * signature="Collection findProccesableByUser(java.lang.Integer userId)"

@@ -964,6 +964,37 @@ public class UserBL extends ResultList
         return new InvoiceDAS().findTotalBalanceByUser(userId).subtract(
                 new PaymentDAS().findTotalBalanceByUser(userId));
     }
+    
+    /**
+     * Get the total amount owed for by user not including payments made, just
+     * outstanding amount for all invoice balances.
+     * 
+     * @param userId
+     * @return the total amount owed
+     */
+    public BigDecimal getTotalOwed(Integer userId) {
+        return new InvoiceDAS().findTotalAmountOwed(userId);
+    }
+    
+    /**
+     * Get the all time total revenue for by user
+     *
+     * @param userId
+     * @return the total revenue for user
+     */
+    public BigDecimal getTotalRevenueByUser(Integer userId) {
+        return new PaymentDAS().findTotalRevenueByUser(userId);
+    }
+    
+    /**
+     * Get the number of outstanding invoice, balance > 0
+     *
+     * @param userId
+     * @return the number of invoice
+     */
+    public Integer getOutstandingInvoices(UserDTO user) {
+        return new InvoiceDAS().findWithBalanceByUser(user).size();
+    }
 
     public UserTransitionResponseWS[] getUserTransitionsByDate(Integer entityId,
             Date from, Date to) {

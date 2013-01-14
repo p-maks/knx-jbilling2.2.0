@@ -1,22 +1,22 @@
 /*
-    jBilling - The Enterprise Open Source Billing System
-    Copyright (C) 2003-2009 Enterprise jBilling Software Ltd. and Emiliano Conde
+ jBilling - The Enterprise Open Source Billing System
+ Copyright (C) 2003-2009 Enterprise jBilling Software Ltd. and Emiliano Conde
 
-    This file is part of jbilling.
+ This file is part of jbilling.
 
-    jbilling is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ jbilling is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    jbilling is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
+ jbilling is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-    You should have received a copy of the GNU Affero General Public License
-    along with jbilling.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with jbilling.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /*
  * Created on Dec 18, 2003
@@ -37,6 +37,7 @@ import com.sapienter.jbilling.server.util.Constants;
  * @author Emil
  */
 public class UserWS implements Serializable {
+
     private int id;
     private Integer currencyId;
     private String password;
@@ -47,13 +48,13 @@ public class UserWS implements Serializable {
     private String userName;
     private int failedAttempts;
     private Integer languageId;
-
     private CreditCardDTO creditCard = null;
     private AchDTO ach = null;
     private ContactWS contact = null;
     private String role = null;
     private String language = null;
     private String status = null;
+    private String subscriberStatus = null;
     private Integer mainRoleId = null;
     private Integer statusId = null;
     private Integer subscriberStatusId = null;
@@ -74,17 +75,26 @@ public class UserWS implements Serializable {
     private BigDecimal owingBalanceAsDecimal;
     private BigDecimal creditLimitAsDecimal;
     private BigDecimal dynamicBalanceAsDecimal;
+    // added extra info
+    private String notes;
+    private Integer automaticPaymentType;
+    private Integer invoiceDeliveryMethodId;
+    private Boolean excludeAgeing = null;
+    private Integer numberOfInvoices = null;//number of unpaid outstanding invoices
+    private BigDecimal totalRevenueAsDecimal;
 
     public Integer getPartnerId() {
         return partnerId;
     }
+
     public void setPartnerId(Integer partnerId) {
         this.partnerId = partnerId;
     }
     // to comply with the Java Bean spec.
+
     public UserWS() {
     }
-    
+
     public UserWS(UserDTOEx dto) {
         id = dto.getId();
         currencyId = dto.getCurrencyId();
@@ -103,6 +113,7 @@ public class UserWS implements Serializable {
         mainRoleId = dto.getMainRoleId();
         language = dto.getLanguageStr();
         status = dto.getStatusStr();
+        subscriberStatus = dto.getSubscriptionStatusStr();
         role = dto.getMainRoleStr();
         statusId = dto.getStatusId();
         subscriberStatusId = dto.getSubscriptionStatusId();
@@ -112,6 +123,7 @@ public class UserWS implements Serializable {
             mainOrderId = dto.getCustomer().getCurrentOrderId();
             isParent = dto.getCustomer().getIsParent() == null ? false : dto.getCustomer().getIsParent().equals(new Integer(1));
             invoiceChild = dto.getCustomer().getInvoiceChild() == null ? false : dto.getCustomer().getInvoiceChild().equals(new Integer(1));
+            excludeAgeing = dto.getCustomer().getExcludeAging() == 1;
             childIds = new Integer[dto.getCustomer().getChildren().size()];
             int index = 0;
             for (CustomerDTO customer : dto.getCustomer().getChildren()) {
@@ -123,21 +135,31 @@ public class UserWS implements Serializable {
             setDynamicBalance(dto.getCustomer().getDynamicBalance());
             setCreditLimit(dto.getCustomer().getCreditLimit());
             setAutoRecharge(dto.getCustomer().getAutoRecharge());
+            
+            // added extra info
+            setNotes(dto.getCustomer().getNotes());
+            setAutomaticPaymentType(dto.getCustomer().getAutoPaymentType());
+            setInvoiceDeliveryMethodId(dto.getCustomer().getInvoiceDeliveryMethod().getId());
         }
         blacklistMatches = dto.getBlacklistMatches() != null ? dto.getBlacklistMatches().toArray(new String[0]) : null;
         userIdBlacklisted = dto.getUserIdBlacklisted();
 
         setOwingBalance(dto.getBalance());
+        
+        // Added extra info, might be better to move to DTOFactory and set on UserDTOEx
+        setNumberOfInvoices(new UserBL().getOutstandingInvoices(dto));
+        setTotalRevenueAsDecimal(new UserBL().getTotalRevenueByUser(dto.getId()));
     }
-    
+
     public String toString() {
-        return "id = [" + id + "] credit card = [" + creditCard + "] ach = [" +
-        		ach + "] contact = [" + contact + "] type = [" + role + 
-        		"] language = [" + languageId + language + "]  status = [" + 
-        		status + "] statusId = [" + statusId + "] subscriberStatusId = [" + 
-        		subscriberStatusId + "] roleId = [" + mainRoleId + "] " +  
-        		" parentId = [" + parentId + "] " + super.toString();
+        return "id = [" + id + "] credit card = [" + creditCard + "] ach = ["
+                + ach + "] contact = [" + contact + "] type = [" + role
+                + "] language = [" + languageId + language + "]  status = ["
+                + status + "] statusId = [" + statusId + "] subscriberStatusId = ["
+                + subscriberStatusId + "] roleId = [" + mainRoleId + "] "
+                + " parentId = [" + parentId + "] " + super.toString();
     }
+
     /**
      * @return
      */
@@ -165,13 +187,13 @@ public class UserWS implements Serializable {
     public void setCreditCard(CreditCardDTO creditCard) {
         this.creditCard = creditCard;
     }
-    
+
     public AchDTO getAch() {
-    	return ach;
+        return ach;
     }
-    
+
     public void setAch(AchDTO ach) {
-    	this.ach = ach;
+        this.ach = ach;
     }
 
     /**
@@ -200,6 +222,22 @@ public class UserWS implements Serializable {
      */
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    /**
+     * Status description
+     *
+     * @return subscriberStatus
+     */
+    public String getSubscriberStatus() {
+        return subscriberStatus;
+    }
+
+    /**
+     * @param subscriberStatus
+     */
+    public void setSubscriberStatus(String subscriberStatus) {
+        this.subscriberStatus = subscriberStatus;
     }
 
     /**
@@ -243,93 +281,123 @@ public class UserWS implements Serializable {
     public void setStatusId(Integer statusId) {
         this.statusId = statusId;
     }
+
     public Integer getSubscriberStatusId() {
         return subscriberStatusId;
     }
+
     public void setSubscriberStatusId(Integer subscriberStatusId) {
         this.subscriberStatusId = subscriberStatusId;
     }
+
     public Integer getParentId() {
         return parentId;
     }
+
     public void setParentId(Integer parentId) {
         this.parentId = parentId;
     }
+
     public Boolean getIsParent() {
         return isParent;
     }
+
     public void setIsParent(Boolean isParent) {
         this.isParent = isParent;
     }
+
     public Boolean getInvoiceChild() {
         return invoiceChild;
     }
+
     public void setInvoiceChild(Boolean invoiceChild) {
         this.invoiceChild = invoiceChild;
     }
+
     public Date getCreateDatetime() {
         return createDatetime;
     }
+
     public void setCreateDatetime(Date createDatetime) {
         this.createDatetime = createDatetime;
     }
+
     public Integer getCurrencyId() {
         return currencyId;
     }
+
     public void setCurrencyId(Integer currencyId) {
         this.currencyId = currencyId;
     }
+
     public int getDeleted() {
         return deleted;
     }
+
     public void setDeleted(int deleted) {
         this.deleted = deleted;
     }
+
     public int getFailedAttempts() {
         return failedAttempts;
     }
+
     public void setFailedAttempts(int failedAttempts) {
         this.failedAttempts = failedAttempts;
     }
+
     public int getUserId() {
         return id;
     }
+
     public void setUserId(int id) {
         this.id = id;
     }
+
     public Date getLastLogin() {
         return lastLogin;
     }
+
     public void setLastLogin(Date lastLogin) {
         this.lastLogin = lastLogin;
     }
+
     public Date getLastStatusChange() {
         return lastStatusChange;
     }
+
     public void setLastStatusChange(Date lastStatusChange) {
         this.lastStatusChange = lastStatusChange;
     }
+
     public String getPassword() {
         return password;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
+
     public String getUserName() {
         return userName;
     }
+
     public void setUserName(String userName) {
         this.userName = userName;
     }
+
     public Integer getLanguageId() {
         return languageId;
     }
+
     public void setLanguageId(Integer languageId) {
         this.languageId = languageId;
     }
+
     public Integer getMainOrderId() {
         return mainOrderId;
     }
+
     public void setMainOrderId(Integer mainOrderId) {
         this.mainOrderId = mainOrderId;
     }
@@ -363,8 +431,9 @@ public class UserWS implements Serializable {
     }
 
     public BigDecimal getOwingBalanceAsDecimal() {
-        if(owingBalanceAsDecimal != null)
+        if (owingBalanceAsDecimal != null) {
             return owingBalanceAsDecimal;
+        }
         return (owingBalance == null ? null : new BigDecimal(owingBalance));
     }
 
@@ -373,14 +442,17 @@ public class UserWS implements Serializable {
     }
 
     /**
-     * <strong>Note:</strong> Subsequent call to getOwingBalance returns value rounded to 2 decimals.
-     * Use getOwingBalanceAsDecimal if precision is important, i.e. for calculations
+     * <strong>Note:</strong> Subsequent call to getOwingBalance returns value
+     * rounded to 2 decimals. Use getOwingBalanceAsDecimal if precision is
+     * important, i.e. for calculations
+     *
      * @param quantity
      */
     public void setOwingBalance(BigDecimal owingBalance) {
         this.owingBalanceAsDecimal = owingBalance;
-        if (owingBalance != null)
+        if (owingBalance != null) {
             this.owingBalance = owingBalance.setScale(Constants.BIGDECIMAL_SCALE_STR, Constants.BIGDECIMAL_ROUND).toString();
+        }
     }
 
     public Integer getBalanceType() {
@@ -396,8 +468,9 @@ public class UserWS implements Serializable {
     }
 
     public BigDecimal getCreditLimitAsDecimal() {
-        if(creditLimitAsDecimal != null)
+        if (creditLimitAsDecimal != null) {
             return creditLimitAsDecimal;
+        }
         return (creditLimit == null ? null : new BigDecimal(creditLimit));
     }
 
@@ -406,14 +479,17 @@ public class UserWS implements Serializable {
     }
 
     /**
-     * <strong>Note:</strong> Subsequent call to getCreditLimit returns value rounded to 2 decimals.
-     * Use getCreditLimitAsDecimal if precision is important, i.e. for calculations
+     * <strong>Note:</strong> Subsequent call to getCreditLimit returns value
+     * rounded to 2 decimals. Use getCreditLimitAsDecimal if precision is
+     * important, i.e. for calculations
+     *
      * @param quantity
      */
     public void setCreditLimit(BigDecimal creditLimit) {
         this.creditLimitAsDecimal = creditLimit;
-        if (creditLimit != null)
+        if (creditLimit != null) {
             this.creditLimit = creditLimit.setScale(Constants.BIGDECIMAL_SCALE_STR, Constants.BIGDECIMAL_ROUND).toString();
+        }
     }
 
     public String getDynamicBalance() {
@@ -421,24 +497,28 @@ public class UserWS implements Serializable {
     }
 
     public BigDecimal getDynamicBalanceAsDecimal() {
-        if(dynamicBalanceAsDecimal != null)
+        if (dynamicBalanceAsDecimal != null) {
             return dynamicBalanceAsDecimal;
+        }
         return (dynamicBalance == null ? null : new BigDecimal(dynamicBalance));
     }
-    
+
     public void setDynamicBalance(String dynamicBalance) {
         this.dynamicBalance = dynamicBalance;
     }
 
     /**
-     * <strong>Note:</strong> Subsequent call to getBalance returns value rounded to 2 decimals.
-     * Use getBalanceAsDecimal if precision is important, i.e. for calculations
+     * <strong>Note:</strong> Subsequent call to getBalance returns value
+     * rounded to 2 decimals. Use getBalanceAsDecimal if precision is important,
+     * i.e. for calculations
+     *
      * @param quantity
      */
     public void setDynamicBalance(BigDecimal dynamicBalance) {
         this.dynamicBalanceAsDecimal = dynamicBalance;
-        if (dynamicBalance != null)
+        if (dynamicBalance != null) {
             this.dynamicBalance = dynamicBalance.setScale(Constants.BIGDECIMAL_SCALE_STR, Constants.BIGDECIMAL_ROUND).toString();
+        }
     }
 
     public String getAutoRecharge() {
@@ -446,7 +526,9 @@ public class UserWS implements Serializable {
     }
 
     public BigDecimal getAutoRechargeAsDecimal() {
-        if (autoRecharge == null) return null;
+        if (autoRecharge == null) {
+            return null;
+        }
         return new BigDecimal(autoRecharge);
     }
 
@@ -455,8 +537,10 @@ public class UserWS implements Serializable {
     }
 
     /**
-     * <strong>Note:</strong> Subsequent call to getAutoRecharge returns value rounded to 2 decimals.
-     * Use getAutoRechargeAsDecimal if precision is important, i.e. for calculations
+     * <strong>Note:</strong> Subsequent call to getAutoRecharge returns value
+     * rounded to 2 decimals. Use getAutoRechargeAsDecimal if precision is
+     * important, i.e. for calculations
+     *
      * @param autoRecharge
      */
     public void setAutoRecharge(BigDecimal autoRecharge) {
@@ -464,5 +548,82 @@ public class UserWS implements Serializable {
             this.autoRecharge = autoRecharge.setScale(Constants.BIGDECIMAL_SCALE_STR, Constants.BIGDECIMAL_ROUND).toString();
             this.autoRechargeAsDecimal = autoRecharge.setScale(Constants.BIGDECIMAL_SCALE, Constants.BIGDECIMAL_ROUND);
         }
+    }
+
+    /**
+     * @return the notes
+     */
+    public String getNotes() {
+        return notes;
+    }
+
+    /**
+     * @param notes the notes to set
+     */
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    /**
+     * @return the automaticPaymentType
+     */
+    public Integer getAutomaticPaymentType() {
+        return automaticPaymentType;
+    }
+
+    /**
+     * @param automaticPaymentType the automaticPaymentType to set
+     */
+    public void setAutomaticPaymentType(Integer automaticPaymentType) {
+        this.automaticPaymentType = automaticPaymentType;
+    }
+
+    /**
+     * @return the invoiceDeliveryMethodId
+     */
+    public Integer getInvoiceDeliveryMethodId() {
+        return invoiceDeliveryMethodId;
+    }
+
+    /**
+     * @param invoiceDeliveryMethodId the invoiceDeliveryMethodId to set
+     */
+    public void setInvoiceDeliveryMethodId(Integer invoiceDeliveryMethodId) {
+        this.invoiceDeliveryMethodId = invoiceDeliveryMethodId;
+    }
+
+    public Boolean getExcludeAgeing() {
+        return excludeAgeing;
+    }
+
+    public void setExcludeAgeing(Boolean excludeAgeing) {
+        this.excludeAgeing = excludeAgeing;
+    }
+
+    /**
+     * Number of outstanding invoice, balance > 0
+     *
+     * @return
+     */
+    public Integer getNumberOfInvoices() {
+        return numberOfInvoices;
+    }
+
+    public void setNumberOfInvoices(Integer numberOfInvoices) {
+        this.numberOfInvoices = numberOfInvoices;
+    }
+
+    /**
+     * @return the totalRevenueAsDecimal
+     */
+    public BigDecimal getTotalRevenueAsDecimal() {
+        return totalRevenueAsDecimal;
+    }
+
+    /**
+     * @param totalRevenueAsDecimal the totalRevenueAsDecimal to set
+     */
+    public void setTotalRevenueAsDecimal(BigDecimal totalRevenueAsDecimal) {
+        this.totalRevenueAsDecimal = totalRevenueAsDecimal;
     }
 }

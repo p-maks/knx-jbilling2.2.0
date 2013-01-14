@@ -19,6 +19,7 @@
  */
 package com.sapienter.jbilling.server.payment.db;
 
+import com.sapienter.jbilling.common.CommonConstants;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
@@ -91,6 +92,40 @@ public class PaymentDAS extends AbstractDAS<PaymentDTO> {
 		return criteria.list();
 	}
 
+        /**
+         * Net revenue for user
+         * @param userId
+         * @return total revenue amount for user
+         */
+        public BigDecimal findTotalRevenueByUser(Integer userId) {
+        Criteria criteria = getSession().createCriteria(PaymentDTO.class);
+        criteria.add(Restrictions.eq("deleted", 0))
+                .createAlias("baseUser", "u")
+                .add(Restrictions.eq("u.id", userId))
+                .createAlias("paymentResult", "pr")
+                .add(Restrictions.ne("pr.id", CommonConstants.PAYMENT_RESULT_FAILED));
+        criteria.add(Restrictions.eq("isRefund", 0));
+        criteria.setProjection(Projections.sum("amount"));
+        criteria.setComment("PaymentDAS.findTotalRevenueByUser-Gross Receipts");
+
+        BigDecimal grossReceipts = criteria.uniqueResult() == null ? BigDecimal.ZERO : (BigDecimal) criteria.uniqueResult();
+
+        Criteria criteria2 = getSession().createCriteria(PaymentDTO.class);
+        criteria2.add(Restrictions.eq("deleted", 0))
+                .createAlias("baseUser", "u")
+                .add(Restrictions.eq("u.id", userId))
+                .createAlias("paymentResult", "pr")
+                .add(Restrictions.ne("pr.id", CommonConstants.PAYMENT_RESULT_FAILED));
+        criteria2.add(Restrictions.eq("isRefund", 1));
+        criteria2.setProjection(Projections.sum("amount"));
+        criteria2.setComment("PaymentDAS.findTotalRevenueByUser-Gross Refunds");
+
+        BigDecimal refunds = criteria2.uniqueResult() == null ? BigDecimal.ZERO : (BigDecimal) criteria2.uniqueResult();
+
+        //net revenue = gross - all refunds
+        return (grossReceipts.subtract(refunds));
+    }
+         
     public BigDecimal findTotalBalanceByUser(Integer userId) {
         Criteria criteria = getSession().createCriteria(PaymentDTO.class);
         criteria.add(Restrictions.eq("deleted", 0))

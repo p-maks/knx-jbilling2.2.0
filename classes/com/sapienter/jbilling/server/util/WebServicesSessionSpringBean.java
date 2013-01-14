@@ -434,7 +434,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             throws SessionInternalError {
 
         // cause exception when customer contact missing
-        // should not be the case
+        // should not be the case as it's optional on update
         validateUser(user);
 
         UserBL bl = new UserBL(user.getUserId());
