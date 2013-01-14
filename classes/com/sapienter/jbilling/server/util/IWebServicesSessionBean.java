@@ -113,8 +113,7 @@ public interface IWebServicesSessionBean {
      *
      * @param userId an id of the customer to send email to
      * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent * * * * * *
-     * successfully, <code>false</code> otherwise.
+     * @return <code>true</code> when email was sent * * * * * *      * successfully, <code>false</code> otherwise.
      * @throws SessionInternalError when internal error occurs
      */
     public Boolean emailInvoice(Integer invoiceId, Integer userId) throws SessionInternalError;
@@ -447,6 +446,16 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public MessageDTO[] getNotificationMessages() throws SessionInternalError;
+
+    /**
+     * Creates or updates {@link MessageDTO natification} messages
+     *
+     * @param messageId id of the notification message to update
+     * @param dto the message to update or create
+     * @return an id of newly created or updated notification message
+     * @throws SessionInternalError
+     */
+    public Integer createUpdateNofications(Integer messageId, MessageDTO dto) throws SessionInternalError;
 
     /**
      *

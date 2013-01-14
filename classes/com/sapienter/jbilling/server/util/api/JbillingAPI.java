@@ -97,8 +97,7 @@ public interface JbillingAPI {
      *
      * @param userId an id of the customer to send email to
      * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent *
-     * successfully, <code>false</code> otherwise.
+     * @return <code>true</code> when email was sent *      * successfully, <code>false</code> otherwise.
      * @throws JbillingAPIException when internal error occurs
      */
     public Boolean emailInvoice(Integer invoiceId, Integer userId) throws JbillingAPIException;
@@ -295,6 +294,9 @@ public interface JbillingAPI {
      * NOTIFICATIONS
      */
     public MessageDTO[] getNotificationMessages() throws JbillingAPIException;
+
+    public Integer createUpdateNofications(Integer messageId, MessageDTO dto) throws JbillingAPIException;
+
     /**
      *
      * ------------------- MISC API EXTENSION --------------------------

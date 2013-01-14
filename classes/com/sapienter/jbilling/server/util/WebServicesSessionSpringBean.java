@@ -1779,6 +1779,13 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     /*
      * NOTIFICATIONS
      */
+    /**
+     * Retrieves a list of {@link MessageDTO natification} messages for
+     * organisation. TODO: This method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#getNotificationMessages()
+     * @throws SessionInternalError
+     */
     public MessageDTO[] getNotificationMessages() throws SessionInternalError {
         try {
             NotificationBL list = new NotificationBL();
@@ -1803,6 +1810,22 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         } catch (Exception e) { // can't remove because of the SQL Exception :(
             LOG.error("WS - getNotificationMessages: could not retrieve notification messages ", e);
             throw new SessionInternalError("Error getting Notification messages");
+        }
+    }
+
+    /**
+     * Creates or updates {@link MessageDTO natification} messages. TODO: This
+     * method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#createUpdateNofications(java.lang.Integer,
+     * com.sapienter.jbilling.server.notification.MessageDTO)
+     * @throws SessionInternalError
+     */
+    public Integer createUpdateNofications(Integer messageId, MessageDTO dto) throws SessionInternalError {
+        if (null == messageId) {
+            return new NotificationBL().createUpdate(getCallerCompanyId(), dto);
+        } else {
+            return new NotificationBL(messageId).createUpdate(getCallerCompanyId(), dto);
         }
     }
 

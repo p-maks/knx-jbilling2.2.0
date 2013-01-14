@@ -745,13 +745,22 @@ public class SpringAPI implements JbillingAPI {
     /*
      * NOTIFICATIONS
      */
-    public MessageDTO[] getNotificationMessages() throws JbillingAPIException{
+    public MessageDTO[] getNotificationMessages() throws JbillingAPIException {
         try {
             return session.getNotificationMessages();
         } catch (Exception e) {
             throw new JbillingAPIException(e);
         }
     }
+
+    public Integer createUpdateNofications(Integer messageId, MessageDTO dto) throws JbillingAPIException {
+        try {
+            return session.createUpdateNofications(messageId, dto);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
     /**
      *
      * ------------------- MISC API EXTENSION --------------------------
