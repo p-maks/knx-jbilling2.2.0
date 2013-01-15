@@ -62,6 +62,7 @@ public class InvoiceWS implements Serializable {
     //additional field
     private String statusDescr;
     private UserWS user;
+    private BigDecimal totalTax;
 
     public InvoiceWS() {
         super();
@@ -336,6 +337,13 @@ public class InvoiceWS implements Serializable {
 
     public void setUser(UserWS user) {
         this.user = user;
+    }
+     public BigDecimal getTotalTaxAsDecimal() {
+        return totalTax;
+    }
+
+    public void setTotalTax(BigDecimal totalTax) {
+        this.totalTax = totalTax;
     }
 
     @Override

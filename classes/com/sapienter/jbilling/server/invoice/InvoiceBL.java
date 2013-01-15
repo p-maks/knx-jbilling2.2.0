@@ -773,11 +773,17 @@ public class InvoiceBL extends ResultList implements Serializable, InvoiceSQL {
             orders[f++] = orderP.getPurchaseOrder().getId();
         }
         f = 0;
+        BigDecimal taxTotal = new BigDecimal(0);
         for (InvoiceLineDTO line : i.getInvoiceLines()) {
             invoiceLines[f++] = new com.sapienter.jbilling.server.entity.InvoiceLineDTO(line.getId(),
                     line.getDescription(), line.getAmount(), line.getPrice(), line.getQuantity(),
                     line.getDeleted(), line.getItem() == null ? null : line.getItem().getId(),
-                    line.getSourceUserId(), line.getIsPercentage());
+                    line.getSourceUserId(), line.getIsPercentage(), line.getInvoiceLineType().getId());
+            // add total tax calculation for InvoiceWS
+            if (line.getInvoiceLineType() != null && line.getInvoiceLineType().getId() == Constants.INVOICE_LINE_TYPE_TAX) {
+                // update the total tax variable
+                taxTotal = taxTotal.add(line.getAmount());
+            }
         }
 
         retValue.setDelegatedInvoiceId(delegatedInvoiceId);
@@ -785,6 +791,8 @@ public class InvoiceBL extends ResultList implements Serializable, InvoiceSQL {
         retValue.setPayments(payments);
         retValue.setInvoiceLines(invoiceLines);
         retValue.setOrders(orders);
+        // added extra, tax total
+        retValue.setTotalTax(taxTotal);
 
         return retValue;
     }
