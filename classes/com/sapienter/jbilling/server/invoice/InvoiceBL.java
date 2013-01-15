@@ -1003,4 +1003,17 @@ public class InvoiceBL extends ResultList implements Serializable, InvoiceSQL {
         return ret;
     }
      * */
+    
+     /**
+     * Retrieves an array of an Ovedue invoices for Organisation
+     *
+     * @param date the overdue date
+     * @return an array of Invoices ids that are overdue
+     * @throws SQLException
+     * @throws Exception
+     */
+    public Integer[] getOverdueInvoiceIDs(Integer entityId, Date date) throws SQLException, Exception {
+        List<Integer> result = new InvoiceDAS().findIdsOverdueInvoice(entityId, date);
+        return result.toArray(new Integer[result.size()]);
+    }
 }

@@ -43,6 +43,33 @@ import java.math.BigDecimal;
 
 public class InvoiceDAS extends AbstractDAS<InvoiceDTO> {
     public static final Logger LOG = Logger.getLogger(InvoiceDAS.class);
+    
+    /**
+     * Used by web service to get overdue invoices.
+     *
+     * @param date
+     * @return a list of overdue invoice ids
+     */
+    public List<Integer> findIdsOverdueInvoice(Integer entityId, Date date) {
+        String hql = "SELECT invoice.id"
+                + " FROM InvoiceDTO invoice "//, UserDTO a
+                + " WHERE invoice.baseUser.company.id = :entityId "
+                + " AND invoice.invoiceStatus.id <> :status"
+                //+ " pr.invoice.baseUser.id = :userId"
+                + "  AND invoice.deleted = 0"
+                + "  AND invoice.dueDate < :date"
+                + "  AND invoice.isReview = 0"
+                + "  ORDER BY invoice.dueDate ASC";
+
+        List<Integer> data = getSession()
+                .createQuery(hql)
+                .setParameter("entityId", entityId)
+                .setParameter("date", date)
+                .setParameter("status", Constants.INVOICE_STATUS_PAID)
+                .setComment("InvoiceDAS.findIdsOverdueInvoice " + entityId + " - " + date)
+                .list();
+        return data;
+    }
 
 	// used for the web services call to get the latest X
 	public List<Integer> findIdsByUserLatestFirst(Integer userId, int maxResults) {

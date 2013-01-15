@@ -325,7 +325,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * @see IWebServicesSessionBean#createInvoiceFromOrder(java.lang.Integer,
      * java.lang.Integer)
      * @throws SessionInternalError if order id is null.
-     */     
+     */
     public Integer createInvoiceFromOrder(Integer orderId, Integer invoiceId) throws SessionInternalError {
         if (orderId == null) {
             throw new SessionInternalError("Order id cannot be null.");
@@ -394,6 +394,27 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             LOG.error("Exception in WS - getInvoiceListByDate(): getting invoices by date "
                     + since + " " + until, e);
             throw new SessionInternalError("Error getting invoices by date");
+        }
+    }
+
+    /**
+     * Retrieves an array of Overdue invoice ids. TODO: This method is not
+     * secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#getOverdueInvoiceIds(java.lang.String)
+     * @throws SessionInternalError
+     */
+    public Integer[] getOverdueInvoiceIds(String date) throws SessionInternalError {
+        try {
+            Date dDate = com.sapienter.jbilling.common.Util.parseDate(date);
+            if (dDate == null) {
+                return null;
+            }
+            InvoiceBL invoiceBl = new InvoiceBL();
+            return invoiceBl.getOverdueInvoiceIDs(getCallerCompanyId(), dDate);
+        } catch (Exception e) { // needed for the SQLException :(
+            LOG.error("Exception in web service: getting Overdue invoice ids " + date, e);
+            throw new SessionInternalError("Error getting Overdue invoice ids");
         }
     }
 

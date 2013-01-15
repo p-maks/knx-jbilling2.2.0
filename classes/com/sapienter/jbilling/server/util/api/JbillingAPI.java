@@ -64,7 +64,6 @@ public interface JbillingAPI {
     /**
      * ------------------- INVOICE API EXTENSION --------------------------
      */
-    
     /**
      * Generates a new invoice for an order, or adds the order to an existing
      * invoice.
@@ -73,9 +72,10 @@ public interface JbillingAPI {
      * @param invoiceId optional invoice id to add the order to. If null, a new
      * invoice will be created.
      * @return id of generated invoice, null if no invoice generated.
-     * @throws  JbillingAPIException if order id is null.
+     * @throws JbillingAPIException if order id is null.
      */
     public Integer createInvoiceFromOrder(Integer orderId, Integer invoiceId) throws JbillingAPIException;
+
     /**
      * Retrieves a list of all the {@link InvoiceWS invoices} in a given period
      * of time. The method will return an array of the InvoiceWS objects.<br>
@@ -91,6 +91,15 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public InvoiceWS[] getInvoiceListByDate(String since, String until) throws JbillingAPIException;
+
+    /**
+     * Retrieves an array of Overdue invoice ids.
+     *
+     * @param date the current date
+     * @return an array of invoice ids or null if nothing found
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Integer[] getOverdueInvoiceIds(String date) throws JbillingAPIException;
 
     /**
      * Generates and returns the paper invoice PDF for the given invoiceId.
@@ -110,8 +119,7 @@ public interface JbillingAPI {
      *
      * @param userId an id of the customer to send email to
      * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent * * *
-     * successfully, <code>false</code> otherwise.
+     * @return <code>true</code> when email was sent * * *      * successfully, <code>false</code> otherwise.
      * @throws JbillingAPIException when internal error occurs
      */
     public Boolean emailInvoice(Integer invoiceId, Integer userId) throws JbillingAPIException;

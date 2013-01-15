@@ -107,6 +107,15 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError when internal error occurs
      */
     public InvoiceWS[] getInvoiceListByDate(String since, String until) throws SessionInternalError;
+    
+    /**
+     * Retrieves an array of Overdue invoice ids.
+     *
+     * @param date the current date
+     * @return an array of invoice ids or null if nothing found
+     * @throws SessionInternalError
+     */
+    public Integer[] getOverdueInvoiceIds(String date) throws SessionInternalError;
 
     /**
      * Generates and returns the paper invoice PDF for the given invoiceId.

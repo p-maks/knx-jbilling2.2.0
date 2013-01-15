@@ -155,6 +155,20 @@ public class SpringAPI implements JbillingAPI {
     }
 
     /**
+     * Retrieves an array of Overdue invoice ids.
+     *
+     * @see JbillingAPI#getOverdueInvoiceIds(java.lang.String)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Integer[] getOverdueInvoiceIds(String date) throws JbillingAPIException {
+        try {
+            return session.getOverdueInvoiceIds(date);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /**
      * Generates and returns the paper invoice PDF for the given invoiceId.
      * TODO: Extra check might require to make sure invoice belongs to user.
      *
