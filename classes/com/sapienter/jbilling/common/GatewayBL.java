@@ -891,7 +891,7 @@ public class GatewayBL {
             return false;
         }
         boolean success = true;
-        ;
+        
         // Tell the validator which bean to validate against.
         validator.setFormName(name);
         validator.setParameter(Validator.BEAN_PARAM, bean);
