@@ -91,9 +91,9 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public InvoiceWS[] getInvoiceListByDate(String since, String until) throws JbillingAPIException;
-    
+
     /**
-     * Retrieves invoices belonging to a customer, starting from the last one.    
+     * Retrieves invoices belonging to a customer, starting from the last one.
      *
      * @param userId the id of the customer
      * @param number the number of invoices that are to be retrieved
@@ -113,6 +113,33 @@ public interface JbillingAPI {
     public Integer[] getOverdueInvoiceIds(String date) throws JbillingAPIException;
 
     /**
+     * Returns an array of all unpaid invoices for given user ID.
+     *
+     * @param userId user id
+     * @return array of un-paid invoice IDs
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public InvoiceWS[] getUnpaidInvoices(Integer userId) throws JbillingAPIException;
+
+    /**
+     * Retrieves an array of the Invoice ids by given Status
+     *
+     * @param status the status of the invoice
+     * @return an array of Invoice ids or null if nothing found
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Integer[] getInvoiceIdsByStatus(Integer status) throws JbillingAPIException;
+
+    /**
+     * Search for Invoices by given string parameter.
+     *
+     * @param searchParam the search parameter string
+     * @return an array of Invoice ids or null if nothing found
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Integer[] searchInvoiceIds(String searchValue) throws JbillingAPIException;
+
+    /**
      * Generates and returns the paper invoice PDF for the given invoiceId.
      * TODO: Extra check might require to make sure invoice belongs to user.
      *
@@ -130,7 +157,8 @@ public interface JbillingAPI {
      *
      * @param userId an id of the customer to send email to
      * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent * * *      * successfully, <code>false</code> otherwise.
+     * @return <code>true</code> when email was sent * * * *
+     * successfully, <code>false</code> otherwise.
      * @throws JbillingAPIException when internal error occurs
      */
     public Boolean emailInvoice(Integer invoiceId, Integer userId) throws JbillingAPIException;

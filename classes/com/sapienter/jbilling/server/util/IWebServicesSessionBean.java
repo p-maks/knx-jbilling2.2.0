@@ -107,9 +107,9 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError when internal error occurs
      */
     public InvoiceWS[] getInvoiceListByDate(String since, String until) throws SessionInternalError;
-    
+
     /**
-     * Retrieves invoices belonging to a customer, starting from the last one.    
+     * Retrieves invoices belonging to a customer, starting from the last one.
      *
      * @param userId the id of the customer
      * @param number the number of invoices that are to be retrieved
@@ -118,7 +118,7 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public InvoiceWS[] getLastInvoicesForUser(Integer userId, Integer number) throws SessionInternalError;
-    
+
     /**
      * Retrieves an array of Overdue invoice ids.
      *
@@ -127,6 +127,33 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public Integer[] getOverdueInvoiceIds(String date) throws SessionInternalError;
+
+    /**
+     * Returns an array of all unpaid invoices for given user ID.
+     *
+     * @param userId user id
+     * @return array of un-paid invoice IDs
+     * @throws SessionInternalError
+     */
+    public InvoiceWS[] getUnpaidInvoices(Integer userId) throws SessionInternalError;
+
+    /**
+     * Retrieves an array of the Invoice ids by given Status
+     *
+     * @param status the status of the invoice
+     * @return an array of Invoice ids or null if nothing found
+     * @throws SessionInternalError
+     */
+    public Integer[] getInvoiceIdsByStatus(Integer status) throws SessionInternalError;
+
+    /**
+     * Search for Invoices by given string parameter.
+     *
+     * @param searchParam the search parameter string
+     * @return an array of Invoice ids or null if nothing found
+     * @throws SessionInternalError
+     */
+    public Integer[] searchInvoiceIds(String searchValue) throws SessionInternalError;
 
     /**
      * Generates and returns the paper invoice PDF for the given invoiceId.

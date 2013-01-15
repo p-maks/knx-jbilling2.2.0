@@ -453,6 +453,88 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
+     * Returns an array of all unpaid invoices for given user ID. TODO: This
+     * method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#getUnpaidInvoices(java.lang.Integer)
+     * @throws SessionInternalError
+     */
+    public InvoiceWS[] getUnpaidInvoices(Integer userId) throws SessionInternalError {
+        try {
+
+            InvoiceBL invoiceBl = new InvoiceBL();
+            CachedRowSet rs = invoiceBl.getPayableInvoicesByUser(userId);
+            InvoiceWS[] invoices = null;
+
+            invoices = new InvoiceWS[rs.size()];
+
+            int i = 0;
+            while (rs.next()) {
+                InvoiceDTO invoice = new InvoiceDAS().find(rs.getInt(1));
+
+                InvoiceWS invWS = invoiceBl.getWS(invoice);
+                // get status description for invoice
+                if (null != invoice.getInvoiceStatus()) {
+                    invWS.setStatusDescr(invoice.getInvoiceStatus().getDescription(getCallerLanguageId()));
+                }
+                // get user details
+                UserBL bl = new UserBL(invWS.getUserId());
+                invWS.setUser(bl.getUserWS());
+
+                invoices[i++] = invWS;
+            }
+            rs.close();
+            return invoices;
+        } catch (Exception e) {
+            LOG.error("Exception in web service: querying payable invoices", e);
+            throw new SessionInternalError("An un-handled exception occurred querying payable invoices.");
+        }
+    }
+
+    /**
+     * Retrieves an array of the Invoice ids by given Status. TODO: This method
+     * is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#getInvoiceIdsByStatus(java.lang.Integer)
+     * @throws SessionInternalError
+     */
+    public Integer[] getInvoiceIdsByStatus(Integer status) throws SessionInternalError {
+        if (status == null || status == 0) {
+            return null;
+        }
+        try {
+            InvoiceBL invoiceBl = new InvoiceBL();
+            return invoiceBl.getInvoicesInStatus(getCallerCompanyId(), status);
+        } catch (Exception e) { // needed for the SQLException :(
+            LOG.error("Exception in web service: getting invoice ids by status" + status, e);
+            throw new SessionInternalError("Error getting Invoice ids by Status");
+        }
+    }
+
+    /**
+     * Search for Invoices by given string parameter. TODO: This method is not
+     * secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#searchInvoiceIds(java.lang.String)
+     * @throws SessionInternalError
+     */
+    public Integer[] searchInvoiceIds(String searchValue) throws SessionInternalError {
+
+        if (searchValue == null || "".equals(searchValue)) {
+            return null;
+        }
+        try {
+
+            InvoiceBL invoiceBl = new InvoiceBL();
+            return invoiceBl.searchInvoices(getCallerCompanyId(), searchValue);
+
+        } catch (Exception e) { // can't remove because of the SQL Exception :(
+            LOG.error("WS - searchInvoice ids", e);
+            throw new SessionInternalError("Error searching for Invoice ids");
+        }
+    }
+
+    /**
      * Generates and returns the paper invoice PDF for the given invoiceId.
      * TODO: This method is not secured or in a jUnit test
      *

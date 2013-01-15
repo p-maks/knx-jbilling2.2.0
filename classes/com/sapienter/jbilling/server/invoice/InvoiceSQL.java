@@ -214,6 +214,20 @@ public interface InvoiceSQL {
         "   and i.deleted = 0 " +
         "   and i.public_number = ? ";
 
+    // search for invoices
+    // limit to max 500 records to return
+    static final String searchInvoices = 
+        "SELECT i.id "
+            + "FROM invoice i, base_user bu, contact co "
+            + " WHERE i.user_id = bu.id "
+            + " AND bu.entity_id = ? "
+            + " AND bu.deleted = 0 "
+            + " AND i.is_review = 0 "
+            + " AND i.deleted = 0 "
+            + " AND co.user_id = bu.id "
+            + " AND (i.public_number LIKE ? OR co.email LIKE ? OR co.organization_name LIKE ? "
+            + " OR co.last_name LIKE ? OR co.first_name LIKE ? OR bu.user_name LIKE ?) "
+            + " ORDER BY 1 DESC LIMIT 500";
 }
 
 

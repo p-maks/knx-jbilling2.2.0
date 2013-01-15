@@ -70,6 +70,31 @@ public class InvoiceDAS extends AbstractDAS<InvoiceDTO> {
                 .list();
         return data;
     }
+    
+    /**
+     * Used by web service to get invoices by status
+     * @param entityId
+     * @param status
+     * @return list of invoice ids
+     */
+    public List<Integer> findIdsByStatus(Integer entityId, Integer status) {
+
+        String hql = "SELECT invoice.id"
+                + " FROM InvoiceDTO invoice "
+                + " WHERE invoice.baseUser.company.id = :entityId "
+                + " AND invoice.invoiceStatus.id = :status"
+                + "  AND invoice.deleted = 0"
+                + "  AND invoice.isReview = 0"
+                + "  ORDER BY invoice.createDatetime DESC";
+
+        List<Integer> data = getSession()
+                .createQuery(hql)
+                .setParameter("entityId", entityId)
+                .setParameter("status", status)
+                .setComment("InvoiceDAS.findIdsByStatus " + entityId + " - " + status)
+                .list();
+        return data;
+    }
 
 	// used for the web services call to get the latest X
 	public List<Integer> findIdsByUserLatestFirst(Integer userId, int maxResults) {

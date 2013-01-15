@@ -184,6 +184,48 @@ public class SpringAPI implements JbillingAPI {
     }
 
     /**
+     * Returns an array of all unpaid invoices for given user ID.
+     *
+     * @see JbillingAPI#getUnpaidInvoices(java.lang.Integer)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public InvoiceWS[] getUnpaidInvoices(Integer userId) throws JbillingAPIException {
+        try {
+            return session.getUnpaidInvoices(userId);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /**
+     * Retrieves an array of the Invoice ids by given Status
+     *
+     * @see JbillingAPI#getInvoiceIdsByStatus(java.lang.Integer)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Integer[] getInvoiceIdsByStatus(Integer status) throws JbillingAPIException {
+        try {
+            return session.getInvoiceIdsByStatus(status);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /**
+     * Search for Invoices by given string parameter.
+     *
+     * @see JbillingAPI#searchInvoiceIds(java.lang.String)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Integer[] searchInvoiceIds(String searchValue) throws JbillingAPIException {
+        try {
+            return session.searchInvoiceIds(searchValue);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /**
      * Generates and returns the paper invoice PDF for the given invoiceId.
      * TODO: Extra check might require to make sure invoice belongs to user.
      *
