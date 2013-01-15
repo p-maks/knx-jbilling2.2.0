@@ -109,6 +109,17 @@ public interface IWebServicesSessionBean {
     public InvoiceWS[] getInvoiceListByDate(String since, String until) throws SessionInternalError;
     
     /**
+     * Retrieves invoices belonging to a customer, starting from the last one.    
+     *
+     * @param userId the id of the customer
+     * @param number the number of invoices that are to be retrieved
+     *
+     * @return an array of invoices
+     * @throws SessionInternalError
+     */
+    public InvoiceWS[] getLastInvoicesForUser(Integer userId, Integer number) throws SessionInternalError;
+    
+    /**
      * Retrieves an array of Overdue invoice ids.
      *
      * @param date the current date

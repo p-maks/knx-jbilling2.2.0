@@ -398,6 +398,40 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     }
 
     /**
+     * Retrieves {@link InvoiceWS invoices} belonging to a customer, starting
+     * from the last one. TODO: This method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#getLastInvoicesForUser(java.lang.Integer,
+     * java.lang.Integer)
+     * @throws SessionInternalError
+     */
+    public InvoiceWS[] getLastInvoicesForUser(Integer userId, Integer number) throws SessionInternalError {
+        if (userId == null || number == null) {
+            return null;
+        }
+
+        InvoiceBL bl = new InvoiceBL();
+        Integer[] invoiceIds = bl.getManyWS(userId, number);
+
+        InvoiceWS[] invoices = null;
+        invoices = new InvoiceWS[invoiceIds.length];
+        for (int f = 0; f < invoiceIds.length; f++) {
+            InvoiceDTO invoice = new InvoiceDAS().find(invoiceIds[f]);
+            InvoiceWS invWS = bl.getWS(invoice);
+            // get status description for invoice
+            if (null != invoice.getInvoiceStatus()) {
+                invWS.setStatusDescr(invoice.getInvoiceStatus().getDescription(getCallerLanguageId()));
+            }
+            // get user details
+            UserBL ubl = new UserBL(invWS.getUserId());
+            invWS.setUser(ubl.getUserWS());
+
+            invoices[f] = invWS;
+        }
+        return invoices;
+    }
+
+    /**
      * Retrieves an array of Overdue invoice ids. TODO: This method is not
      * secured or in a jUnit test
      *

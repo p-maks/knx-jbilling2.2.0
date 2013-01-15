@@ -155,6 +155,21 @@ public class SpringAPI implements JbillingAPI {
     }
 
     /**
+     * Retrieves invoices belonging to a customer, starting from the last one.
+     *
+     * @see JbillingAPI#getLastInvoicesForUser(java.lang.Integer,
+     * java.lang.Integer)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public InvoiceWS[] getLastInvoicesForUser(Integer userId, Integer number) throws JbillingAPIException {
+        try {
+            return session.getLastInvoicesForUser(userId, number);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /**
      * Retrieves an array of Overdue invoice ids.
      *
      * @see JbillingAPI#getOverdueInvoiceIds(java.lang.String)

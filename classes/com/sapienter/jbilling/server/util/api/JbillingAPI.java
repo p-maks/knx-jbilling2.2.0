@@ -91,6 +91,17 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public InvoiceWS[] getInvoiceListByDate(String since, String until) throws JbillingAPIException;
+    
+    /**
+     * Retrieves invoices belonging to a customer, starting from the last one.    
+     *
+     * @param userId the id of the customer
+     * @param number the number of invoices that are to be retrieved
+     *
+     * @return an array of invoices
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public InvoiceWS[] getLastInvoicesForUser(Integer userId, Integer number) throws JbillingAPIException;
 
     /**
      * Retrieves an array of Overdue invoice ids.
