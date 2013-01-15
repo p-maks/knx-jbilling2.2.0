@@ -93,6 +93,7 @@ import com.sapienter.jbilling.server.pluggableTask.TaskException;
 import com.sapienter.jbilling.server.pluggableTask.admin.PluggableTaskException;
 import com.sapienter.jbilling.server.pluggableTask.admin.PluggableTaskManager;
 import com.sapienter.jbilling.server.process.BillingProcessBL;
+import com.sapienter.jbilling.server.process.IBillingProcessSessionBean;
 import com.sapienter.jbilling.server.process.db.BillingProcessConfigurationDAS;
 import com.sapienter.jbilling.server.process.db.BillingProcessConfigurationDTO;
 import com.sapienter.jbilling.server.process.db.BillingProcessDTO;
@@ -221,7 +222,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         // get user details
         UserBL bl = new UserBL(wsDto.getUserId());
         wsDto.setUser(bl.getUserWS());
-        
+
         return wsDto;
     }
 
@@ -251,7 +252,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                 if (null != invoice.getInvoiceStatus()) {
                     retValue.setStatusDescr(invoice.getInvoiceStatus().getDescription(getCallerLanguageId()));
                 }
-                
+
                 // get user details
                 UserBL ubl = new UserBL(retValue.getUserId());
                 retValue.setUser(ubl.getUserWS());
@@ -318,9 +319,45 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * ------------------- INVOICE API EXTENSION --------------------------
      */
     /**
+     * Generates a new invoice for an order, or adds the order to an existing
+     * invoice. TODO: This method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#createInvoiceFromOrder(java.lang.Integer,
+     * java.lang.Integer)
+     * @throws SessionInternalError if order id is null.
+     */     
+    public Integer createInvoiceFromOrder(Integer orderId, Integer invoiceId) throws SessionInternalError {
+        if (orderId == null) {
+            throw new SessionInternalError("Order id cannot be null.");
+        }
+        // validate order to be processed
+        OrderDTO order = new OrderDAS().find(orderId);
+        if (order == null || !Constants.ORDER_STATUS_ACTIVE.equals(order.getStatusId())) {
+            LOG.debug("Order must exist and be active to generate an invoice.");
+            return null;
+        }
+
+        // create new invoice, or add to an existing invoice
+        InvoiceDTO invoice;
+        if (invoiceId == null) {
+            LOG.debug("Creating a new invoice for order " + order.getId());
+            invoice = doCreateInvoice(order.getId());
+            if (null == invoice) {
+                throw new SessionInternalError("Invoice could not be generated. The purchase order may not have any applicable periods to be invoiced.");
+            }
+        } else {
+            LOG.debug("Adding order " + order.getId() + " to invoice " + invoiceId);
+            IBillingProcessSessionBean process = (IBillingProcessSessionBean) Context.getBean(Context.Name.BILLING_PROCESS_SESSION);
+            invoice = process.generateInvoice(order.getId(), invoiceId, null);
+        }
+        return invoice == null ? null : invoice.getId();
+    }
+
+    /**
      * Retrieves a list of all the {@link InvoiceWS invoices} in a given period
-     * of time. TODO: This method is not secured or in a jUnit test
-     * TODO: Performance issue when returns large number of rows
+     * of time. TODO: This method is not secured or in a jUnit test TODO:
+     * Performance issue when returns large number of rows
+     *
      * @see IWebServicesSessionBean#getInvoiceListByDate(java.lang.String,
      * java.lang.String)
      * @throws SessionInternalError when internal error occurs
@@ -347,7 +384,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                 if (null != invoice.getInvoiceStatus()) {
                     invWS.setStatusDescr(invoice.getInvoiceStatus().getDescription(getCallerLanguageId()));
                 }
-                
+
                 // get user details
                 UserBL ubl = new UserBL(invWS.getUserId());
                 invWS.setUser(ubl.getUserWS());

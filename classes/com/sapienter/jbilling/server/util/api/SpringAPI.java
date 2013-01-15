@@ -124,6 +124,22 @@ public class SpringAPI implements JbillingAPI {
      * ------------------- INVOICE API EXTENSION --------------------------
      */
     /**
+     * Generates a new invoice for an order, or adds the order to an existing
+     * invoice.
+     *
+     * @see JbillingAPI#createInvoiceFromOrder(java.lang.Integer,
+     * java.lang.Integer)
+     * @throws JbillingAPIException if order id is null.
+     */
+    public Integer createInvoiceFromOrder(Integer orderId, Integer invoiceId) throws JbillingAPIException {
+        try {
+            return session.createInvoiceFromOrder(orderId, invoiceId);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /**
      * Retrieves a list of all the {@link InvoiceWS invoices} in a given period
      * of time. The method will return an array of the InvoiceWS objects.<br>
      *

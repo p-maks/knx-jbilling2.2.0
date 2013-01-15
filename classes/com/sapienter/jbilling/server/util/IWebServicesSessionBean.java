@@ -81,6 +81,18 @@ public interface IWebServicesSessionBean {
      * ------------------- INVOICE API EXTENSION --------------------------
      */
     /**
+     * Generates a new invoice for an order, or adds the order to an existing
+     * invoice.
+     *
+     * @param orderId order id to generate an invoice for
+     * @param invoiceId optional invoice id to add the order to. If null, a new
+     * invoice will be created.
+     * @return id of generated invoice, null if no invoice generated.
+     * @throws SessionInternalError if order id is null.
+     */
+    public Integer createInvoiceFromOrder(Integer orderId, Integer invoiceId) throws SessionInternalError;
+
+    /**
      * Retrieves a list of all the {@link InvoiceWS invoices} in a given period
      * of time. The method will return an array of the InvoiceWS objects.<br>
      *
@@ -114,7 +126,8 @@ public interface IWebServicesSessionBean {
      *
      * @param userId an id of the customer to send email to
      * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent * * * * * * *      * successfully, <code>false</code> otherwise.
+     * @return <code>true</code> when email was sent * * * * * * * *
+     * successfully, <code>false</code> otherwise.
      * @throws SessionInternalError when internal error occurs
      */
     public Boolean emailInvoice(Integer invoiceId, Integer userId) throws SessionInternalError;
