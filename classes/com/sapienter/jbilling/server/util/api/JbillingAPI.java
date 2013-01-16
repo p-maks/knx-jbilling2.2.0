@@ -157,8 +157,7 @@ public interface JbillingAPI {
      *
      * @param userId an id of the customer to send email to
      * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent * * * * *
-     * successfully, <code>false</code> otherwise.
+     * @return <code>true</code> when email was sent * * * * *      * successfully, <code>false</code> otherwise.
      * @throws JbillingAPIException when internal error occurs
      */
     public Boolean emailInvoice(Integer invoiceId, Integer userId) throws JbillingAPIException;
@@ -336,7 +335,7 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public void deletePayment(Integer paymentId) throws JbillingAPIException;
-    
+
     /**
      * Retrieves several payments for a customer, starting from the last one.
      *
@@ -349,6 +348,46 @@ public interface JbillingAPI {
      *
      */
     public PaymentWS[] getLastUserPayments(Integer userId, Integer number) throws JbillingAPIException;
+
+    /**
+     * Retrieve all the payments created in a given period of time for
+     * organisation.
+     *
+     * @param since the starting date for the data extraction
+     * @param until the ending date for the data extraction
+     * @return an array of payment ids or null if none found. If the input
+     * parameters are missing or are not in required format (yyyy-mm-dd), null
+     * is returned.
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Integer[] getPaymentIdsByDate(String since, String until) throws JbillingAPIException;
+
+    /**
+     * Retrieve all the payments created in a given period of time for
+     * organisation.
+     *
+     * @param since the starting date for the data extraction
+     * @param until the ending date for the data extraction
+     * @return an array of PaymentWS or null if none found. If the input
+     * parameters are missing or are not in required format (yyyy-mm-dd), null
+     * is returned.
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public PaymentWS[] getPaymentsByDate(String since, String until) throws JbillingAPIException;
+
+    /**
+     * Retrieve all the payments created in a given period of time for user.
+     *
+     * @param since the starting date for the data extraction
+     * @param until the ending date for the data extraction
+     * @param userId id of the customer whose payment information is to be
+     * retrieved
+     * @return an array of PaymentWS or null if none found. If the input
+     * parameters are missing or are not in required format (yyyy-mm-dd), null
+     * is returned.
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public PaymentWS[] getUserPaymentsByDate(String since, String until, Integer userId) throws JbillingAPIException;
 
     /*
      * ITEM

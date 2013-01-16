@@ -467,6 +467,46 @@ public interface IWebServicesSessionBean {
      *
      */
     public PaymentWS[] getLastUserPayments(Integer userId, Integer number) throws SessionInternalError;
+    
+    /**
+     * Retrieve all the payments created in a given period of time for
+     * organisation.
+     *
+     * @param since the starting date for the data extraction
+     * @param until the ending date for the data extraction
+     * @return an array of payment ids or null if none found. If the input
+     * parameters are missing or are not in required format (yyyy-mm-dd), null
+     * is returned.
+     * @throws SessionInternalError
+     */
+    public Integer[] getPaymentIdsByDate(String since, String until) throws SessionInternalError;
+    
+    /**
+     * Retrieve all the payments created in a given period of time for
+     * organisation. 
+     *
+     * @param since the starting date for the data extraction
+     * @param until the ending date for the data extraction
+     * @return an array of PaymentWS or null if none found. If the input
+     * parameters are missing or are not in required format (yyyy-mm-dd), null
+     * is returned.
+     * @throws SessionInternalError
+     */
+    public PaymentWS[] getPaymentsByDate(String since, String until) throws SessionInternalError;
+    
+    /**
+     * Retrieve all the payments created in a given period of time for user.  
+     *
+     * @param since the starting date for the data extraction
+     * @param until the ending date for the data extraction
+     * @param userId id of the customer whose payment information is to be
+     * retrieved
+     * @return an array of PaymentWS or null if none found. If the input
+     * parameters are missing or are not in required format (yyyy-mm-dd), null
+     * is returned.
+     * @throws SessionInternalError
+     */
+    public PaymentWS[] getUserPaymentsByDate(String since, String until, Integer userId) throws SessionInternalError;
 
     /*
      * ITEM

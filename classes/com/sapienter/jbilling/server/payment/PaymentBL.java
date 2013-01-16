@@ -1,23 +1,22 @@
 /*
-    jBilling - The Enterprise Open Source Billing System
-    Copyright (C) 2003-2009 Enterprise jBilling Software Ltd. and Emiliano Conde
+ jBilling - The Enterprise Open Source Billing System
+ Copyright (C) 2003-2009 Enterprise jBilling Software Ltd. and Emiliano Conde
 
-    This file is part of jbilling.
+ This file is part of jbilling.
 
-    jbilling is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ jbilling is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    jbilling is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
+ jbilling is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-    You should have received a copy of the GNU Affero General Public License
-    along with jbilling.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU Affero General Public License
+ along with jbilling.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.sapienter.jbilling.server.payment;
 
 import java.math.BigDecimal;
@@ -81,6 +80,7 @@ import com.sapienter.jbilling.server.util.Constants;
 import com.sapienter.jbilling.server.util.Context;
 import com.sapienter.jbilling.server.util.audit.EventLogger;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class PaymentBL extends ResultList implements PaymentSQL {
 
@@ -120,7 +120,7 @@ public class PaymentBL extends ResultList implements PaymentSQL {
             chequeDas = new PaymentInfoChequeDAS();
             // added Cash payment
             cashDas = new PaymentInfoCashDAS();
-            
+
             ccDas = new CreditCardDAS();
 
             methodDas = new PaymentMethodDAS();
@@ -166,13 +166,13 @@ public class PaymentBL extends ResultList implements PaymentSQL {
             // update the relationship dto-info
             payment.setPaymentInfoCheque(cheque);
         }
-        
+
         // Added cash 
         // now verify if an info record should be created as well
         if (dto.getCash() != null) {
             // create the db record
             PaymentInfoCashDTO cash = cashDas.create();
-            cash.setCustomerRef(dto.getCash().getCustomerRef());          
+            cash.setCustomerRef(dto.getCash().getCustomerRef());
             cash.setDate(dto.getCash().getDate());
 
             // update the relationship dto-info
@@ -211,15 +211,15 @@ public class PaymentBL extends ResultList implements PaymentSQL {
         }
 
 // the payment period length this payment was expected to last
-        if (dto.getPaymentPeriod() != null){
+        if (dto.getPaymentPeriod() != null) {
             payment.setPaymentPeriod(dto.getPaymentPeriod());
-        	
+
         }
         // the notes related to this payment
-        if (dto.getPaymentNotes() != null){
-        	payment.setPaymentNotes(dto.getPaymentNotes());
+        if (dto.getPaymentNotes() != null) {
+            payment.setPaymentNotes(dto.getPaymentNotes());
         }
-        
+
         dto.setId(payment.getId());
         dto.setCurrency(payment.getCurrency());
         paymentDas.save(payment);
@@ -246,9 +246,8 @@ public class PaymentBL extends ResultList implements PaymentSQL {
     /**
      * Updates a payment record, including related cheque or credit card
      * records. Only valid for entered payments not linked to an invoice.
-     * 
-     * @param dto
-     *            The DTO with all the information of the new payment record.
+     *
+     * @param dto The DTO with all the information of the new payment record.
      */
     public void update(Integer executorId, PaymentDTOEx dto)
             throws SessionInternalError {
@@ -259,7 +258,7 @@ public class PaymentBL extends ResultList implements PaymentSQL {
         }
 
         // we better log this, so this change can be traced
-        eLogger.audit(executorId, payment.getBaseUser().getId(), 
+        eLogger.audit(executorId, payment.getBaseUser().getId(),
                 Constants.TABLE_PAYMENT, payment.getId(),
                 EventLogger.MODULE_PAYMENT_MAINTENANCE,
                 EventLogger.ROW_UPDATED, null, payment.getAmount().toString(),
@@ -281,9 +280,9 @@ public class PaymentBL extends ResultList implements PaymentSQL {
             cheque.setDate(dto.getCheque().getDate());
         } else if (dto.getCash() != null) {// Added cash
             PaymentInfoCashDTO cash = payment.getPaymentInfoCash();
-            cash.setCustomerRef(dto.getCash().getCustomerRef());            
+            cash.setCustomerRef(dto.getCash().getCustomerRef());
             cash.setDate(dto.getCash().getDate());
-        }else if (dto.getCreditCard() != null) {
+        } else if (dto.getCreditCard() != null) {
             CreditCardBL cc = new CreditCardBL(payment.getCreditCard());
             cc.update(executorId, dto.getCreditCard(), null);
         } else if (dto.getAch() != null) {
@@ -292,13 +291,13 @@ public class PaymentBL extends ResultList implements PaymentSQL {
         }
 
         // the payment period length this payment was expected to last
-        if (dto.getPaymentPeriod() != null){
+        if (dto.getPaymentPeriod() != null) {
             payment.setPaymentPeriod(dto.getPaymentPeriod());
-        	
+
         }
         // the notes related to this payment
-        if (dto.getPaymentNotes() != null){
-        	payment.setPaymentNotes(dto.getPaymentNotes());
+        if (dto.getPaymentNotes() != null) {
+            payment.setPaymentNotes(dto.getPaymentNotes());
         }
     }
 
@@ -307,9 +306,9 @@ public class PaymentBL extends ResultList implements PaymentSQL {
      * information to get the payment processed. If a call fails because of the
      * availability of the processor, it will try with the next task. Otherwise
      * it will return the result of the process (approved or declined).
-     * 
+     *
      * @return the constant of the result allowing for the caller to attempt it
-     *         again with different payment information (like another cc number)
+     * again with different payment information (like another cc number)
      */
     public Integer processPayment(Integer entityId, PaymentDTOEx info)
             throws SessionInternalError {
@@ -421,7 +420,7 @@ public class PaymentBL extends ResultList implements PaymentSQL {
             chequeDto.setNumber(payment.getPaymentInfoCheque().getNumber());
         }
         dto.setCheque(chequeDto);
-        
+
         // cash info if applies
         PaymentInfoCashDTO cashDto = null;
         if (payment.getPaymentInfoCash() != null) {
@@ -429,7 +428,7 @@ public class PaymentBL extends ResultList implements PaymentSQL {
             cashDto.setCustomerRef(payment.getPaymentInfoCash().getCustomerRef());
             cashDto.setDate(payment.getPaymentInfoCash().getDate());
             cashDto.setId(payment.getPaymentInfoCash().getId());
-           
+
         }
         dto.setCash(cashDto);
 
@@ -480,17 +479,17 @@ public class PaymentBL extends ResultList implements PaymentSQL {
         if (payment.getPartnerPayouts().size() > 0) {
             dto.setPayoutId(((PartnerPayout) payment.getPartnerPayouts().toArray()[0]).getId());
         }
-        
+
         // the payment period length this payment was expected to last
-        if (payment.getPaymentPeriod() != null){
+        if (payment.getPaymentPeriod() != null) {
             dto.setPaymentPeriod(payment.getPaymentPeriod());
-        	
+
         }
         // the notes related to this payment
-        if (payment.getPaymentNotes() != null){
-        	dto.setPaymentNotes(payment.getPaymentNotes());
+        if (payment.getPaymentNotes() != null) {
+            dto.setPaymentNotes(payment.getPaymentNotes());
         }
-        
+
         return dto;
     }
 
@@ -511,7 +510,7 @@ public class PaymentBL extends ResultList implements PaymentSQL {
         ws.setResultId(dto.getPaymentResult().getId());
         ws.setPaymentNotes(dto.getPaymentNotes());
         ws.setPaymentPeriod(dto.getPaymentPeriod());
-        
+
         if (dto.getCreditCard() != null) {
             com.sapienter.jbilling.server.entity.CreditCardDTO ccDTO = new com.sapienter.jbilling.server.entity.CreditCardDTO();
             ccDTO.setDeleted(dto.getCreditCard().getDeleted());
@@ -538,13 +537,13 @@ public class PaymentBL extends ResultList implements PaymentSQL {
         } else {
             ws.setCheque(null);
         }
-        
+
         // Added cash
         if (dto.getCash() != null) {
             com.sapienter.jbilling.server.entity.PaymentInfoCashDTO cashDTO = new com.sapienter.jbilling.server.entity.PaymentInfoCashDTO();
             cashDTO.setCustomerRef(dto.getCash().getCustomerRef());
             cashDTO.setDate(dto.getCash().getDate());
-            cashDTO.setId(dto.getCash().getId());           
+            cashDTO.setId(dto.getCash().getId());
             ws.setCash(cashDTO);
         } else {
             ws.setCash(null);
@@ -633,7 +632,7 @@ public class PaymentBL extends ResultList implements PaymentSQL {
 
     /**
      * Does the actual work of deleteing the payment
-     * 
+     *
      * @throws SessionInternalError
      */
     public void delete() throws SessionInternalError {
@@ -720,7 +719,7 @@ public class PaymentBL extends ResultList implements PaymentSQL {
         } else if (dto.getCheque() != null) {
             PaymentDTOEx ex = new PaymentDTOEx(dto);
             retValue = validate(ex.getCheque());
-        }else if (dto.getCash() != null) {
+        } else if (dto.getCash() != null) {
             PaymentDTOEx ex = new PaymentDTOEx(dto);
             retValue = validate(ex.getCash());
         }
@@ -737,7 +736,7 @@ public class PaymentBL extends ResultList implements PaymentSQL {
 
         return retValue;
     }
-    
+
     public static boolean validate(PaymentInfoCashDTO dto) {
         boolean retValue = true;
 
@@ -794,8 +793,8 @@ public class PaymentBL extends ResultList implements PaymentSQL {
     }
 
     /**
-     * Given an invoice, the system will look for any payment with a balance
-     * and get the invoice paid with this payment.
+     * Given an invoice, the system will look for any payment with a balance and
+     * get the invoice paid with this payment.
      */
     public void automaticPaymentApplication(InvoiceDTO invoice)
             throws SQLException {
@@ -844,7 +843,7 @@ public class PaymentBL extends ResultList implements PaymentSQL {
 
         // not pretty, but the methods are there
         IPaymentSessionBean psb = (IPaymentSessionBean) Context.getBean(
-            Context.Name.PAYMENT_SESSION);
+                Context.Name.PAYMENT_SESSION);
         // make the link between the payment and the invoice
         BigDecimal paidAmount = psb.applyPayment(dto, invoice, true);
         createMap(invoice, paidAmount);
@@ -868,16 +867,16 @@ public class PaymentBL extends ResultList implements PaymentSQL {
             MessageDTO message = notif.getPaymentMessage(entityId, info,
                     new Integer(info.getPaymentResult().getId()).equals(Constants.RESULT_OK));
 
-            INotificationSessionBean notificationSess = 
+            INotificationSessionBean notificationSess =
                     (INotificationSessionBean) Context.getBean(
                     Context.Name.NOTIFICATION_SESSION);
             notificationSess.notify(info.getUserId(), message);
         } catch (NotificationNotFoundException e1) {
             // won't send anyting because the entity didn't specify the
             // notification
-            LOG.warn("Can not notify a customer about a payment " + 
-                    "beacuse the entity lacks the notification. " +
-                    "entity = " + entityId);
+            LOG.warn("Can not notify a customer about a payment "
+                    + "beacuse the entity lacks the notification. "
+                    + "entity = " + entityId);
         }
     }
 
@@ -906,7 +905,7 @@ public class PaymentBL extends ResultList implements PaymentSQL {
             }
 
             // log that this was deleted, otherwise there will be no trace
-            eLogger.info(invoice.getBaseUser().getEntity().getId(), 
+            eLogger.info(invoice.getBaseUser().getEntity().getId(),
                     payment.getBaseUser().getId(), mapId,
                     EventLogger.MODULE_PAYMENT_MAINTENANCE,
                     EventLogger.ROW_DELETED,
@@ -933,5 +932,22 @@ public class PaymentBL extends ResultList implements PaymentSQL {
         dto.setInvoiceId(map.getInvoiceEntity().getId());
         dto.setCurrencyId(map.getPayment().getCurrency().getId());
         return dto;
+    }
+
+    /*
+     * List of payments for given period for organization.
+     */
+    public Integer[] getIdsByPeriod(Integer entityID, Date start, Date end)
+            throws SQLException, Exception {
+        List<Integer> result = new PaymentDAS().findIdsByPeriod(entityID, start, end);
+        return result.toArray(new Integer[result.size()]);
+    }
+
+    /*
+     * List of payments for given period for customer.
+     */
+    public Integer[] getPaymentsForUserByPeriod(Integer userId, Date start, Date end) {
+        List<Integer> result = new PaymentDAS().findIdsByPeriodForUser(userId, start, end);
+        return result.toArray(new Integer[result.size()]);
     }
 }

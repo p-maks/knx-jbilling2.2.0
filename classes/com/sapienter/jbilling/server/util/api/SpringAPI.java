@@ -730,6 +730,51 @@ public class SpringAPI implements JbillingAPI {
         }
     }
 
+    /**
+     * Retrieve all the payments created in a given period of time for
+     * organisation.
+     *
+     * @see JbillingAPI#getPaymentIdsByDate(java.lang.String, java.lang.String)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Integer[] getPaymentIdsByDate(String since, String until) throws JbillingAPIException {
+        try {
+            return session.getPaymentIdsByDate(since, until);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /**
+     * Retrieve all the payments created in a given period of time for
+     * organisation.
+     *
+     * @see JbillingAPI#getPaymentsByDate(java.lang.String, java.lang.String)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public PaymentWS[] getPaymentsByDate(String since, String until) throws JbillingAPIException {
+        try {
+            return session.getPaymentsByDate(since, until);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /**
+     * Retrieve all the payments created in a given period of time for user.
+     *
+     * @see JbillingAPI#getUserPaymentsByDate(java.lang.String,
+     * java.lang.String, java.lang.Integer)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public PaymentWS[] getUserPaymentsByDate(String since, String until, Integer userId) throws JbillingAPIException {
+        try {
+            return session.getUserPaymentsByDate(since, until, userId);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
     /*
      * ITEM
      */

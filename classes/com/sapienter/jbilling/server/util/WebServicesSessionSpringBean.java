@@ -1739,6 +1739,117 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
     }
 
+    /**
+     * Retrieve all the payments created in a given period of time for
+     * organisation. TODO: This method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#getPaymentIdsByDate(java.lang.String,
+     * java.lang.String)
+     * @throws SessionInternalError
+     */
+    public Integer[] getPaymentIdsByDate(String since, String until) throws SessionInternalError {
+        Date dSince = com.sapienter.jbilling.common.Util.parseDate(since);
+        Date dUntil = com.sapienter.jbilling.common.Util.parseDate(until);
+        if (since == null || until == null) {
+            return null;
+        }
+
+        Integer entityId = getCallerCompanyId();
+        try {
+            PaymentBL bl = new PaymentBL();
+            return bl.getIdsByPeriod(entityId, dSince, dUntil);
+        } catch (Exception e) { // needed for the SQLException :(
+            LOG.error("Exception in web service: getting payments by date "
+                    + since + " " + until, e);
+            throw new SessionInternalError("Error getting Payment by dates");
+        }
+    }
+
+    /**
+     * Retrieve all the payments created in a given period of time for
+     * organisation. TODO: This method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#getPaymentsByDate(java.lang.String,
+     * java.lang.String)
+     * @throws SessionInternalError
+     */
+    public PaymentWS[] getPaymentsByDate(String since, String until) throws SessionInternalError {
+        Date dSince = com.sapienter.jbilling.common.Util.parseDate(since);
+        Date dUntil = com.sapienter.jbilling.common.Util.parseDate(until);
+        if (since == null || until == null) {
+            return null;
+        }
+
+        Integer entityId = getCallerCompanyId();
+        Integer languageId = getCallerLanguageId();
+
+        try {
+            PaymentBL bl = new PaymentBL();
+            Integer[] paymentIds = bl.getIdsByPeriod(entityId, dSince, dUntil);
+
+            PaymentWS[] payments = new PaymentWS[paymentIds.length];
+
+            for (int f = 0; f < paymentIds.length; f++) {
+                bl.set(paymentIds[f]);
+                PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));
+                // find user for this payment
+                UserBL ubl = new UserBL(payment.getUserId());
+                // add to payment
+                payment.setUser(ubl.getUserWS());
+                payments[f] = payment;
+            }
+            return payments;
+        } catch (Exception e) { // needed for the SQLException :(
+            LOG.error("Exception in web service: getting payments by date "
+                    + since + " " + until, e);
+            throw new SessionInternalError("Error getting Payment by dates");
+        }
+    }
+
+    /**
+     * Retrieve all the payments created in a given period of time for user.
+     * TODO: This method is not secured or in a jUnit test
+     *
+     * @param since the starting date for the data extraction
+     * @param until the ending date for the data extraction
+     * @param userId id of the customer whose payment information is to be
+     * retrieved
+     * @return an array of PaymentWS or null if none found. If the input
+     * parameters are missing or are not in required format (yyyy-mm-dd), null
+     * is returned.
+     * @throws SessionInternalError
+     */
+    public PaymentWS[] getUserPaymentsByDate(String since, String until, Integer userId) throws SessionInternalError {
+        Date dSince = com.sapienter.jbilling.common.Util.parseDate(since);
+        Date dUntil = com.sapienter.jbilling.common.Util.parseDate(until);
+        if (since == null || until == null || userId == null) {
+            return null;
+        }
+        Integer languageId = getCallerLanguageId();
+
+        try {
+            PaymentBL bl = new PaymentBL();
+            Integer[] paymentIds = bl.getPaymentsForUserByPeriod(userId, dSince, dUntil);
+
+            PaymentWS[] payments = new PaymentWS[paymentIds.length];
+
+            for (int f = 0; f < paymentIds.length; f++) {
+                bl.set(paymentIds[f]);
+                PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));
+                // find user for this payment
+                UserBL ubl = new UserBL(payment.getUserId());
+                // add to payment
+                payment.setUser(ubl.getUserWS());
+                payments[f] = payment;
+            }
+            return payments;
+        } catch (Exception e) { // needed for the SQLException :(
+            LOG.error("Exception in web service: getting user payments by date"
+                    + since + until, e);
+            throw new SessionInternalError("Error getting user Payments by dates");
+        }
+    }
+
     /*
      * ITEM
      */
