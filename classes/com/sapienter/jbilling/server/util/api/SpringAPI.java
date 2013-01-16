@@ -688,7 +688,8 @@ public class SpringAPI implements JbillingAPI {
     /**
      * Updates user's payment details.
      *
-     * @see JbillingAPI#updatePayment(com.sapienter.jbilling.server.payment.PaymentWS) 
+     * @see
+     * JbillingAPI#updatePayment(com.sapienter.jbilling.server.payment.PaymentWS)
      * @throws JbillingAPIException when internal error occurs
      */
     public void updatePayment(PaymentWS payment) throws JbillingAPIException {
@@ -698,10 +699,24 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
+
+    /**
+     * Deletes payment for user.
+     *
+     * @see JbillingAPI#deletePayment(java.lang.Integer)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public void deletePayment(Integer paymentId) throws JbillingAPIException {
+        try {
+            session.deletePayment(paymentId);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
     /*
      * ITEM
      */
-
     public Integer createItem(ItemDTOEx dto) throws JbillingAPIException {
         try {
             return session.createItem(dto);

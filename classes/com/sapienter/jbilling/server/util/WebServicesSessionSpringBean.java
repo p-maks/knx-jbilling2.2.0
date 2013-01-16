@@ -1674,12 +1674,12 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     /**
      * ------------------- PAYMENT API EXTENSION --------------------------
      */
-    
     /**
      * Updates user's payment details. TODO: This method is not secured or in a
      * jUnit test.
      *
-     * @param payment The payment data to be updated.
+     * @see
+     * IWebServicesSessionBean#updatePayment(com.sapienter.jbilling.server.payment.PaymentWS)
      * @throws SessionInternalError
      */
     public void updatePayment(PaymentWS payment) throws SessionInternalError {
@@ -1691,6 +1691,18 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             LOG.error("Exception in WS - failed to updatePayment", e);
             throw new SessionInternalError("Error updating Payment details");
         }
+    }
+
+    /**
+     * Deletes payment for user. TODO: This method is not secured or in a jUnit
+     * test. 
+     *
+     * @see IWebServicesSessionBean#deletePayment(java.lang.Integer) 
+     * @throws SessionInternalError
+     */
+    public void deletePayment(Integer paymentId) throws SessionInternalError {
+        IPaymentSessionBean session = (IPaymentSessionBean) Context.getBean(Context.Name.PAYMENT_SESSION);
+        session.deletePayment(paymentId);
     }
 
     /*

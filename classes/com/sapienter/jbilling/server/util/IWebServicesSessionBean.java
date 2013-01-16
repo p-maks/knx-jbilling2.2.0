@@ -447,6 +447,14 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public void updatePayment(PaymentWS payment) throws SessionInternalError;
+    
+    /**
+     * Deletes payment for user.
+     *
+     * @param paymentId the id of the payment to delete
+     * @throws SessionInternalError
+     */
+    public void deletePayment(Integer paymentId) throws SessionInternalError;
 
     /*
      * ITEM

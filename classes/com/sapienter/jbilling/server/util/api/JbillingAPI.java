@@ -157,7 +157,8 @@ public interface JbillingAPI {
      *
      * @param userId an id of the customer to send email to
      * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent * * * *      * successfully, <code>false</code> otherwise.
+     * @return <code>true</code> when email was sent * * * * *
+     * successfully, <code>false</code> otherwise.
      * @throws JbillingAPIException when internal error occurs
      */
     public Boolean emailInvoice(Integer invoiceId, Integer userId) throws JbillingAPIException;
@@ -327,6 +328,14 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public void updatePayment(PaymentWS payment) throws JbillingAPIException;
+
+    /**
+     * Deletes payment for user.
+     *
+     * @param paymentId the id of the payment to delete
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public void deletePayment(Integer paymentId) throws JbillingAPIException;
 
     /*
      * ITEM
