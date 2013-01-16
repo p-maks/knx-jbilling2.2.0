@@ -1810,7 +1810,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * Retrieve all the payments created in a given period of time for user.
      * TODO: This method is not secured or in a jUnit test
      *
-     * @see IWebServicesSessionBean#getUserPaymentsByDate(java.lang.String, java.lang.String, java.lang.Integer) 
+     * @see IWebServicesSessionBean#getUserPaymentsByDate(java.lang.String,
+     * java.lang.String, java.lang.Integer)
      * @throws SessionInternalError
      */
     public PaymentWS[] getUserPaymentsByDate(String since, String until, Integer userId) throws SessionInternalError {
@@ -1848,7 +1849,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * Search all the payments by given search parameter for organisation. TODO:
      * This method is not secured or in a jUnit test
      *
-     * @see IWebServicesSessionBean#searchPayments(java.lang.String) 
+     * @see IWebServicesSessionBean#searchPayments(java.lang.String)
      * @throws SessionInternalError
      */
     public PaymentWS[] searchPayments(String searchValue) throws SessionInternalError {
@@ -1881,7 +1882,58 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             throw new SessionInternalError("Error searching for Payments");
         }
     }
-    
+
+    /**
+     * Un-links a payment from an invoice, effectively making the invoice
+     * "unpaid" by removing the payment balance.
+     *
+     * If either invoiceId or paymentId parameters are null, no operation will
+     * be performed. TODO: This method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#removePaymentLink(java.lang.Integer,
+     * java.lang.Integer)
+     */
+    public void removePaymentLink(Integer invoiceId, Integer paymentId) {
+        if (invoiceId == null || paymentId == null) {
+            return;
+        }
+        boolean result = new PaymentBL(paymentId).unLinkFromInvoice(invoiceId);
+        if (!result) {
+            throw new SessionInternalError("WS Unable to find the Invoice Id " + invoiceId + " linked to Payment Id " + paymentId);
+        }
+    }
+
+    /**
+     * Applies an existing payment to an invoice.
+     *
+     * If either invoiceId or paymentId parameters are null, no operation will
+     * be performed. TODO: This method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#createPaymentLink(java.lang.Integer,
+     * java.lang.Integer)
+     */
+    public void createPaymentLink(Integer invoiceId, Integer paymentId) {
+        if (invoiceId == null || paymentId == null) {
+            return;
+        }
+        IPaymentSessionBean session = (IPaymentSessionBean) Context.getBean(Context.Name.PAYMENT_SESSION);
+        session.applyPayment(paymentId, invoiceId);
+    }
+
+    /**
+     * Sends a Payment email notification to a customer for given payment. TODO:
+     * This method is not secured or in a jUnit test
+     *
+     * @param paymentId
+     * @return
+     * @throws SessionInternalError
+     */
+    public boolean notifyPaymentByEmail(Integer paymentId) throws SessionInternalError {
+        INotificationSessionBean notificationSession =
+                (INotificationSessionBean) Context.getBean(Context.Name.NOTIFICATION_SESSION);
+        return notificationSession.emailPayment(paymentId);
+    }
+
     /*
      * ITEM
      */

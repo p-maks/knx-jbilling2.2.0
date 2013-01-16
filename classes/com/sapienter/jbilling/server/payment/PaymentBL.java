@@ -29,7 +29,6 @@ import java.util.List;
 
 import javax.persistence.EntityNotFoundException;
 
-import com.sapienter.jbilling.server.user.db.UserDTO;
 import org.apache.log4j.Logger;
 
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -37,7 +36,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import sun.jdbc.rowset.CachedRowSet;
 
 import com.sapienter.jbilling.common.SessionInternalError;
-import com.sapienter.jbilling.server.invoice.InvoiceBL;
 import com.sapienter.jbilling.server.invoice.InvoiceIdComparator;
 import com.sapienter.jbilling.server.invoice.db.InvoiceDAS;
 import com.sapienter.jbilling.server.invoice.db.InvoiceDTO;
@@ -66,11 +64,9 @@ import com.sapienter.jbilling.server.pluggableTask.PaymentTask;
 import com.sapienter.jbilling.server.pluggableTask.TaskException;
 import com.sapienter.jbilling.server.pluggableTask.admin.PluggableTaskException;
 import com.sapienter.jbilling.server.pluggableTask.admin.PluggableTaskManager;
-import com.sapienter.jbilling.server.process.ConfigurationBL;
 import com.sapienter.jbilling.server.system.event.EventManager;
 import com.sapienter.jbilling.server.user.AchBL;
 import com.sapienter.jbilling.server.user.CreditCardBL;
-import com.sapienter.jbilling.server.user.UserBL;
 import com.sapienter.jbilling.server.user.db.CompanyDTO;
 import com.sapienter.jbilling.server.user.db.CreditCardDAS;
 import com.sapienter.jbilling.server.user.db.CreditCardDTO;
@@ -924,6 +920,29 @@ public class PaymentBL extends ResultList implements PaymentSQL {
         }
     }
 
+    /**
+     * This method removes the link between this payment and the
+     * <i>invoiceId</i> of the Invoice
+     *
+     * @param invoiceId Invoice Id to be unlinked from this payment
+     */
+    public boolean unLinkFromInvoice(Integer invoiceId) {
+
+        InvoiceDTO invoice = new InvoiceDAS().find(invoiceId);
+        Iterator<PaymentInvoiceMapDTO> it = invoice.getPaymentMap().iterator();
+        boolean bSucceeded = false;
+        while (it.hasNext()) {
+            PaymentInvoiceMapDTO map = it.next();
+            if (this.payment.getId() == map.getPayment().getId()) {
+                this.removeInvoiceLink(map.getId());
+                invoice.getPaymentMap().remove(map);
+                bSucceeded = true;
+                break;
+            }
+        }
+        return bSucceeded;
+    }
+
     public PaymentInvoiceMapDTOEx getMapDTO(Integer mapId) {
         // find the map
         PaymentInvoiceMapDTO map = mapDas.find(mapId);
@@ -950,7 +969,7 @@ public class PaymentBL extends ResultList implements PaymentSQL {
         List<Integer> result = new PaymentDAS().findIdsByPeriodForUser(userId, start, end);
         return result.toArray(new Integer[result.size()]);
     }
-    
+
     /*
      * Search fror payments and refunds.
      */

@@ -792,6 +792,39 @@ public class SpringAPI implements JbillingAPI {
         }
     }
 
+    /**
+     * Un-links a payment from an invoice, effectively making the invoice
+     * "unpaid" by removing the payment balance.
+     *
+     * @see JbillingAPI#removePaymentLink(java.lang.Integer, java.lang.Integer)
+     */
+    public void removePaymentLink(Integer invoiceId, Integer paymentId) {
+        session.removePaymentLink(invoiceId, paymentId);
+    }
+
+    /**
+     * Applies an existing payment to an invoice.
+     *
+     * @see JbillingAPI#createPaymentLink(java.lang.Integer, java.lang.Integer)
+     */
+    public void createPaymentLink(Integer invoiceId, Integer paymentId) {
+        session.createPaymentLink(invoiceId, paymentId);
+    }
+
+    /**
+     * Sends a Payment email notification to a customer for given payment
+     *
+     * @see JbillingAPI#notifyPaymentByEmail(java.lang.Integer)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public boolean notifyPaymentByEmail(Integer paymentId) throws JbillingAPIException {
+        try {
+            return session.notifyPaymentByEmail(paymentId);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
     /*
      * ITEM
      */

@@ -157,7 +157,7 @@ public interface JbillingAPI {
      *
      * @param userId an id of the customer to send email to
      * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent * * * * * *
+     * @return <code>true</code> when email was sent * * * * * * *
      * successfully, <code>false</code> otherwise.
      * @throws JbillingAPIException when internal error occurs
      */
@@ -400,6 +400,32 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public PaymentWS[] searchPayments(String searchValue) throws JbillingAPIException;
+
+    /**
+     * Un-links a payment from an invoice, effectively making the invoice
+     * "unpaid" by removing the payment balance.
+     *
+     * @param invoiceId target Invoice
+     * @param paymentId payment to be unlink
+     */
+    public void removePaymentLink(Integer invoiceId, Integer paymentId);
+
+    /**
+     * Applies an existing payment to an invoice.
+     *
+     * @param invoiceId target invoice
+     * @param paymentId payment to apply
+     */
+    public void createPaymentLink(Integer invoiceId, Integer paymentId);
+
+    /**
+     * Sends a Payment email notification to a customer for given payment
+     *
+     * @param paymentId
+     * @return true if email was successfully sent, false otherwise
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public boolean notifyPaymentByEmail(Integer paymentId) throws JbillingAPIException;
     /*
      * ITEM
      */

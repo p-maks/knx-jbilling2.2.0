@@ -519,6 +519,38 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public PaymentWS[] searchPayments(String searchValue) throws SessionInternalError;
+    
+    /**
+     * Un-links a payment from an invoice, effectively making the invoice
+     * "unpaid" by removing the payment balance.
+     *
+     * If either invoiceId or paymentId parameters are null, no operation will
+     * be performed.
+     *
+     * @param invoiceId target Invoice
+     * @param paymentId payment to be unlink
+     */
+    public void removePaymentLink(Integer invoiceId, Integer paymentId);
+    
+    /**
+     * Applies an existing payment to an invoice.
+     *
+     * If either invoiceId or paymentId parameters are null, no operation will
+     * be performed.
+     *
+     * @param invoiceId target invoice
+     * @param paymentId payment to apply
+     */
+    public void createPaymentLink(Integer invoiceId, Integer paymentId);
+    
+    /**
+     * Sends a Payment email notification to a customer for given payment
+     *
+     * @param paymentId
+     * @return true if email was successfully sent, false otherwise
+     * @throws SessionInternalError
+     */
+    public boolean notifyPaymentByEmail(Integer paymentId) throws SessionInternalError;
 
     /*
      * ITEM
