@@ -149,6 +149,22 @@ public interface PaymentSQL {
         " where deleted = 0 " +
         "   and user_id = ?";
     
+    // search for payments
+    // limit to max 200 records to return
+    static final String searchPayments =
+            "SELECT p.id "
+            + "FROM payment p, base_user u, contact co "
+            + " WHERE p.user_id = u.id "
+            + "   AND p.id not in (select payment_id from partner_payout where payment_id is not null) "
+            + "   AND p.deleted = 0 "
+            + "   AND p.is_preauth = 0 "
+            + "   AND u.id = co.user_id "
+            + "   AND u.entity_id = ? "
+            + "   AND (co.email LIKE ? OR co.organization_name LIKE ? "
+            + "   OR co.last_name LIKE ? OR co.first_name LIKE ? OR u.user_name LIKE ?) "
+            + " ORDER by DESC p.payment_date LIMIT 200";
+
+    
 }
 
 

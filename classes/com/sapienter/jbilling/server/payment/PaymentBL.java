@@ -950,4 +950,21 @@ public class PaymentBL extends ResultList implements PaymentSQL {
         List<Integer> result = new PaymentDAS().findIdsByPeriodForUser(userId, start, end);
         return result.toArray(new Integer[result.size()]);
     }
+    
+    /*
+     * Search fror payments and refunds.
+     */
+    public CachedRowSet searchPayments(Integer entityID, String searchValue)
+            throws SQLException, Exception {
+        prepareStatement(PaymentSQL.searchPayments);
+        cachedResults.setInt(1, entityID.intValue());
+        cachedResults.setString(2, searchValue);
+        cachedResults.setString(3, searchValue);
+        cachedResults.setString(4, searchValue);
+        cachedResults.setString(5, searchValue);
+        cachedResults.setString(6, searchValue);
+        execute();
+        conn.close();
+        return cachedResults;
+    }
 }

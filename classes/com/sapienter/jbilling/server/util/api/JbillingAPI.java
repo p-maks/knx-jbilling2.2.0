@@ -157,7 +157,8 @@ public interface JbillingAPI {
      *
      * @param userId an id of the customer to send email to
      * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent * * * * *      * successfully, <code>false</code> otherwise.
+     * @return <code>true</code> when email was sent * * * * * *
+     * successfully, <code>false</code> otherwise.
      * @throws JbillingAPIException when internal error occurs
      */
     public Boolean emailInvoice(Integer invoiceId, Integer userId) throws JbillingAPIException;
@@ -389,9 +390,20 @@ public interface JbillingAPI {
      */
     public PaymentWS[] getUserPaymentsByDate(String since, String until, Integer userId) throws JbillingAPIException;
 
+    /**
+     * Search all the payments by given search parameter for organisation.
+     *
+     * @param searchValue the search parameter string
+     *
+     * @return an array of PaymentWS or null if none found. If the input
+     * parameters are missing , null is returned.
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public PaymentWS[] searchPayments(String searchValue) throws JbillingAPIException;
     /*
      * ITEM
      */
+
     public Integer createItem(ItemDTOEx dto) throws JbillingAPIException;
 
     public ItemDTOEx[] getAllItems() throws JbillingAPIException;

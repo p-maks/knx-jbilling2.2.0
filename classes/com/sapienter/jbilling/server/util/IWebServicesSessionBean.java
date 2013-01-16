@@ -467,7 +467,7 @@ public interface IWebServicesSessionBean {
      *
      */
     public PaymentWS[] getLastUserPayments(Integer userId, Integer number) throws SessionInternalError;
-    
+
     /**
      * Retrieve all the payments created in a given period of time for
      * organisation.
@@ -480,10 +480,10 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public Integer[] getPaymentIdsByDate(String since, String until) throws SessionInternalError;
-    
+
     /**
      * Retrieve all the payments created in a given period of time for
-     * organisation. 
+     * organisation.
      *
      * @param since the starting date for the data extraction
      * @param until the ending date for the data extraction
@@ -493,9 +493,9 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public PaymentWS[] getPaymentsByDate(String since, String until) throws SessionInternalError;
-    
+
     /**
-     * Retrieve all the payments created in a given period of time for user.  
+     * Retrieve all the payments created in a given period of time for user.
      *
      * @param since the starting date for the data extraction
      * @param until the ending date for the data extraction
@@ -507,6 +507,18 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public PaymentWS[] getUserPaymentsByDate(String since, String until, Integer userId) throws SessionInternalError;
+
+    /**
+     * Search all the payments by given search parameter for organisation. TODO:
+     * This method is not secured or in a jUnit test
+     *
+     * @param searchValue the search parameter string
+     *
+     * @return an array of PaymentWS or null if none found. If the input
+     * parameters are missing , null is returned.
+     * @throws SessionInternalError
+     */
+    public PaymentWS[] searchPayments(String searchValue) throws SessionInternalError;
 
     /*
      * ITEM

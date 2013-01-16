@@ -61,8 +61,9 @@ public class PaymentDAS extends AbstractDAS<PaymentDTO> {
                 + "   and p.is_preauth = 0"
                 + "   and p.method_id = pm.id "
                 + "   and u.entity_id = :entityId "
-                + "   and p.create_datetime >= :start"
-                + "   and p.create_datetime <= :end";
+                + "   and p.payment_date >= :start"
+                + "   and p.payment_date <= :end "
+                + "   ORDER by DESC p.payment_date";
 
         List<Integer> data = getSession()
                 .createQuery(hql)
@@ -80,9 +81,9 @@ public class PaymentDAS extends AbstractDAS<PaymentDTO> {
                 .add(Restrictions.eq("isPreauth", 0))
                 .createAlias("baseUser", "u")
                 .add(Restrictions.eq("u.id", userID))
-                .add(Restrictions.ge("createDatetime", start))
-                .add(Restrictions.lt("createDatetime", end))
-                .setProjection(Projections.id()).addOrder(Order.desc("id"));
+                .add(Restrictions.ge("paymentDate", start))
+                .add(Restrictions.lt("paymentDate", end))
+                .setProjection(Projections.id()).addOrder(Order.desc("paymentDate"));
         return criteria.list();
     }
 
