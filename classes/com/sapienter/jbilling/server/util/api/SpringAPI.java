@@ -714,6 +714,22 @@ public class SpringAPI implements JbillingAPI {
         }
     }
 
+    /**
+     * Retrieves several payments for a customer, starting from the last one.
+     *
+     * @see JbillingAPI#getLastUserPayments(java.lang.Integer,
+     * java.lang.Integer)
+     * @throws JbillingAPIException when internal error occurs
+     *
+     */
+    public PaymentWS[] getLastUserPayments(Integer userId, Integer number) throws JbillingAPIException {
+        try {
+            return session.getLastUserPayments(userId, number);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
     /*
      * ITEM
      */

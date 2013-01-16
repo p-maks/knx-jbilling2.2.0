@@ -25,6 +25,7 @@ import com.sapienter.jbilling.server.entity.CreditCardDTO;
 import com.sapienter.jbilling.server.entity.PaymentAuthorizationDTO;
 import com.sapienter.jbilling.server.entity.PaymentInfoCashDTO;
 import com.sapienter.jbilling.server.entity.PaymentInfoChequeDTO;
+import com.sapienter.jbilling.server.user.UserWS;
 import com.sapienter.jbilling.server.util.Constants;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -67,6 +68,16 @@ public class PaymentWS implements Serializable {
     private Integer paymentPeriod;
     private BigDecimal amountAsDecimal;
     private BigDecimal balanceAsDecimal;
+    // added extra field
+    private UserWS user;
+
+    public UserWS getUser() {
+        return user;
+    }
+
+    public void setUser(UserWS user) {
+        this.user = user;
+    }
     
     public Integer getResultId() {
         return resultId;

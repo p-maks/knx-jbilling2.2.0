@@ -439,7 +439,6 @@ public interface IWebServicesSessionBean {
     /**
      * ------------------- PAYMENT API EXTENSION --------------------------
      */
-    
     /**
      * Updates user's payment details.
      *
@@ -447,7 +446,7 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public void updatePayment(PaymentWS payment) throws SessionInternalError;
-    
+
     /**
      * Deletes payment for user.
      *
@@ -455,6 +454,19 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public void deletePayment(Integer paymentId) throws SessionInternalError;
+
+    /**
+     * Retrieves several payments for a customer, starting from the last one.
+     *
+     * @param userId id of the customer whose payment information is to be
+     * retrieved
+     * @param number the number of payments to retrieve
+     * @return an array of PaymentWS or null if none found. If the input
+     * parameters are missing or incorrect, a SessionInternalError is issued.
+     * @throws SessionInternalError
+     *
+     */
+    public PaymentWS[] getLastUserPayments(Integer userId, Integer number) throws SessionInternalError;
 
     /*
      * ITEM

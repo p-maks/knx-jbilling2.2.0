@@ -1695,14 +1695,48 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
     /**
      * Deletes payment for user. TODO: This method is not secured or in a jUnit
-     * test. 
+     * test.
      *
-     * @see IWebServicesSessionBean#deletePayment(java.lang.Integer) 
+     * @see IWebServicesSessionBean#deletePayment(java.lang.Integer)
      * @throws SessionInternalError
      */
     public void deletePayment(Integer paymentId) throws SessionInternalError {
         IPaymentSessionBean session = (IPaymentSessionBean) Context.getBean(Context.Name.PAYMENT_SESSION);
         session.deletePayment(paymentId);
+    }
+
+    /**
+     * Retrieves several payments for a customer, starting from the last one.
+     * TODO: This method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#getLastUserPayments(java.lang.Integer,
+     * java.lang.Integer)
+     * @throws SessionInternalError
+     *
+     */
+    public PaymentWS[] getLastUserPayments(Integer userId, Integer number) throws SessionInternalError {
+        if (userId == null || number == null) {
+            return null;
+        }
+        Integer languageId = getCallerLanguageId();
+
+        PaymentBL bl = new PaymentBL();
+        PaymentWS[] payments = null;
+
+        Integer[] paymentIds = bl.getManyWS(userId, number, languageId);
+        payments = new PaymentWS[paymentIds.length];
+
+        for (int f = 0; f < paymentIds.length; f++) {
+            bl.set(paymentIds[f]);
+            PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));
+            // find user for this payment
+            UserBL ubl = new UserBL(payment.getUserId());
+            // add to payment
+            payment.setUser(ubl.getUserWS());
+            payments[f] = payment;
+        }
+        return payments;
+
     }
 
     /*
