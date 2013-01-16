@@ -685,9 +685,23 @@ public class SpringAPI implements JbillingAPI {
     /**
      * ------------------- PAYMENT API EXTENSION --------------------------
      */
+    /**
+     * Updates user's payment details.
+     *
+     * @see JbillingAPI#updatePayment(com.sapienter.jbilling.server.payment.PaymentWS) 
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public void updatePayment(PaymentWS payment) throws JbillingAPIException {
+        try {
+            session.updatePayment(payment);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
     /*
      * ITEM
      */
+
     public Integer createItem(ItemDTOEx dto) throws JbillingAPIException {
         try {
             return session.createItem(dto);

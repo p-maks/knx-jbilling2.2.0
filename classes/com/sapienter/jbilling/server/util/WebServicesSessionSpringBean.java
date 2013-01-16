@@ -1674,6 +1674,24 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     /**
      * ------------------- PAYMENT API EXTENSION --------------------------
      */
+    
+    /**
+     * Updates user's payment details. TODO: This method is not secured or in a
+     * jUnit test.
+     *
+     * @param payment The payment data to be updated.
+     * @throws SessionInternalError
+     */
+    public void updatePayment(PaymentWS payment) throws SessionInternalError {
+        try {
+            IPaymentSessionBean session = (IPaymentSessionBean) Context.getBean(Context.Name.PAYMENT_SESSION);
+            PaymentDTOEx dto = new PaymentDTOEx(payment);
+            session.update(getCallerId(), dto);
+        } catch (Exception e) {
+            LOG.error("Exception in WS - failed to updatePayment", e);
+            throw new SessionInternalError("Error updating Payment details");
+        }
+    }
 
     /*
      * ITEM

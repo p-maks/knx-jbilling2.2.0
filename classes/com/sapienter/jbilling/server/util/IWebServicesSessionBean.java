@@ -439,6 +439,14 @@ public interface IWebServicesSessionBean {
     /**
      * ------------------- PAYMENT API EXTENSION --------------------------
      */
+    
+    /**
+     * Updates user's payment details.
+     *
+     * @param payment The payment data to be updated.
+     * @throws SessionInternalError
+     */
+    public void updatePayment(PaymentWS payment) throws SessionInternalError;
 
     /*
      * ITEM
