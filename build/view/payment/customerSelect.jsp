@@ -51,6 +51,9 @@
 <logic:present parameter="cash">            
    <sess:setAttribute name="jsp_payment_method">cash</sess:setAttribute>
 </logic:present>
+<logic:present parameter="bank">            
+   <sess:setAttribute name="jsp_payment_method">bank</sess:setAttribute>
+</logic:present>
 <logic:present parameter="ach">            
    <sess:setAttribute name="jsp_payment_method">ach</sess:setAttribute>
 </logic:present>

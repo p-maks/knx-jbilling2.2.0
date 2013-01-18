@@ -124,17 +124,25 @@ public final class createRefundTop_jsp extends org.apache.jasper.runtime.HttpJsp
       out.write('\n');
       if (_jspx_meth_sess_005fequalsAttribute_005f2(_jspx_page_context))
         return;
+      out.write('\r');
+      out.write('\n');
+      if (_jspx_meth_sess_005fequalsAttribute_005f3(_jspx_page_context))
+        return;
+      out.write('\r');
+      out.write('\n');
+      if (_jspx_meth_sess_005fequalsAttribute_005f4(_jspx_page_context))
+        return;
       out.write("\r\n</p>\r\n\r\n<p class=\"instr\">\r\n     ");
-      if (_jspx_meth_bean_005fmessage_005f3(_jspx_page_context))
+      if (_jspx_meth_bean_005fmessage_005f5(_jspx_page_context))
         return;
       out.write("\r\n</p>\r\n\r\n");
       //  jbilling:genericList
       com.sapienter.jbilling.client.list.GenericListTag _jspx_th_jbilling_005fgenericList_005f0 = (com.sapienter.jbilling.client.list.GenericListTag) _005fjspx_005ftagPool_005fjbilling_005fgenericList_0026_005ftype_005fsetup_005fnobody.get(com.sapienter.jbilling.client.list.GenericListTag.class);
       _jspx_th_jbilling_005fgenericList_005f0.setPageContext(_jspx_page_context);
       _jspx_th_jbilling_005fgenericList_005f0.setParent(null);
-      // /payment/createRefundTop.jsp(57,0) name = setup type = java.lang.Boolean reqTime = true required = false fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
+      // /payment/createRefundTop.jsp(63,0) name = setup type = java.lang.Boolean reqTime = true required = false fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
       _jspx_th_jbilling_005fgenericList_005f0.setSetup(new Boolean(true));
-      // /payment/createRefundTop.jsp(57,0) name = type type = java.lang.String reqTime = true required = false fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
+      // /payment/createRefundTop.jsp(63,0) name = type type = java.lang.String reqTime = true required = false fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
       _jspx_th_jbilling_005fgenericList_005f0.setType(Constants.LIST_TYPE_PAYMENT_USER);
       int _jspx_eval_jbilling_005fgenericList_005f0 = _jspx_th_jbilling_005fgenericList_005f0.doStartTag();
       if (_jspx_th_jbilling_005fgenericList_005f0.doEndTag() == javax.servlet.jsp.tagext.Tag.SKIP_PAGE) {
@@ -151,9 +159,9 @@ public final class createRefundTop_jsp extends org.apache.jasper.runtime.HttpJsp
       org.apache.struts.taglib.html.MessagesTag _jspx_th_html_005fmessages_005f0 = (org.apache.struts.taglib.html.MessagesTag) _005fjspx_005ftagPool_005fhtml_005fmessages_0026_005fmessage_005fid.get(org.apache.struts.taglib.html.MessagesTag.class);
       _jspx_th_html_005fmessages_005f0.setPageContext(_jspx_page_context);
       _jspx_th_html_005fmessages_005f0.setParent(null);
-      // /payment/createRefundTop.jsp(61,0) name = message type = null reqTime = true required = false fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
+      // /payment/createRefundTop.jsp(67,0) name = message type = null reqTime = true required = false fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
       _jspx_th_html_005fmessages_005f0.setMessage("true");
-      // /payment/createRefundTop.jsp(61,0) name = id type = java.lang.String reqTime = false required = true fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
+      // /payment/createRefundTop.jsp(67,0) name = id type = java.lang.String reqTime = false required = true fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
       _jspx_th_html_005fmessages_005f0.setId("myMessage");
       int _jspx_eval_html_005fmessages_005f0 = _jspx_th_html_005fmessages_005f0.doStartTag();
       if (_jspx_eval_html_005fmessages_005f0 != javax.servlet.jsp.tagext.Tag.SKIP_BODY) {
@@ -184,7 +192,7 @@ public final class createRefundTop_jsp extends org.apache.jasper.runtime.HttpJsp
       }
       _005fjspx_005ftagPool_005fhtml_005fmessages_0026_005fmessage_005fid.reuse(_jspx_th_html_005fmessages_005f0);
       out.write("\r\n\r\n\r\n<p class=\"instr\">\r\n     ");
-      if (_jspx_meth_bean_005fmessage_005f4(_jspx_page_context))
+      if (_jspx_meth_bean_005fmessage_005f6(_jspx_page_context))
         return;
       out.write("\r\n</p>\r\n");
     } catch (Throwable t) {
@@ -314,7 +322,7 @@ public final class createRefundTop_jsp extends org.apache.jasper.runtime.HttpJsp
     // /payment/createRefundTop.jsp(48,0) name = name type = java.lang.String reqTime = false required = true fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
     _jspx_th_sess_005fequalsAttribute_005f2.setName("jsp_payment_method");
     // /payment/createRefundTop.jsp(48,0) name = match type = java.lang.String reqTime = false required = true fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
-    _jspx_th_sess_005fequalsAttribute_005f2.setMatch("ach");
+    _jspx_th_sess_005fequalsAttribute_005f2.setMatch("cash");
     int _jspx_eval_sess_005fequalsAttribute_005f2 = _jspx_th_sess_005fequalsAttribute_005f2.doStartTag();
     if (_jspx_eval_sess_005fequalsAttribute_005f2 != javax.servlet.jsp.tagext.Tag.SKIP_BODY) {
       do {
@@ -345,7 +353,7 @@ public final class createRefundTop_jsp extends org.apache.jasper.runtime.HttpJsp
     _jspx_th_bean_005fmessage_005f2.setPageContext(_jspx_page_context);
     _jspx_th_bean_005fmessage_005f2.setParent((javax.servlet.jsp.tagext.Tag) _jspx_th_sess_005fequalsAttribute_005f2);
     // /payment/createRefundTop.jsp(49,5) name = key type = null reqTime = true required = false fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
-    _jspx_th_bean_005fmessage_005f2.setKey("refund.ach.title");
+    _jspx_th_bean_005fmessage_005f2.setKey("refund.cash.title");
     int _jspx_eval_bean_005fmessage_005f2 = _jspx_th_bean_005fmessage_005f2.doStartTag();
     if (_jspx_th_bean_005fmessage_005f2.doEndTag() == javax.servlet.jsp.tagext.Tag.SKIP_PAGE) {
       _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.reuse(_jspx_th_bean_005fmessage_005f2);
@@ -355,22 +363,126 @@ public final class createRefundTop_jsp extends org.apache.jasper.runtime.HttpJsp
     return false;
   }
 
-  private boolean _jspx_meth_bean_005fmessage_005f3(PageContext _jspx_page_context)
+  private boolean _jspx_meth_sess_005fequalsAttribute_005f3(PageContext _jspx_page_context)
+          throws Throwable {
+    PageContext pageContext = _jspx_page_context;
+    JspWriter out = _jspx_page_context.getOut();
+    //  sess:equalsAttribute
+    org.apache.taglibs.session.EqualsAttributeTag _jspx_th_sess_005fequalsAttribute_005f3 = (org.apache.taglibs.session.EqualsAttributeTag) _005fjspx_005ftagPool_005fsess_005fequalsAttribute_0026_005fname_005fmatch.get(org.apache.taglibs.session.EqualsAttributeTag.class);
+    _jspx_th_sess_005fequalsAttribute_005f3.setPageContext(_jspx_page_context);
+    _jspx_th_sess_005fequalsAttribute_005f3.setParent(null);
+    // /payment/createRefundTop.jsp(51,0) name = name type = java.lang.String reqTime = false required = true fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
+    _jspx_th_sess_005fequalsAttribute_005f3.setName("jsp_payment_method");
+    // /payment/createRefundTop.jsp(51,0) name = match type = java.lang.String reqTime = false required = true fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
+    _jspx_th_sess_005fequalsAttribute_005f3.setMatch("bank");
+    int _jspx_eval_sess_005fequalsAttribute_005f3 = _jspx_th_sess_005fequalsAttribute_005f3.doStartTag();
+    if (_jspx_eval_sess_005fequalsAttribute_005f3 != javax.servlet.jsp.tagext.Tag.SKIP_BODY) {
+      do {
+        out.write("                \r\n     ");
+        if (_jspx_meth_bean_005fmessage_005f3(_jspx_th_sess_005fequalsAttribute_005f3, _jspx_page_context))
+          return true;
+        out.write('\r');
+        out.write('\n');
+        int evalDoAfterBody = _jspx_th_sess_005fequalsAttribute_005f3.doAfterBody();
+        if (evalDoAfterBody != javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_AGAIN)
+          break;
+      } while (true);
+    }
+    if (_jspx_th_sess_005fequalsAttribute_005f3.doEndTag() == javax.servlet.jsp.tagext.Tag.SKIP_PAGE) {
+      _005fjspx_005ftagPool_005fsess_005fequalsAttribute_0026_005fname_005fmatch.reuse(_jspx_th_sess_005fequalsAttribute_005f3);
+      return true;
+    }
+    _005fjspx_005ftagPool_005fsess_005fequalsAttribute_0026_005fname_005fmatch.reuse(_jspx_th_sess_005fequalsAttribute_005f3);
+    return false;
+  }
+
+  private boolean _jspx_meth_bean_005fmessage_005f3(javax.servlet.jsp.tagext.JspTag _jspx_th_sess_005fequalsAttribute_005f3, PageContext _jspx_page_context)
           throws Throwable {
     PageContext pageContext = _jspx_page_context;
     JspWriter out = _jspx_page_context.getOut();
     //  bean:message
     org.apache.struts.taglib.bean.MessageTag _jspx_th_bean_005fmessage_005f3 = (org.apache.struts.taglib.bean.MessageTag) _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.get(org.apache.struts.taglib.bean.MessageTag.class);
     _jspx_th_bean_005fmessage_005f3.setPageContext(_jspx_page_context);
-    _jspx_th_bean_005fmessage_005f3.setParent(null);
-    // /payment/createRefundTop.jsp(54,5) name = key type = null reqTime = true required = false fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
-    _jspx_th_bean_005fmessage_005f3.setKey("refund.enter.instr");
+    _jspx_th_bean_005fmessage_005f3.setParent((javax.servlet.jsp.tagext.Tag) _jspx_th_sess_005fequalsAttribute_005f3);
+    // /payment/createRefundTop.jsp(52,5) name = key type = null reqTime = true required = false fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
+    _jspx_th_bean_005fmessage_005f3.setKey("refund.bank.title");
     int _jspx_eval_bean_005fmessage_005f3 = _jspx_th_bean_005fmessage_005f3.doStartTag();
     if (_jspx_th_bean_005fmessage_005f3.doEndTag() == javax.servlet.jsp.tagext.Tag.SKIP_PAGE) {
       _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.reuse(_jspx_th_bean_005fmessage_005f3);
       return true;
     }
     _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.reuse(_jspx_th_bean_005fmessage_005f3);
+    return false;
+  }
+
+  private boolean _jspx_meth_sess_005fequalsAttribute_005f4(PageContext _jspx_page_context)
+          throws Throwable {
+    PageContext pageContext = _jspx_page_context;
+    JspWriter out = _jspx_page_context.getOut();
+    //  sess:equalsAttribute
+    org.apache.taglibs.session.EqualsAttributeTag _jspx_th_sess_005fequalsAttribute_005f4 = (org.apache.taglibs.session.EqualsAttributeTag) _005fjspx_005ftagPool_005fsess_005fequalsAttribute_0026_005fname_005fmatch.get(org.apache.taglibs.session.EqualsAttributeTag.class);
+    _jspx_th_sess_005fequalsAttribute_005f4.setPageContext(_jspx_page_context);
+    _jspx_th_sess_005fequalsAttribute_005f4.setParent(null);
+    // /payment/createRefundTop.jsp(54,0) name = name type = java.lang.String reqTime = false required = true fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
+    _jspx_th_sess_005fequalsAttribute_005f4.setName("jsp_payment_method");
+    // /payment/createRefundTop.jsp(54,0) name = match type = java.lang.String reqTime = false required = true fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
+    _jspx_th_sess_005fequalsAttribute_005f4.setMatch("ach");
+    int _jspx_eval_sess_005fequalsAttribute_005f4 = _jspx_th_sess_005fequalsAttribute_005f4.doStartTag();
+    if (_jspx_eval_sess_005fequalsAttribute_005f4 != javax.servlet.jsp.tagext.Tag.SKIP_BODY) {
+      do {
+        out.write("                \r\n     ");
+        if (_jspx_meth_bean_005fmessage_005f4(_jspx_th_sess_005fequalsAttribute_005f4, _jspx_page_context))
+          return true;
+        out.write('\r');
+        out.write('\n');
+        int evalDoAfterBody = _jspx_th_sess_005fequalsAttribute_005f4.doAfterBody();
+        if (evalDoAfterBody != javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_AGAIN)
+          break;
+      } while (true);
+    }
+    if (_jspx_th_sess_005fequalsAttribute_005f4.doEndTag() == javax.servlet.jsp.tagext.Tag.SKIP_PAGE) {
+      _005fjspx_005ftagPool_005fsess_005fequalsAttribute_0026_005fname_005fmatch.reuse(_jspx_th_sess_005fequalsAttribute_005f4);
+      return true;
+    }
+    _005fjspx_005ftagPool_005fsess_005fequalsAttribute_0026_005fname_005fmatch.reuse(_jspx_th_sess_005fequalsAttribute_005f4);
+    return false;
+  }
+
+  private boolean _jspx_meth_bean_005fmessage_005f4(javax.servlet.jsp.tagext.JspTag _jspx_th_sess_005fequalsAttribute_005f4, PageContext _jspx_page_context)
+          throws Throwable {
+    PageContext pageContext = _jspx_page_context;
+    JspWriter out = _jspx_page_context.getOut();
+    //  bean:message
+    org.apache.struts.taglib.bean.MessageTag _jspx_th_bean_005fmessage_005f4 = (org.apache.struts.taglib.bean.MessageTag) _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.get(org.apache.struts.taglib.bean.MessageTag.class);
+    _jspx_th_bean_005fmessage_005f4.setPageContext(_jspx_page_context);
+    _jspx_th_bean_005fmessage_005f4.setParent((javax.servlet.jsp.tagext.Tag) _jspx_th_sess_005fequalsAttribute_005f4);
+    // /payment/createRefundTop.jsp(55,5) name = key type = null reqTime = true required = false fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
+    _jspx_th_bean_005fmessage_005f4.setKey("refund.ach.title");
+    int _jspx_eval_bean_005fmessage_005f4 = _jspx_th_bean_005fmessage_005f4.doStartTag();
+    if (_jspx_th_bean_005fmessage_005f4.doEndTag() == javax.servlet.jsp.tagext.Tag.SKIP_PAGE) {
+      _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.reuse(_jspx_th_bean_005fmessage_005f4);
+      return true;
+    }
+    _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.reuse(_jspx_th_bean_005fmessage_005f4);
+    return false;
+  }
+
+  private boolean _jspx_meth_bean_005fmessage_005f5(PageContext _jspx_page_context)
+          throws Throwable {
+    PageContext pageContext = _jspx_page_context;
+    JspWriter out = _jspx_page_context.getOut();
+    //  bean:message
+    org.apache.struts.taglib.bean.MessageTag _jspx_th_bean_005fmessage_005f5 = (org.apache.struts.taglib.bean.MessageTag) _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.get(org.apache.struts.taglib.bean.MessageTag.class);
+    _jspx_th_bean_005fmessage_005f5.setPageContext(_jspx_page_context);
+    _jspx_th_bean_005fmessage_005f5.setParent(null);
+    // /payment/createRefundTop.jsp(60,5) name = key type = null reqTime = true required = false fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
+    _jspx_th_bean_005fmessage_005f5.setKey("refund.enter.instr");
+    int _jspx_eval_bean_005fmessage_005f5 = _jspx_th_bean_005fmessage_005f5.doStartTag();
+    if (_jspx_th_bean_005fmessage_005f5.doEndTag() == javax.servlet.jsp.tagext.Tag.SKIP_PAGE) {
+      _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.reuse(_jspx_th_bean_005fmessage_005f5);
+      return true;
+    }
+    _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.reuse(_jspx_th_bean_005fmessage_005f5);
     return false;
   }
 
@@ -399,7 +511,7 @@ public final class createRefundTop_jsp extends org.apache.jasper.runtime.HttpJsp
     org.apache.struts.taglib.bean.WriteTag _jspx_th_bean_005fwrite_005f0 = (org.apache.struts.taglib.bean.WriteTag) _005fjspx_005ftagPool_005fbean_005fwrite_0026_005fname_005fnobody.get(org.apache.struts.taglib.bean.WriteTag.class);
     _jspx_th_bean_005fwrite_005f0.setPageContext(_jspx_page_context);
     _jspx_th_bean_005fwrite_005f0.setParent((javax.servlet.jsp.tagext.Tag) _jspx_th_html_005fmessages_005f0);
-    // /payment/createRefundTop.jsp(62,4) name = name type = null reqTime = true required = true fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
+    // /payment/createRefundTop.jsp(68,4) name = name type = null reqTime = true required = true fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
     _jspx_th_bean_005fwrite_005f0.setName("myMessage");
     int _jspx_eval_bean_005fwrite_005f0 = _jspx_th_bean_005fwrite_005f0.doStartTag();
     if (_jspx_th_bean_005fwrite_005f0.doEndTag() == javax.servlet.jsp.tagext.Tag.SKIP_PAGE) {
@@ -410,22 +522,22 @@ public final class createRefundTop_jsp extends org.apache.jasper.runtime.HttpJsp
     return false;
   }
 
-  private boolean _jspx_meth_bean_005fmessage_005f4(PageContext _jspx_page_context)
+  private boolean _jspx_meth_bean_005fmessage_005f6(PageContext _jspx_page_context)
           throws Throwable {
     PageContext pageContext = _jspx_page_context;
     JspWriter out = _jspx_page_context.getOut();
     //  bean:message
-    org.apache.struts.taglib.bean.MessageTag _jspx_th_bean_005fmessage_005f4 = (org.apache.struts.taglib.bean.MessageTag) _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.get(org.apache.struts.taglib.bean.MessageTag.class);
-    _jspx_th_bean_005fmessage_005f4.setPageContext(_jspx_page_context);
-    _jspx_th_bean_005fmessage_005f4.setParent(null);
-    // /payment/createRefundTop.jsp(67,5) name = key type = null reqTime = true required = false fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
-    _jspx_th_bean_005fmessage_005f4.setKey("refund.enter.payment.list");
-    int _jspx_eval_bean_005fmessage_005f4 = _jspx_th_bean_005fmessage_005f4.doStartTag();
-    if (_jspx_th_bean_005fmessage_005f4.doEndTag() == javax.servlet.jsp.tagext.Tag.SKIP_PAGE) {
-      _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.reuse(_jspx_th_bean_005fmessage_005f4);
+    org.apache.struts.taglib.bean.MessageTag _jspx_th_bean_005fmessage_005f6 = (org.apache.struts.taglib.bean.MessageTag) _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.get(org.apache.struts.taglib.bean.MessageTag.class);
+    _jspx_th_bean_005fmessage_005f6.setPageContext(_jspx_page_context);
+    _jspx_th_bean_005fmessage_005f6.setParent(null);
+    // /payment/createRefundTop.jsp(73,5) name = key type = null reqTime = true required = false fragment = false deferredValue = false expectedTypeName = null deferredMethod = false methodSignature = null
+    _jspx_th_bean_005fmessage_005f6.setKey("refund.enter.payment.list");
+    int _jspx_eval_bean_005fmessage_005f6 = _jspx_th_bean_005fmessage_005f6.doStartTag();
+    if (_jspx_th_bean_005fmessage_005f6.doEndTag() == javax.servlet.jsp.tagext.Tag.SKIP_PAGE) {
+      _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.reuse(_jspx_th_bean_005fmessage_005f6);
       return true;
     }
-    _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.reuse(_jspx_th_bean_005fmessage_005f4);
+    _005fjspx_005ftagPool_005fbean_005fmessage_0026_005fkey_005fnobody.reuse(_jspx_th_bean_005fmessage_005f6);
     return false;
   }
 }

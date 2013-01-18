@@ -48,6 +48,9 @@
 <sess:equalsAttribute name="jsp_payment_method" match="cash">                
      <bean:message key="payment.cash.title"/>
 </sess:equalsAttribute>
+<sess:equalsAttribute name="jsp_payment_method" match="bank">                
+     <bean:message key="payment.bank.title"/>
+</sess:equalsAttribute>
 <sess:equalsAttribute name="jsp_payment_method" match="ach">                
      <bean:message key="payment.ach.title"/>
 </sess:equalsAttribute>

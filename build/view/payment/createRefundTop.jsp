@@ -45,6 +45,12 @@
 <sess:equalsAttribute name="jsp_payment_method" match="cheque">                
      <bean:message key="refund.cheque.title"/>
 </sess:equalsAttribute>
+<sess:equalsAttribute name="jsp_payment_method" match="cash">                
+     <bean:message key="refund.cash.title"/>
+</sess:equalsAttribute>
+<sess:equalsAttribute name="jsp_payment_method" match="bank">                
+     <bean:message key="refund.bank.title"/>
+</sess:equalsAttribute>
 <sess:equalsAttribute name="jsp_payment_method" match="ach">                
      <bean:message key="refund.ach.title"/>
 </sess:equalsAttribute>

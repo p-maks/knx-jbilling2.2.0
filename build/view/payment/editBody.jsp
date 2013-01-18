@@ -155,6 +155,36 @@
 	 	</tr>
         </sess:equalsAttribute>
 
+         <%--  Added Bank Payment --%>
+        <sess:equalsAttribute name="jsp_payment_method" match="bank">                
+            <html:hidden property="method" value="bank"/>
+             <tr class="form">
+                <td></td>
+                <td class="form_prompt"><bean:message key="payment.bank.paidto"/></td>
+            <td colspan="4"><html:text property="paidTo" size="20" /></td>
+            </tr>
+            <tr class="form">
+                <td></td>
+                <td class="form_prompt"><bean:message key="payment.bank.ref"/></td>
+            <td colspan="4"><html:text property="bankRef" size="20" /></td>
+            </tr>	 	
+            <tr class="form">
+                <td></td>
+                <td class="form_prompt"><bean:message key="payment.bank.date"/></td>
+            <jbilling:dateFormat format="mm-dd">
+                <td><html:text property="bankDate_month" size="2" maxlength="2"/></td>
+                <td><html:text property="bankDate_day" size="2" maxlength="2"/></td>
+            </jbilling:dateFormat>
+            <jbilling:dateFormat format="dd-mm">
+                <td><html:text property="bankDate_day" size="2" maxlength="2"/></td>
+                <td><html:text property="bankDate_month" size="2" maxlength="2"/></td>
+            </jbilling:dateFormat>
+            <td><html:text property="bankDate_year" size="4" maxlength="4"/></td>
+            <td><bean:message key="all.prompt.dateFormat"/></td>
+            </tr>
+        </sess:equalsAttribute>
+
+
        <sess:equalsAttribute name="jsp_payment_method" match="ach">                
       	   <html:hidden property="method" value="ach"/>	 
       	  <tr class="form">
