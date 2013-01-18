@@ -695,7 +695,7 @@ public interface IWebServicesSessionBean {
      * @return a list of <code>EventLogDTO</code>
      */
     public List<EventLogDTO> getUserEventLog(Integer userId);
-    
+
     /**
      * Retrieves a list of {@link OptionDTO options} for used in forms fields
      * with a select box.
@@ -706,4 +706,15 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public Collection<OptionDTO> getSelectOption(String type) throws SessionInternalError;
+
+    /**
+     * Generate age receivable report for organisation. TODO: This method is not
+     * secured or in a jUnit test
+     *
+     * @param since the starting date for the data extraction
+     * @param until the ending date for the data extraction
+     * @return a list of ReportWS objects or null if nothing found
+     * @throws SessionInternalError
+     */
+    public List<ReportWS> getAgeReceivableReport(String since, String until) throws SessionInternalError;
 }

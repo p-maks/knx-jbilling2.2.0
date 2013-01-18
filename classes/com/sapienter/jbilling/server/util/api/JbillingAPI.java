@@ -40,6 +40,7 @@ import com.sapienter.jbilling.server.entity.CreditCardDTO;
 import com.sapienter.jbilling.server.notification.MessageDTO;
 import com.sapienter.jbilling.server.user.CompanyWS;
 import com.sapienter.jbilling.server.util.OptionDTO;
+import com.sapienter.jbilling.server.util.ReportWS;
 import com.sapienter.jbilling.server.util.audit.db.EventLogDTO;
 import java.util.Collection;
 import java.util.List;
@@ -160,7 +161,8 @@ public interface JbillingAPI {
      *
      * @param userId an id of the customer to send email to
      * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent * * * * * * *      * successfully, <code>false</code> otherwise.
+     * @return <code>true</code> when email was sent * * * * * * * *
+     * successfully, <code>false</code> otherwise.
      * @throws JbillingAPIException when internal error occurs
      */
     public Boolean emailInvoice(Integer invoiceId, Integer userId) throws JbillingAPIException;
@@ -521,7 +523,7 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public List<EventLogDTO> getUserEventLog(Integer userId) throws JbillingAPIException;
-    
+
     /**
      * Retrieves a list of {@link OptionDTO options} for used in forms fields
      * with a select box.
@@ -532,4 +534,15 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public Collection<OptionDTO> getSelectOption(String type) throws JbillingAPIException;
+
+    /**
+     * Generate age receivable report for organisation. TODO: This method is not
+     * secured or in a jUnit test
+     *
+     * @param since the starting date for the data extraction
+     * @param until the ending date for the data extraction
+     * @return a list of ReportWS objects or null if nothing found
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public List<ReportWS> getAgeReceivableReport(String since, String until) throws JbillingAPIException;
 }

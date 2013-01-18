@@ -64,6 +64,7 @@ import com.sapienter.jbilling.server.user.db.CompanyDTO;
 import com.sapienter.jbilling.server.util.Constants;
 import com.sapienter.jbilling.server.util.Context;
 import com.sapienter.jbilling.server.util.PreferenceBL;
+import com.sapienter.jbilling.server.util.ReportWS;
 import com.sapienter.jbilling.server.util.audit.EventLogger;
 import java.util.ArrayList;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -1063,5 +1064,59 @@ public class InvoiceBL extends ResultList implements Serializable, InvoiceSQL {
         }
 
         return retValue;
+    }
+    
+    /**
+     * Generates Age Receivable report for organisation.
+     *
+     * @param entityId the entity id that users belong to
+     * @param searchValue the string value to search for
+     * @return
+     */
+    public List<ReportWS> getAgeReceivableReport(Integer entityId, Date since, Date until) throws SQLException, Exception {
+
+        String selectSql = "SELECT base_user.id, a.organization_name, a.last_name, "
+                + " a.first_name, base_user.user_name,SUM(invoice.total),SUM(invoice.balance), "
+                + " currency.symbol, invoice.create_datetime "
+                + " FROM base_user, invoice, currency, contact a, contact_map b "
+                + " WHERE base_user.id = invoice.user_id AND a.user_id = base_user.id "
+                + " AND a.id = b.contact_id AND b.foreign_id = base_user.id "
+                + " AND invoice.currency_id = currency.id AND invoice.deleted = 0 "
+                + " AND invoice.is_review = 0 AND base_user.entity_id = ? ";
+
+
+        // append dates if present
+        if (since != null && until != null) {
+            selectSql += " AND invoice.create_datetime >= ? AND invoice.create_datetime < ? ";
+        }
+        String groupSql = " GROUP BY base_user.id, DATE_FORMAT(invoice.create_datetime, '%Y-%m') "
+                + " ORDER BY a.last_name,a.first_name, invoice.create_datetime ASC";
+
+        // full query
+        String sql = selectSql + groupSql;
+        prepareStatement(sql);
+        cachedResults.setInt(1, entityId.intValue());
+        if (since != null && until != null) {
+            cachedResults.setDate(2, new java.sql.Date(since.getTime()));
+            // add a day to include the until date
+            GregorianCalendar cal = new GregorianCalendar();
+            cal.setTime(until);
+            cal.add(GregorianCalendar.DAY_OF_MONTH, 1);
+            cachedResults.setDate(3, new java.sql.Date(cal.getTime().getTime()));
+        }
+
+        execute();
+        conn.close();
+
+        // get ids for return
+        List<ReportWS> list = new ArrayList();
+        while (cachedResults.next()) {
+            ReportWS record = new ReportWS(cachedResults.getInt(1), cachedResults.getString(2),
+                    cachedResults.getString(3), cachedResults.getString(4), cachedResults.getString(5),
+                    cachedResults.getBigDecimal(6), cachedResults.getBigDecimal(7), cachedResults.getString(8),
+                    new java.util.Date(cachedResults.getDate(9).getTime()));
+            list.add(record);
+        }
+        return list;
     }
 }

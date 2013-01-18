@@ -2421,7 +2421,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * Retrieves a list of {@link OptionDTO options} for used in forms fields
      * with a select box. TODO: This method is not secured or in a jUnit test
      *
-     * @see IWebServicesSessionBean#getSelectOption(java.lang.String) 
+     * @see IWebServicesSessionBean#getSelectOption(java.lang.String)
      * @throws SessionInternalError
      */
     public Collection<OptionDTO> getSelectOption(String type) throws SessionInternalError {
@@ -2432,6 +2432,32 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         IListSessionBean remoteList = (IListSessionBean) Context.getBean(Context.Name.LIST_SESSION);
 
         return remoteList.getOptions(type, languageId, entityId, executorType);
+    }
+
+    /**
+     * Generate age receivable report for organisation. TODO: This method is not
+     * secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#getAgeReceivableReport(java.lang.String, java.lang.String) 
+     * @throws SessionInternalError
+     */
+    public List<ReportWS> getAgeReceivableReport(String since, String until) throws SessionInternalError {
+        Date dSince = null;
+        Date dUntil = null;
+        if (since == null || until == null) {
+            dSince = com.sapienter.jbilling.common.Util.parseDate(since);
+            dUntil = com.sapienter.jbilling.common.Util.parseDate(until);
+        }
+        Integer entityId = getCallerCompanyId();
+
+        try {
+
+            InvoiceBL invoiceBl = new InvoiceBL();
+            return invoiceBl.getAgeReceivableReport(entityId, dSince, dUntil);
+        } catch (Exception e) { // can't remove because of the SQL Exception :(
+            LOG.error("WS - getAgeReceivableReport", e);
+            throw new SessionInternalError("Error generating AgeReceivableReport");
+        }
     }
 
     /**

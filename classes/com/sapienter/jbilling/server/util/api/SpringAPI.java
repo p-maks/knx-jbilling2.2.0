@@ -42,6 +42,7 @@ import com.sapienter.jbilling.server.user.ValidatePurchaseWS;
 import com.sapienter.jbilling.server.util.IWebServicesSessionBean;
 import com.sapienter.jbilling.server.util.OptionDTO;
 import com.sapienter.jbilling.server.util.RemoteContext;
+import com.sapienter.jbilling.server.util.ReportWS;
 import com.sapienter.jbilling.server.util.audit.db.EventLogDTO;
 import java.util.Collection;
 import java.util.List;
@@ -1096,6 +1097,22 @@ public class SpringAPI implements JbillingAPI {
     public Collection<OptionDTO> getSelectOption(String type) throws JbillingAPIException {
         try {
             return session.getSelectOption(type);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /**
+     * Generate age receivable report for organisation. TODO: This method is not
+     * secured or in a jUnit test
+     *
+     * @see JbillingAPI#getAgeReceivableReport(java.lang.String,
+     * java.lang.String)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public List<ReportWS> getAgeReceivableReport(String since, String until) throws JbillingAPIException {
+        try {
+            return session.getAgeReceivableReport(since, until);
         } catch (Exception e) {
             throw new JbillingAPIException(e);
         }
