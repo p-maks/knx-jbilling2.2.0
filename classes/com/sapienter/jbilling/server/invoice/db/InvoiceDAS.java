@@ -338,6 +338,36 @@ public class InvoiceDAS extends AbstractDAS<InvoiceDTO> {
 		return save(entity);
 		
 	}
+        
+        /**
+     * Create new Invoice in the system. Usually new Invoice should not be in
+     * paid status, unless the total is 0, here using flag toProcess to set
+     * generic status of the invoice. No billing process involved.
+     *
+     * @param userId the user id for this invoice
+     * @param invoice the Invoice to create
+     * @return
+     */
+    public InvoiceDTO create(Integer userId, NewInvoiceDTO invoice) {
+
+        InvoiceDTO entity = new InvoiceDTO();
+
+        entity.setCreateDatetime(invoice.getBillingDate());
+        entity.setCreateTimestamp(Calendar.getInstance().getTime());
+        entity.setDeleted(new Integer(0));
+        entity.setDueDate(invoice.getDueDate());
+        entity.setTotal(invoice.getTotal());
+        entity.setBalance(invoice.getBalance());
+        entity.setCarriedBalance(invoice.getCarriedBalance());
+        entity.setPaymentAttempts(new Integer(0));
+        entity.setInProcessPayment(invoice.getInProcessPayment());
+        entity.setIsReview(invoice.getIsReview());
+        entity.setCurrency(invoice.getCurrency());
+        entity.setBaseUser(new UserDAS().find(userId));
+        entity.setToProcess(invoice.getToProcess());
+
+        return save(entity);
+    }
 
 /*
  * Collection findWithBalanceByUser(java.lang.Integer userId)"

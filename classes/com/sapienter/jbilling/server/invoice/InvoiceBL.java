@@ -246,6 +246,127 @@ public class InvoiceBL extends ResultList implements Serializable, InvoiceSQL {
                 EventLogger.ROW_CREATED, null, null, null);
 
     }
+    
+    /**
+     * Creates new Invoice in the system. Used for importing legacy invoices
+     * into the system.
+     *
+     * @param userId
+     * @param newInvoice     
+     */
+    public void create(Integer userId, NewInvoiceDTO newInvoice) {
+        // find out the entity id
+        PreferenceBL pref = new PreferenceBL();
+        UserBL user = null;
+        Integer entityId;
+
+        // this is a manual invoice, there's no billing process
+        user = new UserBL(userId);
+        entityId = user.getEntityId(userId);
+        
+        // in any case, ensure that the due date is => that invoice date
+        if (newInvoice.getDueDate().before(newInvoice.getBillingDate())) {
+            newInvoice.setDueDate(newInvoice.getBillingDate());
+        }
+        // ensure that there are only two decimals in the invoice
+        if (newInvoice.getTotal() != null) {
+            newInvoice.setTotal(newInvoice.getTotal().setScale(Constants.BIGDECIMAL_SCALE, Constants.BIGDECIMAL_ROUND));
+
+            // total of invoice <= 0, set to paid, just in 
+            if (newInvoice.getTotal().compareTo(BigDecimal.ZERO) <= 0) {
+                newInvoice.setToProcess(new Integer(0));
+            }
+        }
+        if (newInvoice.getBalance() != null) {
+            newInvoice.setBalance(newInvoice.getBalance().setScale(Constants.BIGDECIMAL_SCALE, Constants.BIGDECIMAL_ROUND));
+            // any balance to be paid balance > 0, set to unpaid
+            if (newInvoice.getBalance().compareTo(BigDecimal.ZERO) > 0) {
+                newInvoice.setToProcess(new Integer(1));
+            }
+        }
+
+        // create the invoice row
+        invoice = invoiceDas.create(userId, newInvoice);
+
+        // add delegated/included invoice links
+        if (newInvoice.getIsReview() == 0) {
+            for (InvoiceDTO dto : newInvoice.getInvoices()) {
+                dto.setInvoice(invoice);
+            }
+        }
+
+        // add the customer notes if it applies
+        try {
+            pref.set(entityId, Constants.PREFERENCE_SHOW_NOTE_IN_INVOICE);
+        } catch (EmptyResultDataAccessException e) {
+            // use the default then
+        }
+
+        if (pref.getInt() == 1) {
+            if (user == null) {
+                user = new UserBL(userId);
+            }
+            if (user.getEntity().getCustomer() != null && user.getEntity().getCustomer().getNotes() != null) {
+                // append the notes if there's some text already there
+                newInvoice.setCustomerNotes((newInvoice.getCustomerNotes() == null) ? user.getEntity().getCustomer().getNotes()
+                        : newInvoice.getCustomerNotes() + " " + user.getEntity().getCustomer().getNotes());
+            }
+        }
+        // notes might come from the customer, the orders, or both
+        if (newInvoice.getCustomerNotes() != null && newInvoice.getCustomerNotes().length() > 0) {
+            invoice.setCustomerNotes(newInvoice.getCustomerNotes());
+        }
+
+        // calculate/compose the number
+        String numberStr = null;
+        if (newInvoice.getIsReview() != null && newInvoice.getIsReview().intValue() == 1) {
+            // invoices for review will be seen by the entity employees
+            // so the entity locale will be used
+            EntityBL entity = new EntityBL(entityId);
+            ResourceBundle bundle = ResourceBundle.getBundle("entityNotifications", entity.getLocale());
+            numberStr = bundle.getString("invoice.review.number");
+        } else if (newInvoice.getPublicNumber() == null || newInvoice.getPublicNumber().length() == 0) {
+            String prefix;
+            try {
+                pref.set(entityId, Constants.PREFERENCE_INVOICE_PREFIX);
+                prefix = pref.getString();
+                if (prefix == null) {
+                    prefix = "";
+                }
+            } catch (EmptyResultDataAccessException e) {
+                prefix = "";
+            }
+            int number;
+            try {
+                pref.set(entityId, Constants.PREFERENCE_INVOICE_NUMBER);
+                number = pref.getInt();
+            } catch (EmptyResultDataAccessException e1) {
+                number = 1;
+            }
+
+            numberStr = prefix + number;
+            // update for the next time
+            number++;
+            pref.createUpdateForEntity(entityId,
+                    Constants.PREFERENCE_INVOICE_NUMBER, new Integer(number),
+                    null, null);
+        } else { // for upload of legacy invoices
+            numberStr = newInvoice.getPublicNumber();
+        }
+
+        invoice.setPublicNumber(numberStr);
+
+        // set the invoice's contact info with the current user's primary
+        ContactBL contact = new ContactBL();
+        contact.set(userId);
+        contact.createForInvoice(contact.getDTO(), invoice.getId());
+
+        // add a log row for convenience
+        eLogger.auditBySystem(entityId, userId, Constants.TABLE_INVOICE,
+                invoice.getId(), EventLogger.MODULE_INVOICE_MAINTENANCE,
+                EventLogger.ROW_CREATED, null, null, null);
+
+    }
 
     public void createLines(NewInvoiceDTO newInvoice) {
         Collection invoiceLines = invoice.getInvoiceLines();

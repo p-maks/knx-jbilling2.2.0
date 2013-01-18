@@ -1117,4 +1117,18 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
+
+    /**
+     * Utility method for importing invoices into JBilling.
+     *
+     * @see JbillingAPI#importInvoices(java.util.Collection)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public void importInvoices(Collection<InvoiceWS> invoices) throws JbillingAPIException {
+        try {
+            session.importInvoices(invoices);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
 }

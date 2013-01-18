@@ -52,15 +52,19 @@ import com.sapienter.jbilling.server.customer.CustomerBL;
 import com.sapienter.jbilling.server.invoice.IInvoiceSessionBean;
 import com.sapienter.jbilling.server.invoice.InvoiceBL;
 import com.sapienter.jbilling.server.invoice.InvoiceWS;
+import com.sapienter.jbilling.server.invoice.NewInvoiceDTO;
 import com.sapienter.jbilling.server.invoice.db.InvoiceDAS;
 import com.sapienter.jbilling.server.invoice.db.InvoiceDTO;
 import com.sapienter.jbilling.server.invoice.db.InvoiceDeliveryMethodDTO;
+import com.sapienter.jbilling.server.invoice.db.InvoiceLineDTO;
+import com.sapienter.jbilling.server.invoice.db.InvoiceLineTypeDTO;
 import com.sapienter.jbilling.server.item.IItemSessionBean;
 import com.sapienter.jbilling.server.item.ItemBL;
 import com.sapienter.jbilling.server.item.ItemDTOEx;
 import com.sapienter.jbilling.server.item.ItemTypeBL;
 import com.sapienter.jbilling.server.item.ItemTypeWS;
 import com.sapienter.jbilling.server.item.PricingField;
+import com.sapienter.jbilling.server.item.db.ItemDAS;
 import com.sapienter.jbilling.server.item.db.ItemDTO;
 import com.sapienter.jbilling.server.item.db.ItemTypeDTO;
 import com.sapienter.jbilling.server.list.IListSessionBean;
@@ -126,6 +130,7 @@ import com.sapienter.jbilling.server.util.api.WebServicesConstants;
 import com.sapienter.jbilling.server.util.audit.EventLogger;
 import com.sapienter.jbilling.server.util.audit.db.EventLogDTO;
 import com.sapienter.jbilling.server.util.db.CurrencyDAS;
+import com.sapienter.jbilling.server.util.db.CurrencyDTO;
 import java.io.File;
 import java.util.Collection;
 
@@ -2438,7 +2443,8 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * Generate age receivable report for organisation. TODO: This method is not
      * secured or in a jUnit test
      *
-     * @see IWebServicesSessionBean#getAgeReceivableReport(java.lang.String, java.lang.String) 
+     * @see IWebServicesSessionBean#getAgeReceivableReport(java.lang.String,
+     * java.lang.String)
      * @throws SessionInternalError
      */
     public List<ReportWS> getAgeReceivableReport(String since, String until) throws SessionInternalError {
@@ -2458,6 +2464,70 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             LOG.error("WS - getAgeReceivableReport", e);
             throw new SessionInternalError("Error generating AgeReceivableReport");
         }
+    }
+
+    /**
+     * Utility method for importing invoices into JBilling. TODO: This method is
+     * not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#importInvoices(java.util.Collection)
+     * @throws SessionInternalError
+     */
+    public void importInvoices(Collection<InvoiceWS> invoices) throws SessionInternalError {
+
+        InvoiceBL invoiceBL = new InvoiceBL();
+        Integer entityId = getCallerCompanyId();
+
+        // go through the list of invoices and add them into the system
+        for (InvoiceWS invoiceWS : invoices) {
+            NewInvoiceDTO invoice = new NewInvoiceDTO();
+            invoice.setPublicNumber(invoiceWS.getNumber());
+            invoice.setBillingDate(invoiceWS.getCreateDateTime());
+            invoice.setDueDate(invoiceWS.getDueDate());
+            invoice.setTotal(invoiceWS.getTotalAsDecimal());
+            invoice.setToProcess(invoiceWS.getToProcess());
+            invoice.setBalance(invoiceWS.getBalanceAsDecimal());
+            CurrencyDTO currency = new CurrencyDAS().find(invoiceWS.getCurrencyId());
+            invoice.setCurrency(currency);
+            invoice.setCustomerNotes(invoiceWS.getCustomerNotes());
+
+            for (com.sapienter.jbilling.server.entity.InvoiceLineDTO itemLine : invoiceWS.getInvoiceLines()) {
+                // start reading lines
+                InvoiceLineDTO line = new InvoiceLineDTO();
+
+                line.setAmount(itemLine.getAmount());
+                line.setQuantity(itemLine.getQuantity());
+                line.setPrice(itemLine.getPrice());
+
+                if (itemLine.getItemId() != null && itemLine.getItemId() > 0) {
+                    ItemDTO item = new ItemDAS().find(itemLine.getItemId());
+                    line.setItem(item);
+                } else {
+                    line.setItem(null);
+                }
+                line.setDescription(itemLine.getDescription());
+                line.setInvoiceLineType(new InvoiceLineTypeDTO(itemLine.getInvoiceLineType()));
+
+                invoice.getResultLines().add(line);
+            }
+
+            // final tweaks
+            invoice.setCarriedBalance(BigDecimal.ZERO);
+            invoice.setInProcessPayment(new Integer(0));
+            invoice.setIsReview(new Integer(0));
+
+            LOG.debug("WS toProcess: " + invoiceWS.getToProcess() + " - " + invoice.getInvoiceStatus().getDescription());
+
+            UserBL user = new UserBL();
+            if (user.getEntityId(invoiceWS.getUserId()).equals(entityId)) {
+                invoiceBL.create(invoiceWS.getUserId(), invoice);
+                invoiceBL.createLines(invoice);
+            } else {
+                throw new SessionInternalError("User " + invoiceWS.getUserId() + " doesn't "
+                        + "belong to entity " + entityId);
+            }
+        }
+
     }
 
     /**

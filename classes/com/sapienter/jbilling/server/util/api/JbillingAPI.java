@@ -545,4 +545,12 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public List<ReportWS> getAgeReceivableReport(String since, String until) throws JbillingAPIException;
+
+    /**
+     * Utility method for importing invoices into JBilling.
+     *
+     * @param invoices a list of invoices to import
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public void importInvoices(Collection<InvoiceWS> invoices) throws JbillingAPIException;
 }

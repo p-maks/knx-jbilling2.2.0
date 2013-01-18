@@ -717,4 +717,12 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public List<ReportWS> getAgeReceivableReport(String since, String until) throws SessionInternalError;
+    
+    /**
+     * Utility method for importing invoices into JBilling.
+     *
+     * @param invoices a list of invoices to import
+     * @throws SessionInternalError
+     */
+    public void importInvoices(Collection<InvoiceWS> invoices) throws SessionInternalError;
 }
