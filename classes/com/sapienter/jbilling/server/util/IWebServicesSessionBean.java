@@ -156,6 +156,15 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public Integer[] searchInvoiceIds(String searchValue) throws SessionInternalError;
+    
+    /**
+     * Search for Invoices by given string parameter.
+     *
+     * @param searchParam the search parameter string
+     * @return an array of Invoice objects or null if nothing found
+     * @throws SessionInternalError
+     */
+    public InvoiceWS[] searchInvoices(String searchValue) throws SessionInternalError;
 
     /**
      * Generates and returns the paper invoice PDF for the given invoiceId.

@@ -228,6 +228,20 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
+    
+    /**
+     * Search for Invoices by given string parameter.
+     *
+     * @see JbillingAPI#searchInvoices(java.lang.String) 
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public InvoiceWS[] searchInvoices(String searchValue) throws JbillingAPIException{
+        try {
+            return session.searchInvoices(searchValue);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
 
     /**
      * Generates and returns the paper invoice PDF for the given invoiceId.

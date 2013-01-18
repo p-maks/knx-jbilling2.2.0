@@ -541,6 +541,46 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             throw new SessionInternalError("Error searching for Invoice ids");
         }
     }
+    
+    /**
+     * Search for Invoices by given string parameter. TODO: This method is not
+     * secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#searchInvoices(java.lang.String) 
+     * @throws SessionInternalError
+     */
+    public InvoiceWS[] searchInvoices(String searchValue) throws SessionInternalError {
+
+        if (searchValue == null || "".equals(searchValue)) {
+            return null;
+        }
+        InvoiceWS[] invoices = null;
+        Integer entityId = getCallerCompanyId();
+
+        try {
+
+            InvoiceBL invoiceBl = new InvoiceBL();
+            Integer[] invoiceIds = invoiceBl.searchInvoices(entityId, searchValue);
+            invoices = new InvoiceWS[invoiceIds.length];
+            for (int f = 0; f < invoiceIds.length; f++) {
+                InvoiceDTO invoice = new InvoiceDAS().find(invoiceIds[f]);
+                InvoiceWS invWS = invoiceBl.getWS(invoice);
+                // get status description for invoice
+                if (null != invoice.getInvoiceStatus()) {
+                    invWS.setStatusDescr(invoice.getInvoiceStatus().getDescription(getCallerLanguageId()));
+                }
+                // get user details
+                UserBL bl = new UserBL(invWS.getUserId());
+                invWS.setUser(bl.getUserWS());
+
+                invoices[f] = invWS;
+            }
+            return invoices;
+        } catch (Exception e) { // can't remove because of the SQL Exception :(
+            LOG.error("WS - searchInvoices ", e);
+            throw new SessionInternalError("Error searching for Invoices");
+        }
+    }
 
     /**
      * Generates and returns the paper invoice PDF for the given invoiceId.

@@ -144,6 +144,15 @@ public interface JbillingAPI {
     public Integer[] searchInvoiceIds(String searchValue) throws JbillingAPIException;
 
     /**
+     * Search for Invoices by given string parameter.
+     *
+     * @param searchParam the search parameter string
+     * @return an array of Invoice objects or null if nothing found
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public InvoiceWS[] searchInvoices(String searchValue) throws JbillingAPIException;
+
+    /**
      * Generates and returns the paper invoice PDF for the given invoiceId.
      * TODO: Extra check might require to make sure invoice belongs to user.
      *
