@@ -430,16 +430,18 @@ public interface JbillingAPI {
      *
      * @param invoiceId target Invoice
      * @param paymentId payment to be unlink
+     * @throws JbillingAPIException when internal error occurs
      */
-    public void removePaymentLink(Integer invoiceId, Integer paymentId);
+    public void removePaymentLink(Integer invoiceId, Integer paymentId) throws JbillingAPIException;
 
     /**
      * Applies an existing payment to an invoice.
      *
      * @param invoiceId target invoice
      * @param paymentId payment to apply
+     * @throws JbillingAPIException when internal error occurs
      */
-    public void createPaymentLink(Integer invoiceId, Integer paymentId);
+    public void createPaymentLink(Integer invoiceId, Integer paymentId) throws JbillingAPIException;
 
     /**
      * Sends a Payment email notification to a customer for given payment

@@ -228,14 +228,14 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
-    
+
     /**
      * Search for Invoices by given string parameter.
      *
-     * @see JbillingAPI#searchInvoices(java.lang.String) 
+     * @see JbillingAPI#searchInvoices(java.lang.String)
      * @throws JbillingAPIException when internal error occurs
      */
-    public InvoiceWS[] searchInvoices(String searchValue) throws JbillingAPIException{
+    public InvoiceWS[] searchInvoices(String searchValue) throws JbillingAPIException {
         try {
             return session.searchInvoices(searchValue);
         } catch (Exception e) {
@@ -830,8 +830,9 @@ public class SpringAPI implements JbillingAPI {
      * "unpaid" by removing the payment balance.
      *
      * @see JbillingAPI#removePaymentLink(java.lang.Integer, java.lang.Integer)
+     * @throws JbillingAPIException when internal error occurs
      */
-    public void removePaymentLink(Integer invoiceId, Integer paymentId) {
+    public void removePaymentLink(Integer invoiceId, Integer paymentId) throws JbillingAPIException {
         session.removePaymentLink(invoiceId, paymentId);
     }
 
@@ -839,8 +840,9 @@ public class SpringAPI implements JbillingAPI {
      * Applies an existing payment to an invoice.
      *
      * @see JbillingAPI#createPaymentLink(java.lang.Integer, java.lang.Integer)
+     * @throws JbillingAPIException when internal error occurs
      */
-    public void createPaymentLink(Integer invoiceId, Integer paymentId) {
+    public void createPaymentLink(Integer invoiceId, Integer paymentId) throws JbillingAPIException {
         session.createPaymentLink(invoiceId, paymentId);
     }
 
