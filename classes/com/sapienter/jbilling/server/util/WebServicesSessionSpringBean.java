@@ -2717,6 +2717,12 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                     "PaymentInfoCashDTO", payment.getCash())) {
                 throw new SessionInternalError(valid.getText());
             }
+            // Added Bank payment validation
+            // may be there is a bank
+            if (payment.getBank() != null && !valid.validate(
+                    "PaymentInfoBankDTO", payment.getBank())) {
+                throw new SessionInternalError(valid.getText());
+            }
             // may be there is a ach
             if (payment.getAch() != null && !valid.validate(
                     "AchDTO", payment.getAch())) {

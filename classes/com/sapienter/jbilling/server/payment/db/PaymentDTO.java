@@ -81,6 +81,8 @@ public class PaymentDTO implements Serializable {
     private Integer isPreauth;
     private PaymentInfoChequeDTO paymentInfoCheque;
     private PaymentInfoCashDTO paymentInfoCash;
+    private PaymentInfoBankDTO paymentInfoBank;
+    
     private Set<PaymentInvoiceMapDTO> invoicesMap = new HashSet<PaymentInvoiceMapDTO>(0);
     private Set<PaymentAuthorizationDTO> paymentAuthorizations = new HashSet<PaymentAuthorizationDTO>(0);
     private Set<PaymentDTO> payments = new HashSet<PaymentDTO>(0);
@@ -136,7 +138,8 @@ public class PaymentDTO implements Serializable {
             BigDecimal balance, Date updateDatetime, int isPreauth,
             Set<PaymentAuthorizationDTO> paymentAuthorizations,
             Set<PaymentDTO> payments, Set<PartnerPayout> partnerPayouts,
-            PaymentInfoChequeDTO paymentInfoCheque, PaymentInfoCashDTO paymentInfoCash) {
+            PaymentInfoChequeDTO paymentInfoCheque, PaymentInfoCashDTO paymentInfoCash,
+            PaymentInfoBankDTO paymentInfoBank) {
         this.id = id;
         this.baseUser = baseUser;
         this.currencyDTO = currencyDTO;
@@ -160,6 +163,7 @@ public class PaymentDTO implements Serializable {
         this.partnerPayouts = partnerPayouts;
         this.paymentInfoCheque = paymentInfoCheque;
         this.paymentInfoCash = paymentInfoCash;
+        this.paymentInfoBank = paymentInfoBank;
     }
 
     public PaymentDTO(int id2, BigDecimal amount2, BigDecimal balance2,
@@ -209,6 +213,7 @@ public class PaymentDTO implements Serializable {
         this.partnerPayouts = dto.partnerPayouts;
         this.paymentInfoCheque = dto.paymentInfoCheque;
         this.paymentInfoCash = dto.paymentInfoCash;
+        this.paymentInfoBank = dto.paymentInfoBank;
         this.paymentNotes = dto.paymentNotes;
         this.paymentPeriod = dto.paymentPeriod;
     }
@@ -458,6 +463,25 @@ public class PaymentDTO implements Serializable {
 
         paymentInfoCash.setPayment(this);
         das.save(paymentInfoCash);
+    }
+
+    @Transient
+    public PaymentInfoBankDTO getPaymentInfoBank() {
+        return new PaymentInfoBankDAS().findByPayment(this);
+    }
+
+    public void setPaymentInfoBank(PaymentInfoBankDTO paymentInfoBank) {
+
+        PaymentInfoBankDAS das = new PaymentInfoBankDAS();
+        PaymentInfoBankDTO finded = das.findByPayment(this);
+
+        if (finded != null) {
+            das.delete(finded);
+        }
+
+        paymentInfoBank.setPayment(this);
+        das.save(paymentInfoBank);
+
     }
 
     public void setInvoicesMap(Set<PaymentInvoiceMapDTO> invoicesMap) {

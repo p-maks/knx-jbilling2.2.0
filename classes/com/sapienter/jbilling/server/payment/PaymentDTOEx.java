@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import com.sapienter.jbilling.server.payment.db.PaymentAuthorizationDAS;
 import com.sapienter.jbilling.server.payment.db.PaymentAuthorizationDTO;
 import com.sapienter.jbilling.server.payment.db.PaymentDTO;
+import com.sapienter.jbilling.server.payment.db.PaymentInfoBankDTO;
 import com.sapienter.jbilling.server.payment.db.PaymentInfoCashDTO;
 import com.sapienter.jbilling.server.payment.db.PaymentInfoChequeDTO;
 import com.sapienter.jbilling.server.payment.db.PaymentMethodDTO;
@@ -40,6 +41,7 @@ public class PaymentDTOEx extends PaymentDTO {
     private Integer userId = null;
     private PaymentInfoChequeDTO cheque = null;
     private PaymentInfoCashDTO cash = null;
+    private PaymentInfoBankDTO bank = null;
     private AchDTO ach = null;
     private CreditCardDTO creditCard = null;
     private String method = null;
@@ -120,7 +122,6 @@ public class PaymentDTOEx extends PaymentDTO {
         } else {
             cheque = null;
         }
-
         // Added cash payment
         if (dto.getCash() != null) {
             PaymentInfoCashDTO cashDTO = new PaymentInfoCashDTO();
@@ -130,6 +131,18 @@ public class PaymentDTOEx extends PaymentDTO {
             cash = cashDTO;
         } else {
             cash = null;
+        }
+        // added bank payment
+        if (dto.getBank() != null) {
+            PaymentInfoBankDTO bankDTO = new PaymentInfoBankDTO();
+            bankDTO.setPaidTo(dto.getBank().getPaidTo());
+            bankDTO.setBankRef(dto.getBank().getBankRef());
+            bankDTO.setDate(dto.getBank().getDate());
+            bankDTO.setId(dto.getBank().getId() == null ? 0 : dto.getBank().getId());
+
+            bank = bankDTO;
+        } else {
+            bank = null;
         }
 
         if (dto.getCreditCard() != null) {
@@ -244,7 +257,7 @@ public class PaymentDTOEx extends PaymentDTO {
 
 
         return super.toString() + " credit card:" + cc.toString()
-                + " cheque:" + cheque + " cash:" + cash + " payment maps:" + maps.toString();
+                + " cheque:" + cheque + " cash:" + cash + " bank:" + bank + " payment maps:" + maps.toString();
     }
 
     /**
@@ -287,6 +300,20 @@ public class PaymentDTOEx extends PaymentDTO {
      */
     public void setCash(PaymentInfoCashDTO cashDto) {
         this.cash = cashDto;
+    }
+
+    /**
+     * @return bankDTO
+     */
+    public PaymentInfoBankDTO getBank() {
+        return bank;
+    }
+
+    /**
+     * @param bankDTO
+     */
+    public void setBank(PaymentInfoBankDTO bankDTO) {
+        this.bank = bankDTO;
     }
 
     /**

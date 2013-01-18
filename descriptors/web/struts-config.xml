@@ -59,6 +59,11 @@
             <form-property name="cashDate_year" type="java.lang.String" />
             <form-property name="cashDate_month" type="java.lang.String" />
             <form-property name="cashDate_day" type="java.lang.String" />
+            <form-property name="paidTo" type="java.lang.String" />
+            <form-property name="bankRef" type="java.lang.String" />
+            <form-property name="bankDate_year" type="java.lang.String" />
+            <form-property name="bankDate_month" type="java.lang.String" />
+            <form-property name="bankDate_day" type="java.lang.String" />            
             <form-property name="ccNumber" type="java.lang.String" />
             <form-property name="ccExpiry_year" type="java.lang.String" />
             <form-property name="ccExpiry_month" type="java.lang.String" />

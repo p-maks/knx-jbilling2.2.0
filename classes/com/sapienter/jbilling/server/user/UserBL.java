@@ -17,7 +17,6 @@
     You should have received a copy of the GNU Affero General Public License
     along with jbilling.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 package com.sapienter.jbilling.server.user;
 
 import java.io.PrintWriter;
@@ -547,6 +546,7 @@ public class UserBL extends ResultList
         final int OPTION_SUB_ACCOUNTS = 78;
         final int OPTION_PAYMENT_CHEQUE = 24;
         final int OPTION_PAYMENT_CASH = 98;
+        final int OPTION_PAYMENT_BANK = 100;
         final int OPTION_PAYMENT_CC = 25;
         final int OPTION_PAYMENT_ACH = 75;
         final int OPTION_PAYMENT_PAYPAL = 90;
@@ -580,15 +580,24 @@ public class UserBL extends ResultList
                 LOG.error("Exception ", e);
              }
             break;
-        case OPTION_PAYMENT_ACH:
-            try {
-                PaymentBL payment = new PaymentBL();
-                retValue = payment.isMethodAccepted(user.getEntity().getId(),
-                        Constants.PAYMENT_METHOD_ACH);
-            } catch (Exception e) {
-                LOG.error("Exception ", e);
-            }
-            break;
+            case OPTION_PAYMENT_BANK:
+                try {
+                    PaymentBL payment = new PaymentBL();
+                    retValue = payment.isMethodAccepted(user.getEntity().getId(),
+                            Constants.PAYMENT_METHOD_BANK);
+                } catch (Exception e) {
+                    LOG.error("Exception ", e);
+                }
+                break;
+          case OPTION_PAYMENT_ACH:
+                try {
+                    PaymentBL payment = new PaymentBL();
+                    retValue = payment.isMethodAccepted(user.getEntity().getId(),
+                            Constants.PAYMENT_METHOD_ACH);
+                } catch (Exception e) {
+                    LOG.error("Exception ", e);
+                }
+                break;        
         case OPTION_PAYMENT_CC:
             try {
                 PaymentBL payment = new PaymentBL();
