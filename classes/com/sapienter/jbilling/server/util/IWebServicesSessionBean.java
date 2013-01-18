@@ -695,4 +695,15 @@ public interface IWebServicesSessionBean {
      * @return a list of <code>EventLogDTO</code>
      */
     public List<EventLogDTO> getUserEventLog(Integer userId);
+    
+    /**
+     * Retrieves a list of {@link OptionDTO options} for used in forms fields
+     * with a select box.
+     *
+     * @param type the type of select option to retrieve
+     * @return a <code>Collection</code> of <code>OptionDTO</code> objects or
+     * null if given type cannot be found
+     * @throws SessionInternalError
+     */
+    public Collection<OptionDTO> getSelectOption(String type) throws SessionInternalError;
 }

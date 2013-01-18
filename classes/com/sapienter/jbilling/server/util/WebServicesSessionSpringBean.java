@@ -63,6 +63,7 @@ import com.sapienter.jbilling.server.item.ItemTypeWS;
 import com.sapienter.jbilling.server.item.PricingField;
 import com.sapienter.jbilling.server.item.db.ItemDTO;
 import com.sapienter.jbilling.server.item.db.ItemTypeDTO;
+import com.sapienter.jbilling.server.list.IListSessionBean;
 import com.sapienter.jbilling.server.mediation.IMediationSessionBean;
 import com.sapienter.jbilling.server.mediation.Record;
 import com.sapienter.jbilling.server.mediation.db.MediationRecordDAS;
@@ -2414,6 +2415,23 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     public List<EventLogDTO> getUserEventLog(Integer userId) {
         IUserSessionBean sess = (IUserSessionBean) Context.getBean(Context.Name.USER_SESSION);
         return sess.getEventLog(userId);
+    }
+
+    /**
+     * Retrieves a list of {@link OptionDTO options} for used in forms fields
+     * with a select box. TODO: This method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#getSelectOption(java.lang.String) 
+     * @throws SessionInternalError
+     */
+    public Collection<OptionDTO> getSelectOption(String type) throws SessionInternalError {
+        Integer entityId = getCallerCompanyId();
+        Integer languageId = getCallerLanguageId();
+        Integer executorType = Constants.TYPE_ROOT;
+
+        IListSessionBean remoteList = (IListSessionBean) Context.getBean(Context.Name.LIST_SESSION);
+
+        return remoteList.getOptions(type, languageId, entityId, executorType);
     }
 
     /**

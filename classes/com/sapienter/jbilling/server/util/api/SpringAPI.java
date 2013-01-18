@@ -40,6 +40,7 @@ import com.sapienter.jbilling.server.user.UserTransitionResponseWS;
 import com.sapienter.jbilling.server.user.UserWS;
 import com.sapienter.jbilling.server.user.ValidatePurchaseWS;
 import com.sapienter.jbilling.server.util.IWebServicesSessionBean;
+import com.sapienter.jbilling.server.util.OptionDTO;
 import com.sapienter.jbilling.server.util.RemoteContext;
 import com.sapienter.jbilling.server.util.audit.db.EventLogDTO;
 import java.util.Collection;
@@ -1080,6 +1081,21 @@ public class SpringAPI implements JbillingAPI {
     public List<EventLogDTO> getUserEventLog(Integer userId) throws JbillingAPIException {
         try {
             return session.getUserEventLog(userId);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /**
+     * Retrieves a list of {@link OptionDTO options} for used in forms fields
+     * with a select box.
+     *
+     * @see JbillingAPI#getSelectOption(java.lang.String)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Collection<OptionDTO> getSelectOption(String type) throws JbillingAPIException {
+        try {
+            return session.getSelectOption(type);
         } catch (Exception e) {
             throw new JbillingAPIException(e);
         }

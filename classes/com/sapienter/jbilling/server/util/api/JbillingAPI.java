@@ -39,6 +39,7 @@ import com.sapienter.jbilling.server.entity.AchDTO;
 import com.sapienter.jbilling.server.entity.CreditCardDTO;
 import com.sapienter.jbilling.server.notification.MessageDTO;
 import com.sapienter.jbilling.server.user.CompanyWS;
+import com.sapienter.jbilling.server.util.OptionDTO;
 import com.sapienter.jbilling.server.util.audit.db.EventLogDTO;
 import java.util.Collection;
 import java.util.List;
@@ -520,4 +521,15 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public List<EventLogDTO> getUserEventLog(Integer userId) throws JbillingAPIException;
+    
+    /**
+     * Retrieves a list of {@link OptionDTO options} for used in forms fields
+     * with a select box.
+     *
+     * @param type the type of select option to retrieve
+     * @return a <code>Collection</code> of <code>OptionDTO</code> objects or
+     * null if given type cannot be found
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Collection<OptionDTO> getSelectOption(String type) throws JbillingAPIException;
 }
