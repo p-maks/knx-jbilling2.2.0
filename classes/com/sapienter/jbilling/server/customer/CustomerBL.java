@@ -29,6 +29,8 @@ import com.sapienter.jbilling.server.user.UserBL;
 import com.sapienter.jbilling.server.user.db.CustomerDAS;
 import com.sapienter.jbilling.server.user.db.CustomerDTO;
 import com.sapienter.jbilling.server.util.Constants;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Emil
@@ -132,6 +134,36 @@ public final class CustomerBL extends ResultList implements CustomerSQL {
         execute();
         conn.close();
         return cachedResults;
+    }
+    
+    /**
+     * Get a list of user ids in given status
+     *
+     * @param entityID
+     * @return
+     * @throws SQLException
+     * @throws Exception
+     */
+    public Integer[] getCustomersInStatus(Integer statusId, Integer entityId)
+            throws SQLException, Exception {
+
+        prepareStatement(CustomerSQL.findCustomersInStatus);
+        cachedResults.setInt(1, statusId);
+        cachedResults.setInt(2, entityId);
+        execute();
+        conn.close();
+
+        // get ids for return
+        List ids = new ArrayList();
+        while (cachedResults.next()) {
+            ids.add(new Integer(cachedResults.getInt(1)));
+        }
+        Integer[] retValue = new Integer[ids.size()];
+        if (retValue.length > 0) {
+            ids.toArray(retValue);
+        }
+
+        return retValue;
     }
 
 }

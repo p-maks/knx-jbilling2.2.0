@@ -460,6 +460,21 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
+    
+    /**
+     * Retrieves a list of all Customer ids in a given status including
+     * sub-accounts. 
+     *
+     * @see JbillingAPI#getCustomerIdsInStatus(java.lang.Integer) 
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Integer[] getCustomerIdsInStatus(Integer statusId) throws JbillingAPIException {
+        try {
+            return session.getCustomerIdsInStatus(statusId);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
 
     /**
      * Search for {@link UserWS users}, including sub-accounts by given search

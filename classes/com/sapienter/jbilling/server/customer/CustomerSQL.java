@@ -162,5 +162,19 @@ public interface CustomerSQL {
             + " AND (a.email LIKE ? OR a.organization_name LIKE ? "
             + " OR a.last_name LIKE ? OR a.first_name LIKE ? OR c.user_name LIKE ?) "
             + " ORDER BY 1 DESC LIMIT 500";
+    
+    // get customer list in status, including sub-accounts
+    static final String findCustomersInStatus =
+            "SELECT a.id "
+            + "  FROM base_user a, user_role_map urm, customer cu "
+            + " WHERE a.status_id = (select id from generic_status "
+            + "    WHERE dtype = 'user_status' AND status_value = ?) "
+            + "   AND a.entity_id = ?"
+            + "   AND a.deleted = 0"
+            + " AND a.status_id != 8 "
+            + " AND a.id = urm.user_id "
+            + " AND urm.role_id = " + Constants.TYPE_CUSTOMER
+            + " AND cu.user_id = a.id "
+            + " ORDER BY 1";
 
 }

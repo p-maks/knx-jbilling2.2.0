@@ -238,6 +238,16 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public Collection<UserWS> getCustomersInStatus(Integer statusId) throws JbillingAPIException;
+    
+    /**
+     * Retrieves a list of all Customer ids in a given status including
+     * sub-accounts. 
+     *
+     * @param statusId the status id that will be used for extraction
+     * @return an array of user ids in a given status.
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Integer[] getCustomerIdsInStatus(Integer statusId) throws JbillingAPIException;
 
     /**
      * Search for {@link UserWS users}, including sub-accounts by given search

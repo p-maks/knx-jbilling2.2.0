@@ -1092,7 +1092,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
     /**
      * Retrieves a list of all {@link UserWS customers} in a given status
      * including sub-accounts. This call excludes any other users that are not
-     * Customers.
+     * Customers. TODO: This method is not secured or in a jUnit test
      *
      * @see IWebServicesSessionBean#getCustomersInStatus(java.lang.Integer)
      * @throws SessionInternalError when internal error occurs
@@ -1101,18 +1101,43 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         Collection users = null;
         Integer entityId = getCallerCompanyId();
 
-        Integer[] userIds = getUsersByStatus(statusId, entityId, true);
-        users = new ArrayList();
+        try {
+            CustomerBL cbl = new CustomerBL();
+            Integer[] userIds = cbl.getCustomersInStatus(statusId, entityId);
+            users = new ArrayList();
 
-        for (int f = 0; f < userIds.length; f++) {
-            UserBL bl = new UserBL(userIds[f]);
-            UserWS dto = bl.getUserWS();
-            // add only customers to return
-            if (Constants.TYPE_CUSTOMER.equals(dto.getMainRoleId())) {
-                users.add(dto);
+            for (int f = 0; f < userIds.length; f++) {
+                UserBL bl = new UserBL(userIds[f]);
+                UserWS dto = bl.getUserWS();
+                // add only customers to return
+                if (Constants.TYPE_CUSTOMER.equals(dto.getMainRoleId())) {
+                    users.add(dto);
+                }
             }
+            return users;
+        } catch (Exception e) { // can't remove because of SQLException :(
+            LOG.error("WS - getCustomersInStatus", e);
+            throw new SessionInternalError("Error getting Customers in status");
         }
-        return users;
+    }
+
+    /**
+     * Retrieves a list of all Customer ids in a given status including
+     * sub-accounts. TODO: This method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#getCustomerIdsInStatus(java.lang.Integer) 
+     * @throws SessionInternalError
+     */
+    public Integer[] getCustomerIdsInStatus(Integer statusId) throws SessionInternalError {
+        Integer entityId = getCallerCompanyId();
+        try {
+            CustomerBL bl = new CustomerBL();
+            return bl.getCustomersInStatus(statusId, entityId);
+
+        } catch (Exception e) { // can't remove because of SQLException :(
+            LOG.error("WS - getCustomerIdsInStatus ", e);
+            throw new SessionInternalError("Error getting Customer ids in status");
+        }
     }
 
     /**
