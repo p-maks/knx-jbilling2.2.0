@@ -41,7 +41,9 @@ import com.sapienter.jbilling.server.user.UserWS;
 import com.sapienter.jbilling.server.user.ValidatePurchaseWS;
 import com.sapienter.jbilling.server.util.IWebServicesSessionBean;
 import com.sapienter.jbilling.server.util.RemoteContext;
+import com.sapienter.jbilling.server.util.audit.db.EventLogDTO;
 import java.util.Collection;
+import java.util.List;
 
 public class SpringAPI implements JbillingAPI {
 
@@ -460,12 +462,12 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
-    
+
     /**
      * Retrieves a list of all Customer ids in a given status including
-     * sub-accounts. 
+     * sub-accounts.
      *
-     * @see JbillingAPI#getCustomerIdsInStatus(java.lang.Integer) 
+     * @see JbillingAPI#getCustomerIdsInStatus(java.lang.Integer)
      * @throws JbillingAPIException when internal error occurs
      */
     public Integer[] getCustomerIdsInStatus(Integer statusId) throws JbillingAPIException {
@@ -1050,6 +1052,34 @@ public class SpringAPI implements JbillingAPI {
     public boolean uploadLogo(byte[] inBytes) throws JbillingAPIException {
         try {
             return session.uploadLogo(inBytes);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /**
+     * Get the absolute logo image path for organisation.
+     *
+     * @see JbillingAPI#getLogoPath()
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public String getLogoPath() throws JbillingAPIException {
+        try {
+            return session.getLogoPath();
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /**
+     * Retrieves an event logs for user account.
+     *
+     * @see JbillingAPI#getUserEventLog(java.lang.Integer)
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public List<EventLogDTO> getUserEventLog(Integer userId) throws JbillingAPIException {
+        try {
+            return session.getUserEventLog(userId);
         } catch (Exception e) {
             throw new JbillingAPIException(e);
         }

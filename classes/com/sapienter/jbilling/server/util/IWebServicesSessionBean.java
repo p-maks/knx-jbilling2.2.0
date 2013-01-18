@@ -40,7 +40,9 @@ import com.sapienter.jbilling.server.user.ValidatePurchaseWS;
 import com.sapienter.jbilling.server.entity.AchDTO;
 import com.sapienter.jbilling.server.notification.MessageDTO;
 import com.sapienter.jbilling.server.user.CompanyWS;
+import com.sapienter.jbilling.server.util.audit.db.EventLogDTO;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Interface for WebServicesSessionBean
@@ -342,10 +344,10 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError when internal error occurs
      */
     public Collection<UserWS> getCustomersInStatus(Integer statusId) throws SessionInternalError;
-    
+
     /**
      * Retrieves a list of all Customer ids in a given status including
-     * sub-accounts. 
+     * sub-accounts.
      *
      * @param statusId the status id that will be used for extraction
      * @return an array of user ids in a given status.
@@ -529,7 +531,7 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public PaymentWS[] searchPayments(String searchValue) throws SessionInternalError;
-    
+
     /**
      * Un-links a payment from an invoice, effectively making the invoice
      * "unpaid" by removing the payment balance.
@@ -541,7 +543,7 @@ public interface IWebServicesSessionBean {
      * @param paymentId payment to be unlink
      */
     public void removePaymentLink(Integer invoiceId, Integer paymentId);
-    
+
     /**
      * Applies an existing payment to an invoice.
      *
@@ -552,7 +554,7 @@ public interface IWebServicesSessionBean {
      * @param paymentId payment to apply
      */
     public void createPaymentLink(Integer invoiceId, Integer paymentId);
-    
+
     /**
      * Sends a Payment email notification to a customer for given payment
      *
@@ -678,4 +680,19 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError when internal error occurs
      */
     public boolean uploadLogo(byte[] inBytes) throws SessionInternalError;
+
+    /**
+     * Get the absolute logo image path for organisation.
+     *
+     * @return a string path for logo image
+     */
+    public String getLogoPath();
+
+    /**
+     * Retrieves an event logs for user account.
+     *
+     * @param userId the id of the user whose event log info to be retrieved
+     * @return a list of <code>EventLogDTO</code>
+     */
+    public List<EventLogDTO> getUserEventLog(Integer userId);
 }

@@ -123,7 +123,9 @@ import com.sapienter.jbilling.server.user.db.UserDAS;
 import com.sapienter.jbilling.server.user.db.UserDTO;
 import com.sapienter.jbilling.server.util.api.WebServicesConstants;
 import com.sapienter.jbilling.server.util.audit.EventLogger;
+import com.sapienter.jbilling.server.util.audit.db.EventLogDTO;
 import com.sapienter.jbilling.server.util.db.CurrencyDAS;
+import java.io.File;
 import java.util.Collection;
 
 @Transactional( propagation = Propagation.REQUIRED)
@@ -1125,7 +1127,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * Retrieves a list of all Customer ids in a given status including
      * sub-accounts. TODO: This method is not secured or in a jUnit test
      *
-     * @see IWebServicesSessionBean#getCustomerIdsInStatus(java.lang.Integer) 
+     * @see IWebServicesSessionBean#getCustomerIdsInStatus(java.lang.Integer)
      * @throws SessionInternalError
      */
     public Integer[] getCustomerIdsInStatus(Integer statusId) throws SessionInternalError {
@@ -2385,6 +2387,33 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         IInvoiceSessionBean invoiceSession = (IInvoiceSessionBean) Context.getBean(Context.Name.INVOICE_SESSION);
         Integer entityId = getCallerCompanyId();
         return invoiceSession.uploadLogo(inBytes, entityId);
+    }
+
+    /**
+     * Get the absolute logo image path for organisation. TODO: This method is
+     * not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#getLogoPath()
+     * @throws SessionInternalError
+     */
+    public String getLogoPath() {
+        Integer entityId = getCallerCompanyId();
+        File imageFile = new File(com.sapienter.jbilling.common.Util.getSysProp("base_dir") + "logos"
+                + File.separator + "entity-" + entityId + ".jpg");
+
+        return imageFile.getPath();
+    }
+
+    /**
+     * Retrieves an event logs for user account. TODO: This method is not
+     * secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#getUserEventLog(java.lang.Integer)
+     * @throws SessionInternalError
+     */
+    public List<EventLogDTO> getUserEventLog(Integer userId) {
+        IUserSessionBean sess = (IUserSessionBean) Context.getBean(Context.Name.USER_SESSION);
+        return sess.getEventLog(userId);
     }
 
     /**

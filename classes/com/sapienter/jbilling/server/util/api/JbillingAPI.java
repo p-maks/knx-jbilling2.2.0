@@ -39,7 +39,9 @@ import com.sapienter.jbilling.server.entity.AchDTO;
 import com.sapienter.jbilling.server.entity.CreditCardDTO;
 import com.sapienter.jbilling.server.notification.MessageDTO;
 import com.sapienter.jbilling.server.user.CompanyWS;
+import com.sapienter.jbilling.server.util.audit.db.EventLogDTO;
 import java.util.Collection;
+import java.util.List;
 
 public interface JbillingAPI {
 
@@ -157,8 +159,7 @@ public interface JbillingAPI {
      *
      * @param userId an id of the customer to send email to
      * @param invoiceId an id of the invoice that will be send out.
-     * @return <code>true</code> when email was sent * * * * * * *
-     * successfully, <code>false</code> otherwise.
+     * @return <code>true</code> when email was sent * * * * * * *      * successfully, <code>false</code> otherwise.
      * @throws JbillingAPIException when internal error occurs
      */
     public Boolean emailInvoice(Integer invoiceId, Integer userId) throws JbillingAPIException;
@@ -238,10 +239,10 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public Collection<UserWS> getCustomersInStatus(Integer statusId) throws JbillingAPIException;
-    
+
     /**
      * Retrieves a list of all Customer ids in a given status including
-     * sub-accounts. 
+     * sub-accounts.
      *
      * @param statusId the status id that will be used for extraction
      * @return an array of user ids in a given status.
@@ -502,4 +503,21 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public boolean uploadLogo(byte[] inBytes) throws JbillingAPIException;
+
+    /**
+     * Get the absolute logo image path for organisation.
+     *
+     * @return a string path for logo image
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public String getLogoPath() throws JbillingAPIException;
+
+    /**
+     * Retrieves an event logs for user account.
+     *
+     * @param userId the id of the user whose event log info to be retrieved
+     * @return a list of <code>EventLogDTO</code>
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public List<EventLogDTO> getUserEventLog(Integer userId) throws JbillingAPIException;
 }
