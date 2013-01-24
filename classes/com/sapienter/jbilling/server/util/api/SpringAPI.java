@@ -811,15 +811,26 @@ public class SpringAPI implements JbillingAPI {
     /**
      * Search all the payments by given search parameter for organisation.
      *
-     * @param searchValue the search parameter string
-     *
-     * @return an array of PaymentWS or null if none found. If the input
-     * parameters are missing , null is returned.
+     * @see JbillingAPI#searchPayments(java.lang.String) 
      * @throws JbillingAPIException when internal error occurs
      */
     public PaymentWS[] searchPayments(String searchValue) throws JbillingAPIException {
         try {
             return session.searchPayments(searchValue);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+    
+    /**
+     * Search all the payments by given search parameter for organisation. 
+     *
+     * @see JbillingAPI#searchPaymentIds(java.lang.String) 
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Integer[] searchPaymentIds(String searchValue) throws JbillingAPIException{
+        try {
+            return session.searchPaymentIds(searchValue);
         } catch (Exception e) {
             throw new JbillingAPIException(e);
         }

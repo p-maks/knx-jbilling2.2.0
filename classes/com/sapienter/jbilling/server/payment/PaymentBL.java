@@ -1007,8 +1007,24 @@ public class PaymentBL extends ResultList implements PaymentSQL {
      */
     public Integer[] getIdsByPeriod(Integer entityID, Date start, Date end)
             throws SQLException, Exception {
-        List<Integer> result = new PaymentDAS().findIdsByPeriod(entityID, start, end);
-        return result.toArray(new Integer[result.size()]);
+        prepareStatement(PaymentSQL.rootClerkListByDate);
+        cachedResults.setInt(1, entityID.intValue());
+        cachedResults.setDate(2, new java.sql.Date(start.getTime()));
+        cachedResults.setDate(3, new java.sql.Date(end.getTime()));
+        execute();
+        conn.close();
+
+        // get ids for return
+        List ids = new ArrayList();
+        while (cachedResults.next()) {
+            ids.add(new Integer(cachedResults.getInt(1)));
+        }
+        Integer[] retValue = new Integer[ids.size()];
+        if (retValue.length > 0) {
+            ids.toArray(retValue);
+        }
+
+        return retValue;
     }
 
     /*

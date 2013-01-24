@@ -149,8 +149,20 @@ public interface PaymentSQL {
         " where deleted = 0 " +
         "   and user_id = ?";
     
+    // Root-Clerk gets all the entity's payments
+    static final String rootClerkListByDate =
+            "select p.id "
+            + "  from payment p, base_user u "
+            + " where p.user_id = u.id "
+            + "   and p.id not in (select payment_id from partner_payout where payment_id is not null) "
+            + "   and p.deleted = 0 "
+            + "   and p.is_preauth = 0"
+            + "   and u.entity_id = ? "
+            + "   and p.payment_date >= ?"
+            + "   and p.payment_date <= ? ORDER BY p.payment_date DESC";
+    
     // search for payments
-    // limit to max 200 records to return
+    // limit to max 500 records to return
     static final String searchPayments =
             "SELECT p.id "
             + "FROM payment p, base_user u, contact co "
@@ -162,7 +174,7 @@ public interface PaymentSQL {
             + "   AND u.entity_id = ? "
             + "   AND (co.email LIKE ? OR co.organization_name LIKE ? "
             + "   OR co.last_name LIKE ? OR co.first_name LIKE ? OR u.user_name LIKE ?) "
-            + " ORDER by DESC p.payment_date LIMIT 200";
+            + " ORDER by p.payment_date DESC LIMIT 500";
 
     
 }

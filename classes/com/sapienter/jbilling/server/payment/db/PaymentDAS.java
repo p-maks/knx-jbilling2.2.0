@@ -50,30 +50,7 @@ public class PaymentDAS extends AbstractDAS<PaymentDTO> {
                 .setMaxResults(maxResults);
         return criteria.list();
     }
-
-    // used for the web services call to get the X by period
-    public List<Integer> findIdsByPeriod(Integer entityId, Date start, Date end) {
-        String hql = "select p.id "
-                + "  from payment p, base_user u "
-                + " where p.user_id = u.id "
-                + "   and p.id not in (select payment_id from partner_payout where payment_id is not null) "
-                + "   and p.deleted = 0 "
-                + "   and p.is_preauth = 0"
-                + "   and p.method_id = pm.id "
-                + "   and u.entity_id = :entityId "
-                + "   and p.payment_date >= :start"
-                + "   and p.payment_date <= :end "
-                + "   ORDER by DESC p.payment_date";
-
-        List<Integer> data = getSession()
-                .createQuery(hql)
-                .setParameter("entityId", entityId)
-                .setParameter("start", start)
-                .setParameter("end", end)
-                .list();
-        return data;
-    }
-
+    
     // used for the web services call to get the X by period for user
     public List<Integer> findIdsByPeriodForUser(Integer userID, Date start, Date end) {
         Criteria criteria = getSession().createCriteria(PaymentDTO.class)

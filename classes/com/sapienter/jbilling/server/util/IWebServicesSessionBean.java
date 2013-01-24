@@ -530,8 +530,7 @@ public interface IWebServicesSessionBean {
     public PaymentWS[] getUserPaymentsByDate(String since, String until, Integer userId) throws SessionInternalError;
 
     /**
-     * Search all the payments by given search parameter for organisation. TODO:
-     * This method is not secured or in a jUnit test
+     * Search all the payments by given search parameter for organisation. 
      *
      * @param searchValue the search parameter string
      *
@@ -540,6 +539,17 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public PaymentWS[] searchPayments(String searchValue) throws SessionInternalError;
+    
+    /**
+     * Search all the payments by given search parameter for organisation. 
+     *
+     * @param searchValue the search parameter string
+     *
+     * @return an array of payment ids or null if none found. If the input
+     * parameters are missing , null is returned.
+     * @throws SessionInternalError
+     */
+    public Integer[] searchPaymentIds(String searchValue) throws SessionInternalError;
 
     /**
      * Un-links a payment from an invoice, effectively making the invoice
@@ -717,8 +727,7 @@ public interface IWebServicesSessionBean {
     public Collection<OptionDTO> getSelectOption(String type) throws SessionInternalError;
 
     /**
-     * Generate age receivable report for organisation. TODO: This method is not
-     * secured or in a jUnit test
+     * Generate age receivable report for organisation. 
      *
      * @param since the starting date for the data extraction
      * @param until the ending date for the data extraction

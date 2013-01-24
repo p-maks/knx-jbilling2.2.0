@@ -541,12 +541,12 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             throw new SessionInternalError("Error searching for Invoice ids");
         }
     }
-    
+
     /**
      * Search for Invoices by given string parameter. TODO: This method is not
      * secured or in a jUnit test
      *
-     * @see IWebServicesSessionBean#searchInvoices(java.lang.String) 
+     * @see IWebServicesSessionBean#searchInvoices(java.lang.String)
      * @throws SessionInternalError
      */
     public InvoiceWS[] searchInvoices(String searchValue) throws SessionInternalError {
@@ -1802,14 +1802,9 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         for (int f = 0; f < paymentIds.length; f++) {
             bl.set(paymentIds[f]);
             PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));
-            // find user for this payment
-            UserBL ubl = new UserBL(payment.getUserId());
-            // add to payment
-            payment.setUser(ubl.getUserWS());
             payments[f] = payment;
         }
         return payments;
-
     }
 
     /**
@@ -1864,11 +1859,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
             for (int f = 0; f < paymentIds.length; f++) {
                 bl.set(paymentIds[f]);
-                PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));
-                // find user for this payment
-                UserBL ubl = new UserBL(payment.getUserId());
-                // add to payment
-                payment.setUser(ubl.getUserWS());
+                PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));                
                 payments[f] = payment;
             }
             return payments;
@@ -1903,11 +1894,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
             for (int f = 0; f < paymentIds.length; f++) {
                 bl.set(paymentIds[f]);
-                PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));
-                // find user for this payment
-                UserBL ubl = new UserBL(payment.getUserId());
-                // add to payment
-                payment.setUser(ubl.getUserWS());
+                PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));                
                 payments[f] = payment;
             }
             return payments;
@@ -1941,18 +1928,46 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             int f = 0;
             while (paymentIds.next()) {
                 bl.set(paymentIds.getInt(1));
-                PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));
-                // find user for this payment
-                UserBL ubl = new UserBL(payment.getUserId());
-                // add to payment
-                payment.setUser(ubl.getUserWS());
+                PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));                
                 payments[f] = payment;
                 f++;
             }
             return payments;
         } catch (Exception e) { // needed for the SQLException :(
-            LOG.error("Exception in web service: searching for payments" + searchValue, e);
+            LOG.error("Exception in web service: searching for payments " + searchValue, e);
             throw new SessionInternalError("Error searching for Payments");
+        }
+    }
+    
+    /**
+     * Search all the payments by given search parameter for organisation. TODO:
+     * This method is not secured or in a jUnit test
+     *
+     * @see IWebServicesSessionBean#searchPaymentIds(java.lang.String)
+     * @throws SessionInternalError
+     */
+    public Integer[] searchPaymentIds(String searchValue) throws SessionInternalError {
+        if (searchValue == null || searchValue.equals("")) {
+            return null;
+        }
+
+        Integer entityId = getCallerCompanyId();
+        Integer languageId = getCallerLanguageId();
+
+        try {
+            PaymentBL bl = new PaymentBL();
+            CachedRowSet paymentIds = bl.searchPayments(entityId, searchValue);
+
+            Integer[] payments = new Integer[paymentIds.size()];
+            int f = 0;
+            while (paymentIds.next()) {                               
+                payments[f] = paymentIds.getInt(1);
+                f++;
+            }
+            return payments;
+        } catch (Exception e) { // needed for the SQLException :(
+            LOG.error("Exception in web service: searching for payment ids " + searchValue, e);
+            throw new SessionInternalError("Error searching for Payment ids");
         }
     }
 

@@ -227,7 +227,7 @@ public interface InvoiceSQL {
             + " AND co.user_id = bu.id "
             + " AND (i.public_number LIKE ? OR co.email LIKE ? OR co.organization_name LIKE ? "
             + " OR co.last_name LIKE ? OR co.first_name LIKE ? OR bu.user_name LIKE ?) "
-            + " ORDER BY i.createDatetime DESC LIMIT 500";
+            + " ORDER BY i.create_datetime DESC LIMIT 500";
 }
 
 

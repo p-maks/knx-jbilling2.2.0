@@ -66,16 +66,6 @@ public class PaymentWS implements Serializable {
     private Integer paymentPeriod;
     private BigDecimal amountAsDecimal;
     private BigDecimal balanceAsDecimal;
-    // added extra field
-    private UserWS user;
-
-    public UserWS getUser() {
-        return user;
-    }
-
-    public void setUser(UserWS user) {
-        this.user = user;
-    }
 
     public Integer getResultId() {
         return resultId;

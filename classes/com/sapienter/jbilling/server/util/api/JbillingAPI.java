@@ -423,6 +423,17 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public PaymentWS[] searchPayments(String searchValue) throws JbillingAPIException;
+    
+    /**
+     * Search all the payments by given search parameter for organisation. 
+     *
+     * @param searchValue the search parameter string
+     *
+     * @return an array of payment ids or null if none found. If the input
+     * parameters are missing , null is returned.
+     * @throws JbillingAPIException when internal error occurs
+     */
+    public Integer[] searchPaymentIds(String searchValue) throws JbillingAPIException;
 
     /**
      * Un-links a payment from an invoice, effectively making the invoice
