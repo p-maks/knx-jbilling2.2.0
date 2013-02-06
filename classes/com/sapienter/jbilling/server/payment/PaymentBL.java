@@ -60,6 +60,7 @@ import com.sapienter.jbilling.server.user.db.UserDAS;
 import com.sapienter.jbilling.server.user.partner.db.PartnerPayout;
 import com.sapienter.jbilling.server.util.Constants;
 import com.sapienter.jbilling.server.util.Context;
+import com.sapienter.jbilling.server.util.PreferenceBL;
 import com.sapienter.jbilling.server.util.audit.EventLogger;
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -900,7 +901,20 @@ public class PaymentBL extends ResultList implements PaymentSQL {
         // entered
         // it has to show as ok
         dto.setPaymentResult(new PaymentResultDAS().find(Constants.RESULT_OK));
-        sendNotification(dto, payment.getBaseUser().getEntity().getId());
+        
+        // Check if we need to send email notification to customer when payment is aplied to invoice
+        PreferenceBL prefBL = new PreferenceBL();
+        try {
+            prefBL.set(payment.getBaseUser().getEntity().getId(), Constants.PREFERENCE_NOTIFY_APPLY_PAYMENT_TO_INVOICE);
+        } catch (EmptyResultDataAccessException e1) {
+            // no problem, I'll get the defaults
+        }       
+        
+        if (prefBL.getInt() == 1) {
+            sendNotification(dto, payment.getBaseUser().getEntity().getId());
+        } else {
+            LOG.debug("Not configured to send email notification when payment applied to invoice, company id " + payment.getBaseUser().getEntity().getId());
+        }
     }
 
     /**

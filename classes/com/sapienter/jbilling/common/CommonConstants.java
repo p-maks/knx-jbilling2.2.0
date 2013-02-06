@@ -142,6 +142,8 @@ public interface CommonConstants {
     public static Integer PREFERENCE_MEDIATION_JDBC_READER_LAST_ID = new Integer(47);
     public static Integer PREFERENCE_USE_PROVISIONING = new Integer(48);
     public static Integer PREFERENCE_AUTO_RECHARGE_THRESHOLD = new Integer(49);
+    // New Preference, send email notification to customer when payment is aplied to invoice
+    public static Integer PREFERENCE_NOTIFY_APPLY_PAYMENT_TO_INVOICE = new Integer(60);
 
     // order status, in synch with db
     public static final Integer ORDER_STATUS_ACTIVE = new Integer(1);
