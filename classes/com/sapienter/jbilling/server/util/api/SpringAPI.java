@@ -45,6 +45,7 @@ import com.sapienter.jbilling.server.util.RemoteContext;
 import com.sapienter.jbilling.server.util.ReportWS;
 import com.sapienter.jbilling.server.util.audit.db.EventLogDTO;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 public class SpringAPI implements JbillingAPI {
@@ -811,7 +812,7 @@ public class SpringAPI implements JbillingAPI {
     /**
      * Search all the payments by given search parameter for organisation.
      *
-     * @see JbillingAPI#searchPayments(java.lang.String) 
+     * @see JbillingAPI#searchPayments(java.lang.String)
      * @throws JbillingAPIException when internal error occurs
      */
     public PaymentWS[] searchPayments(String searchValue) throws JbillingAPIException {
@@ -821,14 +822,14 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
-    
+
     /**
-     * Search all the payments by given search parameter for organisation. 
+     * Search all the payments by given search parameter for organisation.
      *
-     * @see JbillingAPI#searchPaymentIds(java.lang.String) 
+     * @see JbillingAPI#searchPaymentIds(java.lang.String)
      * @throws JbillingAPIException when internal error occurs
      */
-    public Integer[] searchPaymentIds(String searchValue) throws JbillingAPIException{
+    public Integer[] searchPaymentIds(String searchValue) throws JbillingAPIException {
         try {
             return session.searchPaymentIds(searchValue);
         } catch (Exception e) {
@@ -1063,6 +1064,26 @@ public class SpringAPI implements JbillingAPI {
     public Integer createUpdateNofications(Integer messageId, MessageDTO dto) throws JbillingAPIException {
         try {
             return session.createUpdateNofications(messageId, dto);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    /**
+     *
+     * ------------------- PREFERENCES API EXTENSION --------------------------
+     */
+    public HashMap getEntityPreferences(Integer[] ids) throws JbillingAPIException {
+        try {
+            return session.getEntityPreferences(ids);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
+
+    public void setEntityPreferences(HashMap params) throws JbillingAPIException {
+        try {
+            session.setEntityPreferences(params);
         } catch (Exception e) {
             throw new JbillingAPIException(e);
         }

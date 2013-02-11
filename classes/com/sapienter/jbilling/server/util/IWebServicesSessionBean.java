@@ -42,6 +42,7 @@ import com.sapienter.jbilling.server.notification.MessageDTO;
 import com.sapienter.jbilling.server.user.CompanyWS;
 import com.sapienter.jbilling.server.util.audit.db.EventLogDTO;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -156,7 +157,7 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public Integer[] searchInvoiceIds(String searchValue) throws SessionInternalError;
-    
+
     /**
      * Search for Invoices by given string parameter.
      *
@@ -530,7 +531,7 @@ public interface IWebServicesSessionBean {
     public PaymentWS[] getUserPaymentsByDate(String since, String until, Integer userId) throws SessionInternalError;
 
     /**
-     * Search all the payments by given search parameter for organisation. 
+     * Search all the payments by given search parameter for organisation.
      *
      * @param searchValue the search parameter string
      *
@@ -539,9 +540,9 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public PaymentWS[] searchPayments(String searchValue) throws SessionInternalError;
-    
+
     /**
-     * Search all the payments by given search parameter for organisation. 
+     * Search all the payments by given search parameter for organisation.
      *
      * @param searchValue the search parameter string
      *
@@ -689,6 +690,29 @@ public interface IWebServicesSessionBean {
 
     /**
      *
+     * ------------------- PREFERENCES API EXTENSION --------------------------
+     */
+    /**
+     * Retrieves company preferences from given types ids.
+     *
+     * @param ids an array of the parameter type ids that will be looked up the
+     * company preferences.
+     * @return the entity parameters in "id - value" pairs. The value is of type
+     * String
+     * @throws SessionInternalError
+     */
+    public HashMap getEntityPreferences(Integer[] ids) throws SessionInternalError;
+
+    /**
+     * Creates or updates Preferences for company.
+     *
+     * @param params the parameters in "id - value" pairs
+     * @throws SessionInternalError
+     */
+    public void setEntityPreferences(HashMap params) throws SessionInternalError;
+
+    /**
+     *
      * ------------------- MISC API EXTENSION --------------------------
      */
     /**
@@ -727,7 +751,7 @@ public interface IWebServicesSessionBean {
     public Collection<OptionDTO> getSelectOption(String type) throws SessionInternalError;
 
     /**
-     * Generate age receivable report for organisation. 
+     * Generate age receivable report for organisation.
      *
      * @param since the starting date for the data extraction
      * @param until the ending date for the data extraction
@@ -735,7 +759,7 @@ public interface IWebServicesSessionBean {
      * @throws SessionInternalError
      */
     public List<ReportWS> getAgeReceivableReport(String since, String until) throws SessionInternalError;
-    
+
     /**
      * Utility method for importing invoices into JBilling.
      *

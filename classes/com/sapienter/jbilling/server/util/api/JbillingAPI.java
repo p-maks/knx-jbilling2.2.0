@@ -43,6 +43,7 @@ import com.sapienter.jbilling.server.util.OptionDTO;
 import com.sapienter.jbilling.server.util.ReportWS;
 import com.sapienter.jbilling.server.util.audit.db.EventLogDTO;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 public interface JbillingAPI {
@@ -423,9 +424,9 @@ public interface JbillingAPI {
      * @throws JbillingAPIException when internal error occurs
      */
     public PaymentWS[] searchPayments(String searchValue) throws JbillingAPIException;
-    
+
     /**
-     * Search all the payments by given search parameter for organisation. 
+     * Search all the payments by given search parameter for organisation.
      *
      * @param searchValue the search parameter string
      *
@@ -515,6 +516,14 @@ public interface JbillingAPI {
     public MessageDTO[] getNotificationMessages() throws JbillingAPIException;
 
     public Integer createUpdateNofications(Integer messageId, MessageDTO dto) throws JbillingAPIException;
+
+    /**
+     *
+     * ------------------- PREFERENCES API EXTENSION --------------------------
+     */
+    public HashMap getEntityPreferences(Integer[] ids) throws JbillingAPIException;
+
+    public void setEntityPreferences(HashMap params) throws JbillingAPIException;
 
     /**
      *

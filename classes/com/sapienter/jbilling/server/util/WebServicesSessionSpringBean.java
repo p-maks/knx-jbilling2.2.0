@@ -133,9 +133,10 @@ import com.sapienter.jbilling.server.util.db.CurrencyDAS;
 import com.sapienter.jbilling.server.util.db.CurrencyDTO;
 import java.io.File;
 import java.util.Collection;
+import java.util.HashMap;
 
-@Transactional( propagation = Propagation.REQUIRED)
-@WebService( endpointInterface = "com.sapienter.jbilling.server.util.IWebServicesSessionBean")
+@Transactional(propagation = Propagation.REQUIRED)
+@WebService(endpointInterface = "com.sapienter.jbilling.server.util.IWebServicesSessionBean")
 public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
     private static final Logger LOG = Logger.getLogger(WebServicesSessionSpringBean.class);
@@ -1859,7 +1860,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
             for (int f = 0; f < paymentIds.length; f++) {
                 bl.set(paymentIds[f]);
-                PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));                
+                PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));
                 payments[f] = payment;
             }
             return payments;
@@ -1894,7 +1895,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
             for (int f = 0; f < paymentIds.length; f++) {
                 bl.set(paymentIds[f]);
-                PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));                
+                PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));
                 payments[f] = payment;
             }
             return payments;
@@ -1928,7 +1929,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             int f = 0;
             while (paymentIds.next()) {
                 bl.set(paymentIds.getInt(1));
-                PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));                
+                PaymentWS payment = PaymentBL.getWS(bl.getDTOEx(languageId));
                 payments[f] = payment;
                 f++;
             }
@@ -1938,7 +1939,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
             throw new SessionInternalError("Error searching for Payments");
         }
     }
-    
+
     /**
      * Search all the payments by given search parameter for organisation. TODO:
      * This method is not secured or in a jUnit test
@@ -1960,7 +1961,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
 
             Integer[] payments = new Integer[paymentIds.size()];
             int f = 0;
-            while (paymentIds.next()) {                               
+            while (paymentIds.next()) {
                 payments[f] = paymentIds.getInt(1);
                 f++;
             }
@@ -2300,7 +2301,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
                     result.setAuthorized(false);
                     result.setQuantity(BigDecimal.ZERO);
                     result.setMessage(new String[]{"Error: "
-                                + e.getMessage()});
+                        + e.getMessage()});
 
                     return result;
                 }
@@ -2430,6 +2431,35 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         } else {
             return new NotificationBL(messageId).createUpdate(getCallerCompanyId(), dto);
         }
+    }
+
+    /**
+     *
+     * ------------------- PREFERENCES API EXTENSION --------------------------
+     */
+    /**
+     * Retrieves company preferences from given types ids.
+     *
+     * @param ids an array of the parameter type ids that will be looked up the
+     * company preferences.
+     * @return the entity parameters in "id - value" pairs. The value is of type
+     * String
+     * @throws SessionInternalError
+     */
+    public HashMap getEntityPreferences(Integer[] ids) throws SessionInternalError {
+        IUserSessionBean sess = (IUserSessionBean) Context.getBean(Context.Name.USER_SESSION);
+        return sess.getEntityParameters(getCallerCompanyId(), ids);
+    }
+
+    /**
+     * Creates or updates Preferences for company.
+     *
+     * @param params the parameters in "id - value" pairs
+     * @throws SessionInternalError
+     */
+    public void setEntityPreferences(HashMap params) throws SessionInternalError {
+        IUserSessionBean sess = (IUserSessionBean) Context.getBean(Context.Name.USER_SESSION);
+        sess.setEntityParameters(getCallerCompanyId(), params);
     }
 
     /**
