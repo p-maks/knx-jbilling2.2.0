@@ -2457,7 +2457,7 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
      * @param params the parameters in "id - value" pairs
      * @throws SessionInternalError
      */
-    public void setEntityPreferences(HashMap params) throws SessionInternalError {
+    public void createUpdateEntityPreferences(HashMap params) throws SessionInternalError {
         IUserSessionBean sess = (IUserSessionBean) Context.getBean(Context.Name.USER_SESSION);
         sess.setEntityParameters(getCallerCompanyId(), params);
     }

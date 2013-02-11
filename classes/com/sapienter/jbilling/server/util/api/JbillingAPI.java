@@ -523,7 +523,7 @@ public interface JbillingAPI {
      */
     public HashMap getEntityPreferences(Integer[] ids) throws JbillingAPIException;
 
-    public void setEntityPreferences(HashMap params) throws JbillingAPIException;
+    public void createUpdateEntityPreferences(HashMap params) throws JbillingAPIException;
 
     /**
      *

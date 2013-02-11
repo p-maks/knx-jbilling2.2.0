@@ -709,7 +709,7 @@ public interface IWebServicesSessionBean {
      * @param params the parameters in "id - value" pairs
      * @throws SessionInternalError
      */
-    public void setEntityPreferences(HashMap params) throws SessionInternalError;
+    public void createUpdateEntityPreferences(HashMap params) throws SessionInternalError;
 
     /**
      *

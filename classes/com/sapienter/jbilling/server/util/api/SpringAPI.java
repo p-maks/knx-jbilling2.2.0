@@ -1081,9 +1081,9 @@ public class SpringAPI implements JbillingAPI {
         }
     }
 
-    public void setEntityPreferences(HashMap params) throws JbillingAPIException {
+    public void createUpdateEntityPreferences(HashMap params) throws JbillingAPIException {
         try {
-            session.setEntityPreferences(params);
+            session.createUpdateEntityPreferences(params);
         } catch (Exception e) {
             throw new JbillingAPIException(e);
         }
