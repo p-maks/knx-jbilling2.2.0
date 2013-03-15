@@ -44,6 +44,7 @@ public class ReportWS implements Serializable {
     private BigDecimal balanceAsDecimal;
     private String currencySymbol;
     private Date createDateTime;
+    private int intValue;// free field to use with report
 
     /**
      *
@@ -65,6 +66,21 @@ public class ReportWS implements Serializable {
         this.currencySymbol = currencySymbol;
         this.createDateTime = createDateTime;
     }     
+    
+    public ReportWS(Integer id, String organizationName,
+            String lastName, String firstName, String username,
+            BigDecimal totalAsDecimal, BigDecimal balanceAsDecimal, String currencySymbol, Date createDateTime, int intValue) {
+        this.id = id;
+        this.organizationName = organizationName;
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.username = username;
+        this.totalAsDecimal = totalAsDecimal;
+        this.balanceAsDecimal = balanceAsDecimal;
+        this.currencySymbol = currencySymbol;
+        this.createDateTime = createDateTime;
+        this.intValue = intValue;
+    }  
     
     /**
      * @return the id
@@ -190,6 +206,14 @@ public class ReportWS implements Serializable {
      */
     public void setCreateDateTime(Date createDateTime) {
         this.createDateTime = createDateTime;
+    }
+    
+    public int getIntValue() {
+        return intValue;
+    }
+
+    public void setIntValue(int intValue) {
+        this.intValue = intValue;
     }
 
    

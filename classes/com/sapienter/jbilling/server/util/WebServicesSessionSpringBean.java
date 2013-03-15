@@ -2551,6 +2551,38 @@ public class WebServicesSessionSpringBean implements IWebServicesSessionBean {
         }
     }
 
+    
+    /**
+     * Generate payments report for organisation. TODO: This method is not
+     * secured or in a jUnit test
+     *
+     * @param since from date
+     * @param until to date
+     * @return a list of ReportWS
+     * @throws SessionInternalError
+     */
+    public List<ReportWS> getPaymentsReport(String since, String until) throws SessionInternalError {
+        Date dSince = null;
+        Date dUntil = null;
+        if (since == null || until == null) {
+            dSince = com.sapienter.jbilling.common.Util.parseDate(since);
+            dUntil = com.sapienter.jbilling.common.Util.parseDate(until);
+            return null;
+        }
+        
+        Integer entityId = getCallerCompanyId();
+
+        try {
+
+            PaymentBL paymentBl = new PaymentBL();
+            return paymentBl.getPaymentsReport(entityId, dSince, dUntil);
+        } catch (Exception e) { // can't remove because of the SQL Exception :(
+            LOG.error("WS - getPaymentsReport", e);
+            throw new SessionInternalError("Error generating Payments Report");
+        }
+    }
+
+    
     /**
      * Utility method for importing invoices into JBilling. TODO: This method is
      * not secured or in a jUnit test

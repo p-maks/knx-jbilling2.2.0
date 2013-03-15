@@ -577,6 +577,7 @@ public interface JbillingAPI {
      */
     public List<ReportWS> getAgeReceivableReport(String since, String until) throws JbillingAPIException;
 
+    public List<ReportWS> getPaymentsReport(String since, String until) throws JbillingAPIException;
     /**
      * Utility method for importing invoices into JBilling.
      *

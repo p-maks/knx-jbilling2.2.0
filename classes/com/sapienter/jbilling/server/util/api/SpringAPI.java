@@ -1165,6 +1165,14 @@ public class SpringAPI implements JbillingAPI {
             throw new JbillingAPIException(e);
         }
     }
+    
+    public List<ReportWS> getPaymentsReport(String since, String until) throws JbillingAPIException {
+        try {
+            return session.getPaymentsReport(since, until);
+        } catch (Exception e) {
+            throw new JbillingAPIException(e);
+        }
+    }
 
     /**
      * Utility method for importing invoices into JBilling.

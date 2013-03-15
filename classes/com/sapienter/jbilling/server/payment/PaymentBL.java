@@ -61,6 +61,7 @@ import com.sapienter.jbilling.server.user.partner.db.PartnerPayout;
 import com.sapienter.jbilling.server.util.Constants;
 import com.sapienter.jbilling.server.util.Context;
 import com.sapienter.jbilling.server.util.PreferenceBL;
+import com.sapienter.jbilling.server.util.ReportWS;
 import com.sapienter.jbilling.server.util.audit.EventLogger;
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -69,6 +70,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityNotFoundException;
@@ -901,15 +903,15 @@ public class PaymentBL extends ResultList implements PaymentSQL {
         // entered
         // it has to show as ok
         dto.setPaymentResult(new PaymentResultDAS().find(Constants.RESULT_OK));
-        
+
         // Check if we need to send email notification to customer when payment is aplied to invoice
         PreferenceBL prefBL = new PreferenceBL();
         try {
             prefBL.set(payment.getBaseUser().getEntity().getId(), Constants.PREFERENCE_NOTIFY_APPLY_PAYMENT_TO_INVOICE);
         } catch (EmptyResultDataAccessException e1) {
             // no problem, I'll get the defaults
-        }       
-        
+        }
+
         if (prefBL.getInt() == 1) {
             sendNotification(dto, payment.getBaseUser().getEntity().getId());
         } else {
@@ -1064,5 +1066,63 @@ public class PaymentBL extends ResultList implements PaymentSQL {
         execute();
         conn.close();
         return cachedResults;
+    }
+
+    /**
+     * Generate payments report.
+     *
+     * @param entityId organisation id
+     * @param since from date
+     * @param until to date
+     * @return
+     */
+    public List<ReportWS> getPaymentsReport(Integer entityId, Date since, Date until) throws SQLException, Exception {
+
+        String selectSql = "SELECT u.id, co.organization_name, co.last_name, "
+                + " co.first_name, u.user_name, SUM(p.amount), SUM(p.balance), "
+                + " c.symbol, p.payment_date, p.is_refund "
+                + " FROM payment p, base_user u, contact co, currency c "
+                + " WHERE p.user_id = u.id"
+                + " AND p.id not in (select payment_id from partner_payout where payment_id is not null) "
+                + " AND p.deleted = 0 "
+                + " AND p.is_preauth = 0 "
+                + " AND p.currency_id = c.id "
+                + " AND u.entity_id = ?"
+                + " AND co.user_id = u.id "
+                + " AND p.result_id <> " + Constants.PAYMENT_RESULT_FAILED;
+
+        // append dates if present
+        if (since != null && until != null) {
+            selectSql += " AND (p.payment_date >= ? AND p.payment_date <= ?)";
+        }
+        String groupSql = " GROUP BY u.id, DATE_FORMAT(p.payment_date, '%Y-%m'), p.is_refund "
+                + " ORDER BY p.payment_date ASC";
+
+        // full query
+        String sql = selectSql + groupSql;
+        prepareStatement(sql);
+        cachedResults.setInt(1, entityId.intValue());
+        if (since != null && until != null) {
+            cachedResults.setDate(2, new java.sql.Date(since.getTime()));
+            // add a day to include the until date
+            GregorianCalendar cal = new GregorianCalendar();
+            cal.setTime(until);
+            cal.add(GregorianCalendar.DAY_OF_MONTH, 1);
+            cachedResults.setDate(3, new java.sql.Date(cal.getTime().getTime()));
+        }
+
+        execute();
+        conn.close();
+
+        // get ids for return
+        List<ReportWS> list = new ArrayList();
+        while (cachedResults.next()) {
+            ReportWS record = new ReportWS(cachedResults.getInt(1), cachedResults.getString(2),
+                    cachedResults.getString(3), cachedResults.getString(4), cachedResults.getString(5),
+                    cachedResults.getBigDecimal(6), cachedResults.getBigDecimal(7), cachedResults.getString(8),
+                    new java.util.Date(cachedResults.getDate(9).getTime()));
+            list.add(record);
+        }
+        return list;
     }
 }
