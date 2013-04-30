@@ -156,11 +156,13 @@ public class InvoiceBL extends ResultList implements Serializable, InvoiceSQL {
             newInvoice.setDueDate(newInvoice.getBillingDate());
         }
         // ensure that there are only two decimals in the invoice
+        // Invoice does not get's involved in many calculations so might as well
+        // round to 2 decimal ponts BIGDECIMAL_SCALE_STR
         if (newInvoice.getTotal() != null) {
-            newInvoice.setTotal(newInvoice.getTotal().setScale(Constants.BIGDECIMAL_SCALE, Constants.BIGDECIMAL_ROUND));
+            newInvoice.setTotal(newInvoice.getTotal().setScale(Constants.BIGDECIMAL_SCALE_STR, Constants.BIGDECIMAL_ROUND));
         }
         if (newInvoice.getBalance() != null) {
-            newInvoice.setBalance(newInvoice.getBalance().setScale(Constants.BIGDECIMAL_SCALE, Constants.BIGDECIMAL_ROUND));
+            newInvoice.setBalance(newInvoice.getBalance().setScale(Constants.BIGDECIMAL_SCALE_STR, Constants.BIGDECIMAL_ROUND));
         }
 
         // create the invoice row

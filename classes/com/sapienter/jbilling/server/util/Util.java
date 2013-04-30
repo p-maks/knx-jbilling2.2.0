@@ -99,6 +99,8 @@ public class Util {
 
             NumberFormat format = NumberFormat.getNumberInstance(locale);
             ((DecimalFormat) format).applyPattern(bundle.getString("format.float"));
+            //Keep fixing rounding issue for BigDecimals
+            ((DecimalFormat) format).setRoundingMode(RoundingMode.UP);
 
             // now the symbol of the currency
             CurrencyBL currency = new CurrencyBL(currencyId);
