@@ -221,7 +221,7 @@ public interface InvoiceSQL {
             + "FROM invoice i, base_user bu, contact co "
             + " WHERE i.user_id = bu.id "
             + " AND bu.entity_id = ? "
-            + " AND bu.deleted = 0 "
+//            + " AND bu.deleted = 0 " allow search on deleted customer accounts
             + " AND i.is_review = 0 "
             + " AND i.deleted = 0 "
             + " AND co.user_id = bu.id "
